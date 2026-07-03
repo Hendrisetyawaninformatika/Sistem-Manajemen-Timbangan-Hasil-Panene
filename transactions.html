@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi - Sistem Manajemen Timbangan Hasil Panen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .page-header .header-icon {
+            font-size: 3rem;
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .table-container {
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .table-container .card-header {
+            border-bottom: none;
+            padding: 20px 24px;
+        }
+
+        .table-container .card-body {
+            padding: 0 24px 24px;
+        }
+
+        .transaction-code {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 8px 14px;
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+        }
+
+        .filter-section .btn-filter {
+            border-radius: 10px;
+            padding: 8px 24px;
+        }
+
+        .total-summary {
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            border-radius: 16px;
+            padding: 16px 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .total-summary .total-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .total-summary .total-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        body.dark-mode .filter-section {
+            background: #1a1f33;
+        }
+
+        body.dark-mode .filter-section .form-control,
+        body.dark-mode .filter-section .form-select {
+            background: #141824;
+            border-color: #2a2f45;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .page-header {
+            background: linear-gradient(135deg, #0a0e27, #1a1a3e);
+        }
+
+        .transaction-status {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .transaction-status.completed {
+            background: rgba(32, 201, 151, 0.15);
+            color: #20c997;
+        }
+
+        .transaction-status.pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+
+        .transaction-status.cancelled {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <div class="loader-text mt-3">Memuat Transaksi...</div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="fw-bold">
+                <i class="bi bi-scale"></i> Timbangan Panen
+            </h5>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="dashboard.html">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="farmers.html">
+                    <i class="bi bi-people"></i>
+                    <span>Data Petani</span>
+                </a>
+            </li>
+            <li>
+                <a href="products.html">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Jenis Hasil Panen</span>
+                </a>
+            </li>
+            <li>
+                <a href="transactions.html" class="active">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Transaksi</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.html">
+                    <i class="bi bi-file-text"></i>
+                    <span>Laporan</span>
+                </a>
+            </li>
+            <li class="mt-4">
+                <hr>
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right text-danger"></i>
+                    <span class="text-danger">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link" id="toggleSidebar">
+                            <i class="bi bi-list fs-4"></i>
+                        </button>
+                        <div class="d-none d-md-block">
+                            <span class="text-muted">Transaksi</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link" id="darkModeToggle">
+                            <i class="bi bi-moon fs-5"></i>
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                                    <span id="userInitial">A</span>
+                                </div>
+                                <span id="userNameDisplay" class="d-none d-md-inline">Admin</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Pengaturan</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" id="logoutDropdown"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="container-fluid mt-4">
+            <!-- Page Header -->
+            <div class="page-header" data-aos="fade-up">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="header-icon">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-1">Transaksi Penimbangan</h4>
+                                <p class="mb-0 opacity-75">Kelola semua transaksi penimbangan hasil panen</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <a href="transactions-create.html" class="btn btn-light">
+                            <i class="bi bi-plus-circle"></i> Transaksi Baru
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Container -->
+            <div id="alertContainer" class="mb-3"></div>
+
+            <!-- Filter Section -->
+            <div class="filter-section" data-aos="fade-up" data-aos-delay="50">
+                <form id="filterForm" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Petani</label>
+                        <select class="form-select" id="filter_farmer">
+                            <option value="">Semua Petani</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Produk</label>
+                        <select class="form-select" id="filter_product">
+                            <option value="">Semua Produk</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Dari Tanggal</label>
+                        <input type="date" class="form-control" id="filter_date_from">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Sampai Tanggal</label>
+                        <input type="date" class="form-control" id="filter_date_to">
+                    </div>
+                    <div class="col-md-2">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-filter w-100">
+                                <i class="bi bi-search"></i> Filter
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary btn-filter" id="resetFilter">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Total Summary -->
+            <div class="total-summary mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div>
+                    <span class="total-label">Total Pendapatan</span>
+                    <div class="total-value" id="totalTransactionsAmount">Rp 0</div>
+                </div>
+                <div>
+                    <span class="total-label">Total Transaksi</span>
+                    <div class="total-value" id="totalTransactionsCount">0</div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card border-0 shadow-sm table-container" data-aos="fade-up" data-aos-delay="150">
+                <div class="card-header bg-transparent d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="tableSearch" placeholder="Cari transaksi..." class="form-control">
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success btn-sm" onclick="exportTransactionsExcel()">
+                            <i class="bi bi-file-excel"></i> Excel
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="exportTransactionsPDF()">
+                            <i class="bi bi-file-pdf"></i> PDF
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshTable()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="transactionsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Kode</th>
+                                    <th>Petani</th>
+                                    <th>Produk</th>
+                                    <th>Berat Kotor</th>
+                                    <th>Berat Bersih</th>
+                                    <th>Total</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTableBody">
+                                <!-- Data akan dimuat oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
+       class="whatsapp-float" 
+       target="_blank"
+       title="Hubungi Admin via WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/transactions.js"></script>
+</body>
+</html>

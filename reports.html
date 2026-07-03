@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan - Sistem Manajemen Timbangan Hasil Panen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #dc3545, #b02a37);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .page-header .header-icon {
+            font-size: 3rem;
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 8px 14px;
+        }
+
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+        }
+
+        .filter-section .btn-filter {
+            border-radius: 10px;
+            padding: 8px 32px;
+        }
+
+        .report-container {
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .report-container .card-header {
+            border-bottom: none;
+            padding: 20px 24px;
+        }
+
+        .report-container .card-body {
+            padding: 24px;
+        }
+
+        .report-summary-card {
+            border-radius: 16px;
+            padding: 16px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .report-summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .report-summary-card .summary-icon {
+            font-size: 2rem;
+            opacity: 0.6;
+        }
+
+        .report-summary-card .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 16px;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .report-actions .btn {
+            border-radius: 10px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+        }
+
+        .top-product-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .top-product-item:last-child {
+            border-bottom: none;
+        }
+
+        .top-product-item .rank {
+            font-weight: 700;
+            color: #6c757d;
+            margin-right: 12px;
+        }
+
+        .top-product-item .product-name {
+            flex: 1;
+        }
+
+        .top-product-item .product-count {
+            font-weight: 600;
+        }
+
+        body.dark-mode .filter-section {
+            background: #1a1f33;
+        }
+
+        body.dark-mode .filter-section .form-control,
+        body.dark-mode .filter-section .form-select {
+            background: #141824;
+            border-color: #2a2f45;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .filter-section .form-control:focus,
+        body.dark-mode .filter-section .form-select:focus {
+            border-color: #dc3545;
+        }
+
+        body.dark-mode .page-header {
+            background: linear-gradient(135deg, #0a0e27, #1a1a3e);
+        }
+
+        body.dark-mode .top-product-item {
+            border-color: #2a2f45;
+        }
+
+        body.dark-mode .report-summary-card {
+            background: #141824 !important;
+        }
+
+        .report-loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .report-loading .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .empty-report {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-report i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 16px;
+        }
+
+        .empty-report h5 {
+            color: #6c757d;
+        }
+
+        .report-period {
+            font-size: 0.9rem;
+            color: #6c757d;
+            padding: 6px 16px;
+            background: #f8f9fa;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        body.dark-mode .report-period {
+            background: #1a1f33;
+            color: #8a8f9e;
+        }
+
+        @media print {
+            .sidebar, .top-navbar, .whatsapp-float, .filter-section, .report-actions, .no-print {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+            .report-container {
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .page-header {
+                background: #dc3545 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <div class="loader-text mt-3">Memuat Laporan...</div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="fw-bold">
+                <i class="bi bi-scale"></i> Timbangan Panen
+            </h5>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="dashboard.html">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="farmers.html">
+                    <i class="bi bi-people"></i>
+                    <span>Data Petani</span>
+                </a>
+            </li>
+            <li>
+                <a href="products.html">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Jenis Hasil Panen</span>
+                </a>
+            </li>
+            <li>
+                <a href="transactions.html">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Transaksi</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.html" class="active">
+                    <i class="bi bi-file-text"></i>
+                    <span>Laporan</span>
+                </a>
+            </li>
+            <li class="mt-4">
+                <hr>
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right text-danger"></i>
+                    <span class="text-danger">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar no-print">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link" id="toggleSidebar">
+                            <i class="bi bi-list fs-4"></i>
+                        </button>
+                        <div class="d-none d-md-block">
+                            <span class="text-muted">Laporan</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link" id="darkModeToggle">
+                            <i class="bi bi-moon fs-5"></i>
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                                    <span id="userInitial">A</span>
+                                </div>
+                                <span id="userNameDisplay" class="d-none d-md-inline">Admin</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Pengaturan</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" id="logoutDropdown"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="container-fluid mt-4">
+            <!-- Page Header -->
+            <div class="page-header" data-aos="fade-up">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="header-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-1">Laporan Transaksi</h4>
+                                <p class="mb-0 opacity-75">Analisis dan laporan transaksi penimbangan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Container -->
+            <div id="alertContainer" class="mb-3"></div>
+
+            <!-- Filter Section -->
+            <div class="filter-section" data-aos="fade-up" data-aos-delay="50">
+                <form id="reportForm" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Jenis Laporan</label>
+                        <select class="form-select" id="report_type">
+                            <option value="daily">Harian</option>
+                            <option value="weekly">Mingguan</option>
+                            <option value="monthly" selected>Bulanan</option>
+                            <option value="yearly">Tahunan</option>
+                            <option value="custom">Kustom</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Dari Tanggal</label>
+                        <input type="date" class="form-control" id="date_from">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Sampai Tanggal</label>
+                        <input type="date" class="form-control" id="date_to">
+                    </div>
+                    <div class="col-md-3">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger btn-filter w-100">
+                                <i class="bi bi-search"></i> Tampilkan
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary btn-filter" id="resetFilter">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Report Container -->
+            <div id="reportContainer">
+                <!-- Report akan di-render oleh JavaScript -->
+                <div class="report-loading">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Pilih periode dan klik Tampilkan untuk melihat laporan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
+       class="whatsapp-float" 
+       target="_blank"
+       title="Hubungi Admin via WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

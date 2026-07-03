@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Manajemen Timbangan Hasil Panen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0e27, #1a1a3e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(13, 110, 253, 0.1) 0%, transparent 70%);
+            animation: pulse-auth 8s ease-in-out infinite;
+        }
+
+        .auth-page::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(111, 66, 193, 0.08) 0%, transparent 70%);
+            animation: pulse-auth 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes pulse-auth {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .auth-card {
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            z-index: 1;
+            animation: slide-up 0.6s ease;
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-card .card-body {
+            padding: 40px;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo .logo-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 16px;
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .auth-logo h3 {
+            font-weight: 700;
+            color: #0a0e27;
+        }
+
+        .auth-logo p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .auth-card .form-control {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .auth-card .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+
+        .auth-card .input-group-text {
+            border-radius: 12px 0 0 12px;
+            background: transparent;
+            border: 2px solid #e9ecef;
+            border-right: none;
+            color: #6c757d;
+        }
+
+        .auth-card .input-group .form-control {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .auth-card .btn-login {
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            border: none;
+        }
+
+        .auth-card .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
+        }
+
+        .auth-card .btn-login:disabled {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-card .form-check-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .auth-card .auth-link {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-card .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .auth-card .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+        }
+
+        .auth-card .divider::before,
+        .auth-card .divider::after {
+            content: '';
+            flex: 1;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .auth-card .divider span {
+            padding: 0 16px;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .auth-card .toggle-password {
+            border-radius: 0 12px 12px 0;
+            border: 2px solid #e9ecef;
+            border-left: none;
+            background: transparent;
+            color: #6c757d;
+        }
+
+        .auth-card .toggle-password:hover {
+            background: #f8f9fa;
+        }
+
+        body.dark-mode .auth-card {
+            background: rgba(20, 24, 36, 0.95);
+        }
+
+        body.dark-mode .auth-logo h3 {
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .auth-card .form-control {
+            background: #1a1f33;
+            border-color: #2a2f45;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .auth-card .form-control:focus {
+            border-color: #0d6efd;
+        }
+
+        body.dark-mode .auth-card .input-group-text {
+            background: #1a1f33;
+            border-color: #2a2f45;
+            color: #8a8f9e;
+        }
+
+        body.dark-mode .auth-card .toggle-password {
+            background: #1a1f33;
+            border-color: #2a2f45;
+            color: #8a8f9e;
+        }
+
+        body.dark-mode .auth-card .divider::before,
+        body.dark-mode .auth-card .divider::after {
+            border-color: #2a2f45;
+        }
+
+        .auth-background-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .auth-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.05;
+        }
+
+        .auth-shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: #0d6efd;
+            top: -100px;
+            right: -100px;
+        }
+
+        .auth-shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: #6f42c1;
+            bottom: -50px;
+            left: -50px;
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <!-- Background Shapes -->
+    <div class="auth-background-shapes">
+        <div class="auth-shape"></div>
+        <div class="auth-shape"></div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <div class="loader-text mt-3">Memuat...</div>
+        </div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="auth-card">
+        <div class="card-body">
+            <div class="auth-logo">
+                <div class="logo-icon">
+                    <i class="bi bi-scale"></i>
+                </div>
+                <h3>Sistem Timbangan Panen</h3>
+                <p>Masuk untuk mengelola transaksi</p>
+            </div>
+
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               placeholder="admin@timbanganpanen.com" 
+                               value="admin@timbanganpanen.com"
+                               required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               placeholder="Masukkan password"
+                               value="admin123"
+                               required>
+                        <button class="btn toggle-password" type="button" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="remember">
+                        <label class="form-check-label" for="remember">Ingat saya</label>
+                    </div>
+                    <a href="#" class="auth-link small">Lupa password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary btn-login w-100">
+                    <i class="bi bi-box-arrow-in-right"></i> Masuk
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>atau</span>
+            </div>
+
+            <div class="text-center">
+                <p class="text-muted mb-0">
+                    Belum punya akun? <a href="register.html" class="auth-link">Daftar sekarang</a>
+                </p>
+                <a href="index.html" class="text-muted text-decoration-none small mt-2 d-inline-block">
+                    <i class="bi bi-arrow-left"></i> Kembali ke beranda
+                </a>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="mt-4 p-3 bg-light rounded-3">
+                <small class="text-muted d-block text-center">
+                    <i class="bi bi-info-circle"></i> Demo Account
+                </small>
+                <div class="d-flex justify-content-center gap-4 small">
+                    <span><strong>Email:</strong> admin@timbanganpanen.com</span>
+                    <span><strong>Password:</strong> admin123</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
+       class="whatsapp-float" 
+       target="_blank"
+       title="Hubungi Admin via WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

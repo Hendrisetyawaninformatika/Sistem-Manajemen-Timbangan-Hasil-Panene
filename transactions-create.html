@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi Baru - Sistem Manajemen Timbangan Hasil Panen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-card {
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .form-card .card-header {
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            color: white;
+            border: none;
+            padding: 20px 24px;
+        }
+
+        .form-card .card-header .header-icon {
+            font-size: 2rem;
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .form-card .card-body {
+            padding: 30px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 10px 16px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+        }
+
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .form-section {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #6f42c1;
+            margin-bottom: 16px;
+        }
+
+        .form-section-title i {
+            margin-right: 8px;
+        }
+
+        .btn-submit {
+            border-radius: 12px;
+            padding: 12px 40px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3);
+        }
+
+        .btn-submit:disabled {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-cancel {
+            border-radius: 12px;
+            padding: 12px 40px;
+            font-weight: 600;
+        }
+
+        .calculation-display {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .calculation-display .calc-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .calculation-display .calc-item:last-child {
+            border-bottom: none;
+        }
+
+        .calculation-display .calc-label {
+            color: #6c757d;
+        }
+
+        .calculation-display .calc-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .calculation-display .calc-value.total {
+            color: #6f42c1;
+            font-size: 1.3rem;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #1a1f33;
+            border-color: #2a2f45;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            border-color: #6f42c1;
+        }
+
+        body.dark-mode .form-label {
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .form-hint {
+            color: #8a8f9e;
+        }
+
+        body.dark-mode .form-section {
+            border-color: #2a2f45;
+        }
+
+        body.dark-mode .form-card .card-body {
+            background: #141824;
+        }
+
+        body.dark-mode .calculation-display {
+            background: #1a1f33;
+        }
+
+        body.dark-mode .calculation-display .calc-item {
+            border-color: #2a2f45;
+        }
+
+        body.dark-mode .calculation-display .calc-label {
+            color: #8a8f9e;
+        }
+
+        .weight-input-group .input-group-text {
+            border-radius: 12px 0 0 12px;
+            font-weight: 600;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-right: none;
+        }
+
+        .weight-input-group .form-control {
+            border-radius: 0 12px 12px 0;
+        }
+
+        body.dark-mode .weight-input-group .input-group-text {
+            background: #1a1f33;
+            border-color: #2a2f45;
+            color: #e4e6eb;
+        }
+
+        .transaction-code-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #6f42c1;
+            background: rgba(111, 66, 193, 0.1);
+            padding: 8px 16px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        body.dark-mode .transaction-code-display {
+            background: rgba(111, 66, 193, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <div class="loader-text mt-3">Memuat Form...</div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="fw-bold">
+                <i class="bi bi-scale"></i> Timbangan Panen
+            </h5>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="dashboard.html">
+                    <i class="bi bi-grid"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="farmers.html">
+                    <i class="bi bi-people"></i>
+                    <span>Data Petani</span>
+                </a>
+            </li>
+            <li>
+                <a href="products.html">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Jenis Hasil Panen</span>
+                </a>
+            </li>
+            <li>
+                <a href="transactions.html" class="active">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Transaksi</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.html">
+                    <i class="bi bi-file-text"></i>
+                    <span>Laporan</span>
+                </a>
+            </li>
+            <li class="mt-4">
+                <hr>
+                <a href="#" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right text-danger"></i>
+                    <span class="text-danger">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link" id="toggleSidebar">
+                            <i class="bi bi-list fs-4"></i>
+                        </button>
+                        <div class="d-none d-md-block">
+                            <span class="text-muted">Transaksi Baru</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-link" id="darkModeToggle">
+                            <i class="bi bi-moon fs-5"></i>
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                                    <span id="userInitial">A</span>
+                                </div>
+                                <span id="userNameDisplay" class="d-none d-md-inline">Admin</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Pengaturan</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" id="logoutDropdown"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="container-fluid mt-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Alert Container -->
+                    <div id="alertContainer" class="mb-3"></div>
+
+                    <!-- Form Card -->
+                    <div class="card border-0 shadow-sm form-card" data-aos="fade-up">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="header-icon">
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0">Transaksi Baru</h5>
+                                    <p class="mb-0 opacity-75 small">Isikan data transaksi penimbangan</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="transactionForm" novalidate>
+                                <!-- Kode Transaksi -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-tag"></i> Kode Transaksi
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="transaction-code-display" id="transactionCodeDisplay">
+                                            TRX20240101XXXXXX
+                                        </div>
+                                        <p class="text-muted small mt-2">Kode transaksi akan dibuat otomatis</p>
+                                    </div>
+                                </div>
+
+                                <!-- Data Transaksi -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-info-circle"></i> Data Transaksi
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="farmer_id" class="form-label">Petani <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="farmer_id" required>
+                                                <option value="">Pilih Petani</option>
+                                            </select>
+                                            <div class="invalid-feedback">Silakan pilih petani</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="product_id" class="form-label">Produk <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="product_id" required>
+                                                <option value="">Pilih Produk</option>
+                                            </select>
+                                            <div class="invalid-feedback">Silakan pilih produk</div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label for="transaction_date" class="form-label">Tanggal Transaksi <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="transaction_date" required>
+                                            <div class="invalid-feedback">Tanggal transaksi wajib diisi</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Berat -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-scale"></i> Data Penimbangan
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="gross_weight" class="form-label">Berat Kotor (kg) <span class="text-danger">*</span></label>
+                                            <div class="weight-input-group input-group">
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="gross_weight" 
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       step="0.01"
+                                                       required>
+                                                <span class="input-group-text">kg</span>
+                                            </div>
+                                            <div class="invalid-feedback">Berat kotor wajib diisi</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="tare_weight" class="form-label">Berat Tarra (kg)</label>
+                                            <div class="weight-input-group input-group">
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="tare_weight" 
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       step="0.01">
+                                                <span class="input-group-text">kg</span>
+                                            </div>
+                                            <div class="form-hint">Berat wadah (opsional, default 0)</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Harga -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-tag"></i> Harga
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-12">
+                                            <label for="price_per_kg" class="form-label">Harga per kg <span class="text-danger">*</span></label>
+                                            <div class="weight-input-group input-group">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       id="price_per_kg" 
+                                                       placeholder="0"
+                                                       min="0"
+                                                       step="100"
+                                                       required>
+                                                <span class="input-group-text">/kg</span>
+                                            </div>
+                                            <div class="invalid-feedback">Harga per kg wajib diisi</div>
+                                            <div class="form-hint">Harga akan otomatis terisi dari produk yang dipilih</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Catatan -->
+                                <div class="form-section">
+                                    <div class="form-section-title">
+                                        <i class="bi bi-pencil"></i> Catatan
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-12">
+                                            <label for="notes" class="form-label">Catatan Tambahan</label>
+                                            <textarea class="form-control" 
+                                                      id="notes" 
+                                                      rows="3" 
+                                                      placeholder="Masukkan catatan tambahan (opsional)"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex flex-wrap gap-3 justify-content-end mt-4">
+                                    <a href="transactions.html" class="btn btn-outline-secondary btn-cancel">
+                                        <i class="bi bi-arrow-left"></i> Kembali
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-submit">
+                                        <i class="bi bi-save"></i> Simpan Transaksi
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar - Perhitungan -->
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent">
+                            <h6 class="fw-bold mb-0"><i class="bi bi-calculator"></i> Ringkasan Perhitungan</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="calculation-display">
+                                <div class="calc-item">
+                                    <span class="calc-label">Berat Kotor</span>
+                                    <span class="calc-value" id="calcGrossWeight">0.00 kg</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-label">Berat Tarra</span>
+                                    <span class="calc-value" id="calcTareWeight">0.00 kg</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-label">Berat Bersih</span>
+                                    <span class="calc-value" id="calcNetWeight">0.00 kg</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-label">Harga per kg</span>
+                                    <span class="calc-value" id="calcPrice">Rp 0</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-label fw-bold">Total Pembayaran</span>
+                                    <span class="calc-value total" id="calcTotal">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <small>Perhitungan otomatis: <strong>Berat Bersih = Berat Kotor - Berat Tarra</strong></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Info -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold"><i class="bi bi-lightbulb"></i> Tips</h6>
+                            <ul class="text-muted small ps-3 mb-0">
+                                <li>Pastikan berat kotor lebih besar dari berat tarra</li>
+                                <li>Harga per kg akan otomatis terisi dari produk</li>
+                                <li>Kode transaksi akan dibuat otomatis</li>
+                                <li>Transaksi dapat dicetak setelah disimpan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
+       class="whatsapp-float" 
+       target="_blank"
+       title="Hubungi Admin via WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/transactions.js"></script>
+</body>
+</html>

@@ -1,0 +1,663 @@
+/* ============================================
+   CSS Variables & Root Settings
+   ============================================ */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --dark-color: #212529;
+    --light-color: #f8f9fa;
+    
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
+    --header-height: 64px;
+    
+    --transition-speed: 0.3s;
+    
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================================
+   Global Styles
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: #f0f2f5;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* ============================================
+   Loading Screen
+   ============================================ */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-container {
+    text-align: center;
+    color: white;
+}
+
+.loader {
+    width: 70px;
+    height: 70px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loader-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.loader-subtext {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+/* ============================================
+   Sidebar Styles
+   ============================================ */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, #0a0e27 0%, #1a1a3e 100%);
+    color: white;
+    transition: all var(--transition-speed) ease;
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-header {
+    padding: 20px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-header h5 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+
+.sidebar-header i {
+    font-size: 1.6rem;
+    color: #4fc3f7;
+}
+
+.sidebar.collapsed .sidebar-header h5,
+.sidebar.collapsed .sidebar-menu span {
+    display: none;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 4px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.65);
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    font-size: 0.95rem;
+}
+
+.sidebar-menu a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border-left-color: var(--primary-color);
+}
+
+.sidebar-menu a.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left-color: var(--primary-color);
+}
+
+.sidebar-menu a i {
+    font-size: 1.3rem;
+    width: 24px;
+    text-align: center;
+}
+
+.sidebar-menu hr {
+    border-color: rgba(255, 255, 255, 0.08);
+    margin: 16px 20px;
+}
+
+/* ============================================
+   Main Content Styles
+   ============================================ */
+.main-content {
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-speed) ease;
+    min-height: 100vh;
+}
+
+.main-content.expanded {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* ============================================
+   Top Navbar
+   ============================================ */
+.top-navbar {
+    background: white;
+    padding: 12px 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.top-navbar .btn-link {
+    color: var(--dark-color);
+    padding: 0;
+}
+
+.top-navbar .btn-link:hover {
+    color: var(--primary-color);
+}
+
+/* ============================================
+   Auth Pages
+   ============================================ */
+.auth-page {
+    background: linear-gradient(135deg, #e8f0fe 0%, #d4e4f7 100%);
+    min-height: 100vh;
+}
+
+.auth-card {
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    transition: transform 0.3s ease;
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+}
+
+.auth-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto;
+}
+
+.auth-icon i {
+    font-size: 2.2rem;
+}
+
+/* ============================================
+   Dashboard Cards
+   ============================================ */
+.stat-card {
+    border-radius: 16px;
+    padding: 4px 0;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+/* ============================================
+   Feature Cards (Landing Page)
+   ============================================ */
+.feature-card {
+    border-radius: 16px;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+.feature-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+
+/* ============================================
+   Hero Section
+   ============================================ */
+.hero-section {
+    padding: 80px 0;
+    background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(13, 110, 253, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca, #6f42c1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-image {
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    transition: transform 0.5s ease;
+}
+
+.hero-image:hover {
+    transform: scale(1.02) rotate(-1deg);
+}
+
+/* ============================================
+   Floating Icons Animation
+   ============================================ */
+.floating-icons {
+    position: relative;
+    height: 100px;
+    margin-bottom: 30px;
+}
+
+.icon-float {
+    position: absolute;
+    font-size: 2.5rem;
+    color: rgba(13, 110, 253, 0.3);
+    animation: float 4s ease-in-out infinite;
+}
+
+.icon-float:nth-child(1) {
+    left: 10%;
+    top: 0;
+    animation-delay: 0s;
+}
+
+.icon-float:nth-child(2) {
+    left: 35%;
+    top: 20%;
+    animation-delay: 1s;
+}
+
+.icon-float:nth-child(3) {
+    right: 35%;
+    top: 10%;
+    animation-delay: 2s;
+}
+
+.icon-float:nth-child(4) {
+    right: 10%;
+    top: 30%;
+    animation-delay: 3s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(10deg);
+    }
+}
+
+/* ============================================
+   WhatsApp Floating Button
+   ============================================ */
+.whatsapp-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: #25d366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    z-index: 999;
+    transition: all 0.3s ease;
+    animation: pulse-whatsapp 2s ease-in-out infinite;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1) rotate(-5deg);
+    color: white;
+    box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
+}
+
+@keyframes pulse-whatsapp {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6);
+    }
+}
+
+/* ============================================
+   Table Styles
+   ============================================ */
+.table-container {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 10px !important;
+    padding: 8px 16px !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15) !important;
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+body.dark-mode {
+    background-color: #0a0e1a;
+    color: #e4e6eb;
+}
+
+body.dark-mode .top-navbar {
+    background: #141824;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .top-navbar .btn-link {
+    color: #e4e6eb;
+}
+
+body.dark-mode .card {
+    background: #141824;
+    border-color: #2a2f45 !important;
+}
+
+body.dark-mode .card-header {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: #2a2f45;
+}
+
+body.dark-mode .table {
+    color: #e4e6eb;
+}
+
+body.dark-mode .table-light {
+    background: #1a1f33;
+    color: #e4e6eb;
+}
+
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+body.dark-mode .text-muted {
+    color: #8a8f9e !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .input-group-text {
+    background: #1a1f33;
+    border-color: #2a2f45;
+    color: #e4e6eb;
+}
+
+body.dark-mode .form-control:focus {
+    background: #1a1f33;
+    border-color: var(--primary-color);
+    color: #e4e6eb;
+}
+
+body.dark-mode .dropdown-menu {
+    background: #141824;
+    border-color: #2a2f45;
+}
+
+body.dark-mode .dropdown-item {
+    color: #e4e6eb;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background: #1a1f33;
+    color: white;
+}
+
+body.dark-mode .modal-content {
+    background: #141824;
+    border-color: #2a2f45;
+}
+
+body.dark-mode .modal-header {
+    border-color: #2a2f45;
+}
+
+body.dark-mode .close {
+    color: white;
+}
+
+body.dark-mode .bg-light {
+    background: #141824 !important;
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .main-content.expanded {
+        margin-left: 0;
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    .hero-section {
+        padding: 40px 0;
+    }
+    
+    .hero-section .display-3 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+    
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+    .sidebar,
+    .top-navbar,
+    .whatsapp-float,
+    .btn {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c7cd;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8afb6;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1a1f33;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #2a2f45;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #3a3f55;
+}
