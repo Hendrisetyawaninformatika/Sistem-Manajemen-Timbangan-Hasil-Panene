@@ -20,47 +20,30 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
-        /* ============================================
-           ROOT VARIABLES
-           ============================================ */
+        /* Sama seperti login.html */
         :root {
             --primary: #2e7d32;
             --primary-light: #4caf50;
             --primary-dark: #1b5e20;
             --primary-bg: #e8f5e9;
-            --primary-gradient: linear-gradient(135deg, #2e7d32, #43a047);
             --white: #ffffff;
-            --gray-50: #f8faf8;
-            --gray-100: #f0f5f0;
-            --gray-200: #e8ece8;
-            --gray-300: #d5ddd5;
-            --gray-400: #a8b8a8;
-            --gray-500: #7a8a7a;
-            --gray-600: #5a6a5a;
-            --gray-700: #3a4a3a;
-            --gray-800: #2a3a2a;
-            --gray-900: #1a2a1a;
-            --shadow-sm: 0 2px 16px rgba(46, 125, 50, 0.08);
-            --shadow-md: 0 8px 32px rgba(46, 125, 50, 0.12);
-            --shadow-lg: 0 16px 48px rgba(46, 125, 50, 0.16);
-            --radius-sm: 12px;
-            --radius-md: 20px;
-            --radius-lg: 28px;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --text-dark: #1a2a1a;
+            --text-muted: #6c757d;
         }
 
-        /* ============================================
-           RESET & BASE
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             min-height: 100dvh;
             background: linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 50%, #0a1a0a 100%);
@@ -72,16 +55,15 @@
             overflow: hidden;
         }
 
-        /* Animated Background */
         body::before {
             content: '';
             position: fixed;
             top: -50%;
             right: -30%;
-            width: 600px;
-            height: 600px;
+            width: 400px;
+            height: 400px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(46, 125, 50, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(46,125,50,0.08) 0%, transparent 70%);
             animation: pulseBg 8s ease-in-out infinite;
             pointer-events: none;
         }
@@ -91,10 +73,10 @@
             position: fixed;
             bottom: -30%;
             left: -20%;
-            width: 400px;
-            height: 400px;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(76, 175, 80, 0.06) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(76,175,80,0.06) 0%, transparent 70%);
             animation: pulseBg 10s ease-in-out infinite reverse;
             pointer-events: none;
         }
@@ -104,61 +86,14 @@
             50% { transform: scale(1.2); opacity: 1; }
         }
 
-        /* Floating Orbs */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            filter: blur(60px);
-            opacity: 0.3;
-            animation: floatOrb 20s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 300px;
-            height: 300px;
-            background: rgba(46, 125, 50, 0.15);
-            top: -100px;
-            right: -100px;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 200px;
-            height: 200px;
-            background: rgba(76, 175, 80, 0.1);
-            bottom: -50px;
-            left: -50px;
-            animation-delay: -7s;
-        }
-
-        .orb-3 {
-            width: 150px;
-            height: 150px;
-            background: rgba(139, 195, 74, 0.08);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -14s;
-        }
-
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -20px) scale(1.1); }
-            50% { transform: translate(-20px, 30px) scale(0.9); }
-            75% { transform: translate(20px, -30px) scale(1.05); }
-        }
-
-        /* ============================================
-           LOADING SCREEN
-           ============================================ */
+        /* Loading Screen */
         #loadingScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -179,24 +114,24 @@
         }
 
         .loader-icon {
-            font-size: 4rem;
+            font-size: 3.5rem;
             display: block;
             animation: bounceLoader 1.5s ease-in-out infinite;
         }
 
         @keyframes bounceLoader {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.1); }
+            50% { transform: translateY(-15px) scale(1.1); }
         }
 
         .loader {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.15);
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.15);
             border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 16px auto 0;
+            margin: 12px auto 0;
         }
 
         @keyframes spin {
@@ -204,24 +139,23 @@
         }
 
         .loader-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-top: 16px;
-            letter-spacing: 0.5px;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 12px;
         }
 
         .loader-subtext {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             opacity: 0.7;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .loader-progress {
-            width: 180px;
+            width: 150px;
             height: 3px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             border-radius: 10px;
-            margin: 20px auto 0;
+            margin: 16px auto 0;
             overflow: hidden;
         }
 
@@ -239,22 +173,20 @@
             100% { width: 100%; }
         }
 
-        /* ============================================
-           AUTH CARD - MOBILE FIRST
-           ============================================ */
+        /* Auth Card */
         .auth-card {
             width: 100%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.97);
+            max-width: 400px;
+            background: #ffffff;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 32px 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+            padding: 28px 24px;
             position: relative;
             z-index: 10;
-            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-height: 95vh;
             overflow-y: auto;
         }
@@ -268,14 +200,14 @@
         }
 
         .auth-card::-webkit-scrollbar-thumb {
-            background: var(--gray-300);
+            background: #d5ddd5;
             border-radius: 10px;
         }
 
         @keyframes slideUp {
             from { 
                 opacity: 0; 
-                transform: translateY(40px) scale(0.95); 
+                transform: translateY(30px) scale(0.95); 
             }
             to { 
                 opacity: 1; 
@@ -283,79 +215,65 @@
             }
         }
 
-        /* ============================================
-           LOGO SECTION
-           ============================================ */
+        /* Logo */
         .auth-logo {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .auth-logo .logo-icon {
-            width: 72px;
-            height: 72px;
-            border-radius: 22px;
-            background: var(--primary-gradient);
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: white;
-            margin-bottom: 16px;
-            box-shadow: 0 12px 32px rgba(46, 125, 50, 0.25);
+            margin-bottom: 12px;
+            box-shadow: 0 8px 24px rgba(46,125,50,0.2);
             animation: floatLogo 3s ease-in-out infinite;
-            transition: var(--transition);
-        }
-
-        .auth-logo .logo-icon:hover {
-            transform: scale(1.05);
         }
 
         @keyframes floatLogo {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(-2deg); }
+            50% { transform: translateY(-5px) rotate(-2deg); }
         }
 
         .auth-logo h3 {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--text-dark);
             letter-spacing: -0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .auth-logo p {
-            color: var(--gray-500);
-            font-size: 0.9rem;
-            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0;
         }
 
-        /* ============================================
-           FORM ELEMENTS
-           ============================================ */
+        /* Form */
         .form-label {
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--gray-700);
-            margin-bottom: 6px;
-        }
-
-        .form-label .required {
-            color: #dc3545;
-            margin-left: 2px;
+            margin-bottom: 4px;
         }
 
         .input-group {
-            border-radius: var(--radius-sm);
+            border-radius: 10px;
             overflow: hidden;
-            background: var(--gray-50);
-            border: 2px solid var(--gray-200);
-            transition: var(--transition);
+            background: var(--gray-100);
+            border: 2px solid var(--gray-300);
+            transition: all 0.3s ease;
         }
 
         .input-group:focus-within {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.1);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
         }
 
         .input-group.has-error {
@@ -363,23 +281,23 @@
         }
 
         .input-group.has-error:focus-within {
-            box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
         }
 
         .input-group-text {
             background: transparent;
             border: none;
-            color: var(--gray-400);
-            padding: 0 0 0 14px;
-            font-size: 1.1rem;
+            color: var(--gray-500);
+            padding: 0 0 0 12px;
+            font-size: 1rem;
         }
 
         .form-control {
             border: none;
             background: transparent;
-            padding: 12px 14px;
-            font-size: 0.95rem;
-            color: var(--gray-900);
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
             font-weight: 500;
             border-radius: 0;
         }
@@ -392,37 +310,33 @@
         .form-control::placeholder {
             color: var(--gray-400);
             font-weight: 400;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .form-control.is-invalid {
             background: transparent;
         }
 
-        .form-control.is-invalid:focus {
-            box-shadow: none;
-        }
-
         .toggle-password {
             background: transparent;
             border: none;
-            color: var(--gray-400);
-            padding: 0 14px 0 0;
+            color: var(--gray-500);
+            padding: 0 12px 0 0;
             cursor: pointer;
-            transition: var(--transition);
-            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
             display: flex;
             align-items: center;
         }
 
         .toggle-password:hover {
-            color: var(--gray-600);
+            color: var(--gray-700);
         }
 
         .invalid-feedback {
             font-size: 0.75rem;
             color: #dc3545;
-            margin-top: 4px;
+            margin-top: 3px;
             display: none;
         }
 
@@ -430,54 +344,52 @@
             display: block;
         }
 
-        /* ============================================
-           PASSWORD STRENGTH
-           ============================================ */
+        /* Password Strength */
         .password-strength-wrapper {
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
         .password-strength {
-            height: 4px;
-            border-radius: 4px;
-            background: var(--gray-200);
+            height: 3px;
+            border-radius: 3px;
+            background: var(--gray-300);
             overflow: hidden;
             position: relative;
         }
 
         .password-strength .strength-bar {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.4s ease, background-color 0.4s ease;
             width: 0%;
         }
 
         .strength-text {
-            font-size: 0.7rem;
-            margin-top: 4px;
+            font-size: 0.65rem;
+            margin-top: 3px;
             transition: color 0.3s ease;
             font-weight: 500;
+            color: var(--gray-600);
         }
 
-        /* ============================================
-           CHECKBOX
-           ============================================ */
+        /* Checkbox */
         .form-check {
             padding-left: 0;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 8px;
+            margin-top: 4px;
         }
 
         .form-check-input {
-            width: 18px;
-            height: 18px;
-            min-width: 18px;
-            border-radius: 6px;
-            border: 2px solid var(--gray-300);
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            border-radius: 4px;
+            border: 2px solid var(--gray-400);
             cursor: pointer;
-            margin-top: 1px;
-            transition: var(--transition);
+            margin-top: 2px;
+            transition: all 0.3s ease;
             flex-shrink: 0;
             appearance: none;
             -webkit-appearance: none;
@@ -496,17 +408,17 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 700;
         }
 
         .form-check-input:focus {
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
         }
 
         .form-check-label {
-            font-size: 0.85rem;
-            color: var(--gray-600);
+            font-size: 0.75rem;
+            color: var(--gray-700);
             line-height: 1.4;
             cursor: pointer;
         }
@@ -521,47 +433,28 @@
             text-decoration: underline;
         }
 
-        /* ============================================
-           BUTTON
-           ============================================ */
+        /* Button */
         .btn-register {
             width: 100%;
-            padding: 14px;
+            padding: 11px;
             border: none;
-            border-radius: var(--radius-sm);
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: white;
-            background: var(--primary-gradient);
-            transition: var(--transition);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
+            transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-top: 8px;
-        }
-
-        .btn-register::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .btn-register:hover::before {
-            left: 100%;
+            gap: 8px;
+            margin-top: 4px;
         }
 
         .btn-register:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(46, 125, 50, 0.3);
+            box-shadow: 0 6px 24px rgba(46,125,50,0.3);
         }
 
         .btn-register:active {
@@ -575,46 +468,42 @@
         }
 
         .btn-register .spinner-border {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-width: 2px;
         }
 
-        /* ============================================
-           DIVIDER
-           ============================================ */
+        /* Divider */
         .divider {
             display: flex;
             align-items: center;
-            margin: 24px 0;
+            margin: 18px 0;
         }
 
         .divider::before,
         .divider::after {
             content: '';
             flex: 1;
-            border-top: 1px solid var(--gray-200);
+            border-top: 1px solid var(--gray-300);
         }
 
         .divider span {
-            padding: 0 16px;
-            color: var(--gray-400);
-            font-size: 0.8rem;
+            padding: 0 14px;
+            color: var(--gray-500);
+            font-size: 0.75rem;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* ============================================
-           FOOTER LINKS
-           ============================================ */
+        /* Footer */
         .auth-footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .auth-footer p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--gray-600);
             margin-bottom: 0;
         }
@@ -631,70 +520,86 @@
 
         .auth-footer .back-link {
             display: inline-block;
-            margin-top: 8px;
-            color: var(--gray-400);
-            font-size: 0.8rem;
+            margin-top: 6px;
+            color: var(--gray-500);
+            font-size: 0.75rem;
             text-decoration: none;
-            transition: var(--transition);
+            transition: all 0.3s ease;
         }
 
         .auth-footer .back-link:hover {
-            color: var(--gray-600);
+            color: var(--gray-700);
         }
 
-        /* ============================================
-           ALERT
-           ============================================ */
+        /* Alert */
         #alertContainer {
-            margin-bottom: 16px;
-            min-height: 44px;
+            margin-bottom: 12px;
+            min-height: 38px;
         }
 
         .alert {
-            border-radius: var(--radius-sm);
-            padding: 10px 14px;
-            font-size: 0.85rem;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
             border: none;
             animation: slideDown 0.4s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #cce5ff;
+            color: #004085;
         }
 
         .alert i {
-            font-size: 1.1rem;
+            font-size: 1rem;
             flex-shrink: 0;
         }
 
         .alert .btn-close {
-            padding: 4px;
-            font-size: 0.7rem;
+            padding: 3px;
+            font-size: 0.6rem;
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-16px); }
+            from { opacity: 0; transform: translateY(-12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============================================
-           WHATSAPP FLOAT
-           ============================================ */
+        /* WhatsApp Float */
         .whatsapp-float {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 52px;
-            height: 52px;
+            bottom: 16px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
             background: #25d366;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+            font-size: 1.5rem;
+            box-shadow: 0 4px 16px rgba(37,211,102,0.3);
             z-index: 999;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             animation: pulseWA 2s ease-in-out infinite;
             text-decoration: none;
         }
@@ -702,102 +607,54 @@
         .whatsapp-float:hover {
             transform: scale(1.1) rotate(-5deg);
             color: white;
-            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.4);
+            box-shadow: 0 6px 24px rgba(37,211,102,0.4);
         }
 
         @keyframes pulseWA {
-            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3); }
-            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.5); }
+            0%, 100% { box-shadow: 0 4px 16px rgba(37,211,102,0.3); }
+            50% { box-shadow: 0 4px 32px rgba(37,211,102,0.5); }
         }
 
-        /* ============================================
-           SHAKE ANIMATION
-           ============================================ */
+        /* Shake */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-12px); }
-            40% { transform: translateX(12px); }
-            60% { transform: translateX(-8px); }
-            80% { transform: translateX(8px); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
         }
 
         .shake {
-            animation: shake 0.5s ease;
+            animation: shake 0.4s ease;
         }
 
-        /* ============================================
-           RESPONSIVE - MOBILE FIRST
-           ============================================ */
+        /* Responsive */
         @media (max-width: 480px) {
             body {
-                padding: 12px;
+                padding: 10px;
                 align-items: flex-start;
                 padding-top: 20px;
             }
 
             .auth-card {
-                padding: 24px 18px;
-                border-radius: 24px;
-                max-height: 92vh;
-            }
-
-            .auth-logo .logo-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-                border-radius: 18px;
-            }
-
-            .auth-logo h3 {
-                font-size: 1.3rem;
-            }
-
-            .auth-logo p {
-                font-size: 0.8rem;
-            }
-
-            .form-control {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-            }
-
-            .btn-register {
-                padding: 12px;
-                font-size: 0.9rem;
-            }
-
-            .whatsapp-float {
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-                bottom: 14px;
-                right: 14px;
-            }
-
-            .input-group-text {
-                font-size: 1rem;
-                padding-left: 12px;
-            }
-
-            .toggle-password {
-                padding-right: 12px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .auth-card {
-                padding: 18px 14px;
+                padding: 20px 16px;
+                border-radius: 16px;
+                max-height: 94vh;
             }
 
             .auth-logo .logo-icon {
                 width: 50px;
                 height: 50px;
-                font-size: 1.6rem;
+                font-size: 1.8rem;
+                border-radius: 14px;
             }
 
             .auth-logo h3 {
                 font-size: 1.1rem;
+            }
+
+            .auth-logo p {
+                font-size: 0.75rem;
             }
 
             .form-control {
@@ -805,123 +662,28 @@
                 font-size: 0.85rem;
             }
 
+            .form-label {
+                font-size: 0.75rem;
+            }
+
             .btn-register {
-                padding: 10px;
+                padding: 9px;
                 font-size: 0.85rem;
             }
-        }
 
-        /* ============================================
-           DARK MODE SUPPORT
-           ============================================ */
-        @media (prefers-color-scheme: dark) {
-            .auth-card {
-                background: rgba(20, 30, 20, 0.97);
-                border-color: rgba(255, 255, 255, 0.05);
-            }
-
-            .auth-logo h3 {
-                color: #e8f5e9;
-            }
-
-            .auth-logo p {
-                color: #8aaa8a;
-            }
-
-            .form-label {
-                color: #a5d6a7;
-            }
-
-            .input-group {
-                background: rgba(255, 255, 255, 0.05);
-                border-color: rgba(255, 255, 255, 0.08);
-            }
-
-            .form-control {
-                color: #e8f5e9;
-            }
-
-            .form-control::placeholder {
-                color: #5a7a5a;
-            }
-
-            .input-group-text {
-                color: #6a8a6a;
-            }
-
-            .toggle-password {
-                color: #6a8a6a;
-            }
-
-            .toggle-password:hover {
-                color: #8aaa8a;
-            }
-
-            .divider::before,
-            .divider::after {
-                border-color: rgba(255, 255, 255, 0.08);
-            }
-
-            .divider span {
-                color: #6a8a6a;
-            }
-
-            .auth-footer p {
-                color: #6a8a6a;
-            }
-
-            .auth-footer .back-link {
-                color: #5a7a5a;
-            }
-
-            .auth-footer .back-link:hover {
-                color: #8aaa8a;
-            }
-
-            .form-check-label {
-                color: #8aaa8a;
-            }
-
-            .password-strength {
-                background: rgba(255, 255, 255, 0.08);
-            }
-
-            .strength-text {
-                color: #6a8a6a;
-            }
-
-            .alert {
-                background: rgba(255, 255, 255, 0.05);
-                color: #e8f5e9;
-            }
-        }
-
-        /* ============================================
-           SAFE AREA PADDING (Notch phones)
-           ============================================ */
-        @supports (padding: max(0px)) {
-            .auth-card {
-                padding-left: max(24px, env(safe-area-inset-left));
-                padding-right: max(24px, env(safe-area-inset-right));
-            }
-
-            body {
-                padding-left: max(16px, env(safe-area-inset-left));
-                padding-right: max(16px, env(safe-area-inset-right));
+            .whatsapp-float {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                bottom: 12px;
+                right: 12px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Floating Orbs -->
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-
-    <!-- ============================================
-    LOADING SCREEN
-    ============================================ -->
+    <!-- Loading Screen -->
     <div id="loadingScreen">
         <div class="loader-container">
             <i class="bi bi-tree loader-icon"></i>
@@ -934,11 +696,8 @@
         </div>
     </div>
 
-    <!-- ============================================
-    AUTH CARD
-    ============================================ -->
+    <!-- Register Card -->
     <div class="auth-card" id="authCard">
-        <!-- Logo -->
         <div class="auth-logo">
             <div class="logo-icon">
                 <i class="bi bi-tree"></i>
@@ -947,13 +706,10 @@
             <p>Buat akun untuk memulai</p>
         </div>
 
-        <!-- Alert Container -->
         <div id="alertContainer"></div>
 
-        <!-- Form -->
         <form id="registerForm" novalidate>
-            <!-- Nama -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="name" class="form-label">
                     Nama Lengkap <span class="required">*</span>
                 </label>
@@ -969,8 +725,7 @@
                 <div class="invalid-feedback" id="nameFeedback">Nama lengkap wajib diisi</div>
             </div>
 
-            <!-- Email -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="email" class="form-label">
                     Email <span class="required">*</span>
                 </label>
@@ -985,8 +740,7 @@
                 <div class="invalid-feedback" id="emailFeedback">Email wajib diisi dengan format yang benar</div>
             </div>
 
-            <!-- Password -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="password" class="form-label">
                     Password <span class="required">*</span>
                 </label>
@@ -1006,13 +760,12 @@
                     <div class="password-strength">
                         <div class="strength-bar" id="strengthBar"></div>
                     </div>
-                    <div class="strength-text text-muted" id="strengthText">Ketik password untuk melihat kekuatan</div>
+                    <div class="strength-text" id="strengthText">Ketik password untuk melihat kekuatan</div>
                 </div>
                 <div class="invalid-feedback" id="passwordFeedback">Password minimal 6 karakter</div>
             </div>
 
-            <!-- Konfirmasi Password -->
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="password_confirmation" class="form-label">
                     Konfirmasi Password <span class="required">*</span>
                 </label>
@@ -1027,27 +780,23 @@
                 <div class="invalid-feedback" id="confirmFeedback">Konfirmasi password tidak cocok</div>
             </div>
 
-            <!-- Terms -->
-            <div class="mb-4 form-check">
+            <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="terms" required>
                 <label class="form-check-label" for="terms">
                     Saya setuju dengan <a href="#" class="auth-link">Syarat & Ketentuan</a>
                 </label>
-                <div class="invalid-feedback" id="termsFeedback">Harap setujui Syarat & Ketentuan</div>
             </div>
+            <div class="invalid-feedback" id="termsFeedback" style="display:none;font-size:0.7rem;color:#dc3545;margin-top:2px;">Harap setujui Syarat & Ketentuan</div>
 
-            <!-- Submit -->
             <button type="submit" class="btn-register" id="registerBtn">
                 <i class="bi bi-person-plus"></i> Daftar
             </button>
         </form>
 
-        <!-- Divider -->
         <div class="divider">
             <span>atau</span>
         </div>
 
-        <!-- Footer -->
         <div class="auth-footer">
             <p>
                 Sudah punya akun? <a href="login.html" class="auth-link">Masuk sekarang</a>
@@ -1058,40 +807,67 @@
         </div>
     </div>
 
-    <!-- ============================================
-    WHATSAPP FLOAT
-    ============================================ -->
+    <!-- WhatsApp Float -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
        class="whatsapp-float" 
-       target="_blank"
-       aria-label="Hubungi Admin via WhatsApp">
+       target="_blank">
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- ============================================
-    SCRIPTS
-    ============================================ -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/firebase-config.js"></script>
 
     <script>
         // ============================================
-        // 1. HIDE LOADING SCREEN
+        // 1. FIREBASE CONFIGURATION
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDi_zEip2snQx_TlCN--tcgm5WZLXgZq4Q",
+            authDomain: "manajement-petani.firebaseapp.com",
+            databaseURL: "https://manajement-petani-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "manajement-petani",
+            storageBucket: "manajement-petani.firebasestorage.app",
+            messagingSenderId: "795537405486",
+            appId: "1:795537405486:web:7819bc9ac5da03d352d1bf",
+            measurementId: "G-QCW5W6FVCP"
+        };
+
+        // ============================================
+        // 2. INITIALIZE FIREBASE
+        // ============================================
+        let auth = null;
+        let db = null;
+        let firebaseReady = false;
+
+        try {
+            if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                firebaseReady = true;
+                console.log('✅ Firebase initialized successfully!');
+                console.log('🔥 Project: manajement-petani');
+            } else {
+                console.warn('⚠️ Firebase already initialized or SDK not loaded');
+            }
+        } catch (error) {
+            console.warn('⚠️ Firebase initialization failed:', error.message);
+            console.log('💡 Using demo mode (LocalStorage)');
+        }
+
+        // ============================================
+        // 3. HIDE LOADING SCREEN
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.classList.add('hidden');
-                    setTimeout(function() {
-                        loadingScreen.style.display = 'none';
-                    }, 600);
-                }
-            }, 1000);
+            setTimeout(hideLoading, 500);
         });
 
-        setTimeout(function() {
+        setTimeout(hideLoading, 1500);
+        setTimeout(hideLoading, 3000);
+        setTimeout(hideLoading, 5000);
+
+        function hideLoading() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
                 loadingScreen.classList.add('hidden');
@@ -1099,10 +875,10 @@
                     loadingScreen.style.display = 'none';
                 }, 600);
             }
-        }, 3000);
+        }
 
         // ============================================
-        // 2. TOGGLE PASSWORD
+        // 4. TOGGLE PASSWORD
         // ============================================
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
@@ -1120,7 +896,7 @@
         });
 
         // ============================================
-        // 3. PASSWORD STRENGTH
+        // 5. PASSWORD STRENGTH
         // ============================================
         document.getElementById('password').addEventListener('input', function() {
             const password = this.value;
@@ -1152,9 +928,8 @@
         });
 
         // ============================================
-        // 4. REAL-TIME VALIDATION
+        // 6. REAL-TIME VALIDATION
         // ============================================
-        // Password confirmation match
         document.getElementById('password_confirmation').addEventListener('input', function() {
             const password = document.getElementById('password').value;
             const confirm = this.value;
@@ -1178,10 +953,17 @@
         });
 
         // ============================================
-        // 5. SHOW ALERT FUNCTION
+        // 7. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
+            
+            const alertClass = {
+                success: 'alert-success',
+                danger: 'alert-danger',
+                warning: 'alert-warning',
+                info: 'alert-info'
+            };
             
             const icons = {
                 success: 'bi-check-circle-fill',
@@ -1190,18 +972,11 @@
                 info: 'bi-info-circle-fill'
             };
             
-            const colors = {
-                success: '#d4edda',
-                danger: '#f8d7da',
-                warning: '#fff3cd',
-                info: '#cce5ff'
-            };
-            
             container.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" style="background: ${colors[type]}; border-radius: 12px; padding: 10px 14px;">
-                    <i class="bi ${icons[type] || 'bi-info-circle-fill'}"></i>
+                <div class="alert ${alertClass[type]} alert-dismissible fade show" style="border-radius: 10px; padding: 8px 12px; font-size: 0.8rem;">
+                    <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-1"></i>
                     <span style="flex:1;">${message}</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding:4px;"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding:3px;"></button>
                 </div>
             `;
             
@@ -1214,11 +989,11 @@
                         if (alert.parentNode) alert.remove();
                     }, 500);
                 }
-            }, 5000);
+            }, 4000);
         }
 
         // ============================================
-        // 6. REGISTER HANDLER
+        // 8. REGISTER HANDLER - SIMPAN KE LOCALSTORAGE
         // ============================================
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1230,6 +1005,7 @@
             document.querySelectorAll('.invalid-feedback').forEach(el => {
                 el.classList.remove('show');
             });
+            document.getElementById('termsFeedback').style.display = 'none';
 
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -1266,7 +1042,7 @@
 
             if (!terms) {
                 document.getElementById('terms').classList.add('is-invalid');
-                document.getElementById('termsFeedback').classList.add('show');
+                document.getElementById('termsFeedback').style.display = 'block';
                 hasError = true;
             }
 
@@ -1275,7 +1051,7 @@
                 document.getElementById('authCard').classList.add('shake');
                 setTimeout(() => {
                     document.getElementById('authCard').classList.remove('shake');
-                }, 500);
+                }, 400);
                 return;
             }
 
@@ -1288,46 +1064,94 @@
             `;
             registerBtn.disabled = true;
 
-            // ========== SIMPAN KE LOCALSTORAGE (Demo Mode) ==========
-            setTimeout(() => {
-                const userData = {
-                    id: 'user_' + Date.now(),
-                    name: name,
-                    email: email,
-                    role: 'admin',
-                    createdAt: new Date().toISOString()
-                };
+            // ==========================================
+            // SIMPAN KE LOCALSTORAGE (PRIORITAS)
+            // ==========================================
+            const userData = {
+                id: 'user_' + Date.now(),
+                name: name,
+                email: email,
+                password: password, // Simpan password untuk login nanti
+                role: 'admin',
+                createdAt: new Date().toISOString()
+            };
 
-                // Simpan ke localStorage
+            try {
                 let users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // Cek apakah email sudah terdaftar
+                const existingUser = users.find(u => u.email === email);
+                if (existingUser) {
+                    showAlert('❌ Email sudah terdaftar! Silakan login.', 'danger');
+                    registerBtn.innerHTML = originalText;
+                    registerBtn.disabled = false;
+                    return;
+                }
+                
                 users.push(userData);
                 localStorage.setItem('users', JSON.stringify(users));
+                console.log('✅ User saved to LocalStorage:', userData);
+            } catch (e) {
+                console.error('LocalStorage error:', e);
+            }
 
-                // Simpan session
-                sessionStorage.setItem('user', JSON.stringify(userData));
+            // ==========================================
+            // JUGA COBA REGISTRASI KE FIREBASE (jika tersedia)
+            // ==========================================
+            if (firebaseReady && auth) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(async (userCredential) => {
+                        const user = userCredential.user;
+                        await user.updateProfile({ displayName: name });
+                        
+                        try {
+                            if (db) {
+                                await db.collection('users').doc(user.uid).set({
+                                    name: name,
+                                    email: email,
+                                    role: 'admin',
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                            }
+                        } catch (e) {
+                            console.log('Firestore not available');
+                        }
+                        console.log('✅ User registered to Firebase too!');
+                    })
+                    .catch((error) => {
+                        console.log('Firebase registration skipped or failed:', error.message);
+                    });
+            }
 
-                showAlert('✅ Registrasi berhasil! Selamat datang, ' + name + '!', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
+            // ==========================================
+            // AUTO LOGIN SETELAH REGISTRASI
+            // ==========================================
+            sessionStorage.setItem('user', JSON.stringify({
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                role: 'admin'
+            }));
+
+            showAlert('✅ Registrasi berhasil! Selamat datang, ' + name + '!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
             }, 1500);
         });
 
         // ============================================
-        // 7. CHECK IF ALREADY LOGGED IN
+        // 9. CHECK IF ALREADY LOGGED IN
         // ============================================
         try {
-            const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+            const user = sessionStorage.getItem('user');
             if (user) {
                 window.location.href = 'dashboard.html';
             }
-        } catch (e) {
-            // Silent fail
-        }
+        } catch (e) {}
 
         // ============================================
-        // 8. KEYBOARD SUPPORT
+        // 10. KEYBOARD SUPPORT
         // ============================================
         document.getElementById('password_confirmation').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -1336,11 +1160,12 @@
         });
 
         // ============================================
-        // 9. LOG
+        // 11. LOG
         // ============================================
-        console.log('%c🌿 Timbangan Panen - Registrasi', 'color: #2e7d32; font-size: 18px; font-weight: bold;');
-        console.log('%c📱 Mobile First - Desain Premium', 'color: #4caf50;');
-        console.log('%c💡 Mode: Demo (LocalStorage)', 'color: #6a8a6a;');
+        console.log('%c🌿 Timbangan Panen - Registrasi', 'color: #2e7d32; font-size: 16px; font-weight: bold;');
+        console.log('%c🔥 Mode: Firebase + LocalStorage ✅', 'color: #4caf50;');
+        console.log('%c✅ Data tersimpan di LocalStorage untuk login', 'color: #4caf50;');
+        console.log('%c📁 Project: manajement-petani', 'color: #6c757d;');
     </script>
 
 </body>

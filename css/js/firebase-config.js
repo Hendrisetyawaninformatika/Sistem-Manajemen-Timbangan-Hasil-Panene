@@ -14,345 +14,190 @@ const firebaseConfig = {
   measurementId: "G-QCW5W6FVCP"
 };
 
+
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
-// Initialize Firestore
-const db = firebase.firestore();
-
-// Initialize Auth
+const database = firebase.database();
 const auth = firebase.auth();
 
 // ============================================
-// DATABASE HELPER FUNCTIONS
+// CRUD HELPERS FOR REALTIME DATABASE
 // ============================================
 
 const FireDB = {
     // ==========================================
-    // USERS COLLECTION
-    // ==========================================
-    users: {
-        async getAll() {
-            const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        },
-        
-        async getById(id) {
-            const doc = await db.collection('users').doc(id).get();
-            if (!doc.exists) return null;
-            return { id: doc.id, ...doc.data() };
-        },
-        
-        async create(data) {
-            const docRef = await db.collection('users').add({
-                ...data,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            const doc = await docRef.get();
-            return { id: docRef.id, ...doc.data() };
-        },
-        
-        async update(id, data) {
-            await db.collection('users').doc(id).update({
-                ...data,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            return this.getById(id);
-        },
-        
-        async delete(id) {
-            await db.collection('users').doc(id).delete();
-            return true;
-        },
-        
-        async findByEmail(email) {
-            const snapshot = await db.collection('users')
-                .where('email', '==', email)
-                .limit(1)
-                .get();
-            if (snapshot.empty) return null;
-            const doc = snapshot.docs[0];
-            return { id: doc.id, ...doc.data() };
-        }
-    },
-
-    // ==========================================
-    // FARMERS COLLECTION
+    // FARMERS CRUD
     // ==========================================
     farmers: {
         async getAll() {
-            const snapshot = await db.collection('farmers')
-                .orderBy('createdAt', 'desc')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        },
-        
-        async getActive() {
-            const snapshot = await db.collection('farmers')
-                .where('isActive', '==', true)
-                .orderBy('name')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const snapshot = await database.ref('farmers').once('value');
+            const data = snapshot.val();
+            if (!data) return [];
+            return Object.keys(data).map(key => ({ id: key, ...data[key] }));
         },
         
         async getById(id) {
-            const doc = await db.collection('farmers').doc(id).get();
-            if (!doc.exists) return null;
-            return { id: doc.id, ...doc.data() };
+            const snapshot = await database.ref(`farmers/${id}`).once('value');
+            const data = snapshot.val();
+            if (!data) return null;
+            return { id, ...data };
         },
         
         async create(data) {
-            const docRef = await db.collection('farmers').add({
+            const newRef = database.ref('farmers').push();
+            await newRef.set({
                 ...data,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: firebase.database.ServerValue.TIMESTAMP
             });
-            const doc = await docRef.get();
-            return { id: docRef.id, ...doc.data() };
+            const snapshot = await newRef.once('value');
+            return { id: newRef.key, ...snapshot.val() };
         },
         
         async update(id, data) {
-            await db.collection('farmers').doc(id).update({
+            await database.ref(`farmers/${id}`).update({
                 ...data,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
             });
             return this.getById(id);
         },
         
         async delete(id) {
-            await db.collection('farmers').doc(id).delete();
+            await database.ref(`farmers/${id}`).remove();
             return true;
-        },
-        
-        async search(query) {
-            const snapshot = await db.collection('farmers')
-                .where('name', '>=', query)
-                .where('name', '<=', query + '\uf8ff')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
     },
 
     // ==========================================
-    // PRODUCTS COLLECTION
+    // PRODUCTS CRUD
     // ==========================================
     products: {
         async getAll() {
-            const snapshot = await db.collection('products')
-                .orderBy('createdAt', 'desc')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        },
-        
-        async getActive() {
-            const snapshot = await db.collection('products')
-                .where('isActive', '==', true)
-                .orderBy('name')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const snapshot = await database.ref('products').once('value');
+            const data = snapshot.val();
+            if (!data) return [];
+            return Object.keys(data).map(key => ({ id: key, ...data[key] }));
         },
         
         async getById(id) {
-            const doc = await db.collection('products').doc(id).get();
-            if (!doc.exists) return null;
-            return { id: doc.id, ...doc.data() };
+            const snapshot = await database.ref(`products/${id}`).once('value');
+            const data = snapshot.val();
+            if (!data) return null;
+            return { id, ...data };
         },
         
         async create(data) {
-            const docRef = await db.collection('products').add({
+            const newRef = database.ref('products').push();
+            await newRef.set({
                 ...data,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: firebase.database.ServerValue.TIMESTAMP
             });
-            const doc = await docRef.get();
-            return { id: docRef.id, ...doc.data() };
+            const snapshot = await newRef.once('value');
+            return { id: newRef.key, ...snapshot.val() };
         },
         
         async update(id, data) {
-            await db.collection('products').doc(id).update({
+            await database.ref(`products/${id}`).update({
                 ...data,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
             });
             return this.getById(id);
         },
         
         async delete(id) {
-            await db.collection('products').doc(id).delete();
+            await database.ref(`products/${id}`).remove();
             return true;
         }
     },
 
     // ==========================================
-    // TRANSACTIONS COLLECTION
+    // TRANSACTIONS CRUD
     // ==========================================
     transactions: {
         async getAll() {
-            const snapshot = await db.collection('transactions')
-                .orderBy('createdAt', 'desc')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const snapshot = await database.ref('transactions').once('value');
+            const data = snapshot.val();
+            if (!data) return [];
+            return Object.keys(data).map(key => ({ id: key, ...data[key] }));
         },
         
         async getById(id) {
-            const doc = await db.collection('transactions').doc(id).get();
-            if (!doc.exists) return null;
-            return { id: doc.id, ...doc.data() };
+            const snapshot = await database.ref(`transactions/${id}`).once('value');
+            const data = snapshot.val();
+            if (!data) return null;
+            return { id, ...data };
         },
         
         async create(data) {
-            const docRef = await db.collection('transactions').add({
+            const newRef = database.ref('transactions').push();
+            await newRef.set({
                 ...data,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: firebase.database.ServerValue.TIMESTAMP
             });
-            const doc = await docRef.get();
-            return { id: docRef.id, ...doc.data() };
+            const snapshot = await newRef.once('value');
+            return { id: newRef.key, ...snapshot.val() };
         },
         
         async update(id, data) {
-            await db.collection('transactions').doc(id).update({
+            await database.ref(`transactions/${id}`).update({
                 ...data,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
             });
             return this.getById(id);
         },
         
         async delete(id) {
-            await db.collection('transactions').doc(id).delete();
+            await database.ref(`transactions/${id}`).remove();
             return true;
         },
         
         async getByDateRange(startDate, endDate) {
-            const snapshot = await db.collection('transactions')
-                .where('transactionDate', '>=', startDate)
-                .where('transactionDate', '<=', endDate)
-                .orderBy('transactionDate', 'desc')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        },
-        
-        async getDaily(date) {
-            const snapshot = await db.collection('transactions')
-                .where('transactionDate', '==', date)
-                .orderBy('createdAt', 'desc')
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        },
-        
-        async getMonthly(month, year) {
-            const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-            const endDate = `${year}-${String(month).padStart(2, '0')}-31`;
-            return this.getByDateRange(startDate, endDate);
-        },
-        
-        async getYearly(year) {
-            const startDate = `${year}-01-01`;
-            const endDate = `${year}-12-31`;
-            return this.getByDateRange(startDate, endDate);
+            const all = await this.getAll();
+            return all.filter(t => t.date >= startDate && t.date <= endDate);
         }
     },
 
     // ==========================================
-    // SETTINGS COLLECTION
+    // USERS CRUD
     // ==========================================
-    settings: {
+    users: {
         async getAll() {
-            const snapshot = await db.collection('settings').get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const snapshot = await database.ref('users').once('value');
+            const data = snapshot.val();
+            if (!data) return [];
+            return Object.keys(data).map(key => ({ id: key, ...data[key] }));
         },
         
-        async getByKey(key) {
-            const snapshot = await db.collection('settings')
-                .where('key', '==', key)
-                .limit(1)
-                .get();
-            if (snapshot.empty) return null;
-            const doc = snapshot.docs[0];
-            return { id: doc.id, ...doc.data() };
+        async getById(id) {
+            const snapshot = await database.ref(`users/${id}`).once('value');
+            const data = snapshot.val();
+            if (!data) return null;
+            return { id, ...data };
         },
         
-        async set(key, value, description = null) {
-            const existing = await this.getByKey(key);
-            if (existing) {
-                await db.collection('settings').doc(existing.id).update({
-                    value,
-                    description,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                return this.getByKey(key);
-            } else {
-                const docRef = await db.collection('settings').add({
-                    key,
-                    value,
-                    description,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                const doc = await docRef.get();
-                return { id: docRef.id, ...doc.data() };
-            }
+        async create(data) {
+            const newRef = database.ref('users').push();
+            await newRef.set({
+                ...data,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            });
+            const snapshot = await newRef.once('value');
+            return { id: newRef.key, ...snapshot.val() };
+        },
+        
+        async findByEmail(email) {
+            const all = await this.getAll();
+            return all.find(u => u.email === email) || null;
         }
     }
 };
 
-// Make FireDB available globally
+// Make available globally
 window.FireDB = FireDB;
+window.database = database;
 window.auth = auth;
-window.db = db;
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
-// Generate UUID
-function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-window.generateUUID = generateUUID;
-
-// Format currency
-function formatCurrency(amount) {
-    if (amount === undefined || amount === null) return 'Rp 0';
-    return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
-}
-window.formatCurrency = formatCurrency;
-
-// Format date
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    });
-}
-window.formatDate = formatDate;
-
-// Format datetime
-function formatDateTime(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-window.formatDateTime = formatDateTime;
-
-// Generate transaction code
-function generateTransactionCode() {
-    const prefix = 'TRX';
-    const date = new Date();
-    const dateStr = date.getFullYear() +
-        String(date.getMonth() + 1).padStart(2, '0') +
-        String(date.getDate()).padStart(2, '0');
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return prefix + dateStr + random;
-}
-window.generateTransactionCode = generateTransactionCode;
-
-console.log('✅ Firebase connected successfully!');
-console.log('🔥 Firestore database ready!');
+console.log('✅ Firebase Realtime Database connected!');
+console.log('🔥 Project: manajement-petani');

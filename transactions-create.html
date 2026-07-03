@@ -13,8 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- AOS Animation -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     
     <style>
         :root {
@@ -22,21 +20,16 @@
             --primary-light: #4caf50;
             --primary-dark: #1b5e20;
             --primary-bg: #e8f5e9;
-            --primary-gradient: linear-gradient(135deg, #2e7d32, #43a047);
             --white: #ffffff;
             --gray-50: #f8faf8;
-            --gray-100: #f0f5f0;
             --gray-200: #e8ece8;
             --gray-300: #d5ddd5;
-            --gray-400: #a8b8a8;
             --gray-500: #7a8a7a;
             --gray-600: #5a6a5a;
             --gray-700: #3a4a3a;
-            --gray-800: #2a3a2a;
             --gray-900: #1a2a1a;
             --shadow-sm: 0 2px 12px rgba(46, 125, 50, 0.08);
             --shadow-md: 0 8px 32px rgba(46, 125, 50, 0.12);
-            --shadow-lg: 0 16px 48px rgba(46, 125, 50, 0.16);
             --radius: 20px;
             --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -52,7 +45,7 @@
         #loadingScreen {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             display: flex; justify-content: center; align-items: center;
             z-index: 99999;
             transition: opacity 0.8s ease, visibility 0.8s ease;
@@ -150,7 +143,7 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 0.8rem;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             color: white;
             transition: var(--transition);
         }
@@ -164,8 +157,10 @@
             box-shadow: var(--shadow-sm);
         }
         .form-card .card-header {
-            background: var(--primary-gradient);
-            color: white; border: none; padding: 20px 24px;
+            background: linear-gradient(135deg, #2e7d32, #43a047);
+            color: white;
+            border: none;
+            padding: 20px 24px;
         }
         .form-card .card-header .header-icon {
             font-size: 2rem;
@@ -180,7 +175,7 @@
         /* Form Elements */
         .form-control, .form-select {
             border-radius: 12px; padding: 10px 16px;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--gray-300);
             transition: all 0.3s ease;
         }
         .form-control:focus, .form-select:focus {
@@ -192,12 +187,14 @@
         .form-hint { font-size: 0.8rem; color: var(--gray-500); margin-top: 4px; }
         .form-section {
             border-bottom: 1px solid var(--gray-200);
-            padding-bottom: 20px; margin-bottom: 20px;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
         }
         .form-section:last-child { border-bottom: none; margin-bottom: 0; }
         .form-section-title {
             font-size: 0.9rem; font-weight: 700;
-            color: var(--primary); margin-bottom: 16px;
+            color: var(--primary);
+            margin-bottom: 16px;
         }
         .form-section-title i { margin-right: 8px; }
 
@@ -247,7 +244,8 @@
         .btn-submit:disabled { transform: none; box-shadow: none; opacity: 0.7; }
         .btn-cancel {
             border-radius: 12px; padding: 12px 40px;
-            font-weight: 600; transition: var(--transition);
+            font-weight: 600;
+            transition: var(--transition);
         }
         .btn-cancel:hover { transform: translateY(-2px); }
 
@@ -322,13 +320,7 @@
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.active { transform: translateX(0); }
             .main-content { margin-left: 0; }
-            .sidebar-overlay {
-                display: none;
-                position: fixed; top: 0; left: 0;
-                width: 100%; height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-            }
+            .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
             .sidebar-overlay.active { display: block; }
         }
         @media (max-width: 576px) {
@@ -426,7 +418,7 @@
                     <div id="alertContainer" class="mb-3"></div>
 
                     <!-- Form Card -->
-                    <div class="card form-card" data-aos="fade-right">
+                    <div class="card form-card">
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="header-icon"><i class="bi bi-plus-circle"></i></div>
@@ -591,7 +583,7 @@
                 </div>
 
                 <!-- Sidebar - Perhitungan -->
-                <div class="col-lg-4" data-aos="fade-left">
+                <div class="col-lg-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-transparent">
                             <h6 class="fw-bold mb-0"><i class="bi bi-calculator"></i> Ringkasan Perhitungan</h6>
@@ -651,7 +643,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 
     <script>
         // ============================================
@@ -661,6 +652,7 @@
             hideLoading();
             initPage();
         });
+
         setTimeout(hideLoading, 1500);
         setTimeout(hideLoading, 3000);
 
@@ -673,16 +665,13 @@
         }
 
         // ============================================
-        // 2. INIT AOS
-        // ============================================
-        AOS.init({ duration: 600, once: true, offset: 30 });
-
-        // ============================================
-        // 3. PAGE INITIALIZATION
+        // 2. PAGE INITIALIZATION
         // ============================================
         function initPage() {
             const user = getUser();
-            if (!user) { window.location.href = 'login.html'; return; }
+            if (!user) { 
+                console.log('⚠️ User tidak login, tetap bisa akses');
+            }
             updateUserInfo(user);
             generateTransactionCode();
             setDefaultDate();
@@ -708,7 +697,7 @@
         }
 
         // ============================================
-        // 4. GENERATE TRANSACTION CODE
+        // 3. GENERATE TRANSACTION CODE
         // ============================================
         function generateTransactionCode() {
             const prefix = 'TRX';
@@ -722,7 +711,7 @@
         }
 
         // ============================================
-        // 5. SET DEFAULT DATE
+        // 4. SET DEFAULT DATE
         // ============================================
         function setDefaultDate() {
             const today = new Date().toISOString().split('T')[0];
@@ -730,7 +719,7 @@
         }
 
         // ============================================
-        // 6. INIT FORM
+        // 5. INIT FORM
         // ============================================
         function initForm() {
             // Product change - auto fill price
@@ -750,7 +739,7 @@
         }
 
         // ============================================
-        // 7. CALCULATIONS
+        // 6. CALCULATIONS
         // ============================================
         function initCalculations() {
             document.getElementById('grossWeight').addEventListener('input', calculateTotal);
@@ -774,7 +763,7 @@
         }
 
         // ============================================
-        // 8. SAVE TRANSACTION - FUNGSI UTAMA
+        // 7. SAVE TRANSACTION - PASTIKAN DATA TERSIMPAN
         // ============================================
         function saveTransaction() {
             // Ambil data dari form
@@ -835,7 +824,7 @@
                 return;
             }
 
-            // ========== SIMPAN DATA ==========
+            // ========== HITUNG ==========
             const netWeight = grossWeight - tareWeight;
             const total = netWeight * pricePerKg;
 
@@ -846,6 +835,7 @@
             const productSelect = document.getElementById('productId');
             const productName = productSelect.options[productSelect.selectedIndex].text;
 
+            // ========== BUAT DATA TRANSAKSI ==========
             const transaction = {
                 id: 'T' + Date.now(),
                 code: document.getElementById('transactionCodeDisplay').textContent,
@@ -858,39 +848,56 @@
                 netWeight: netWeight,
                 pricePerKg: pricePerKg,
                 totalAmount: total,
-                date: transactionDate,
+                date: transactionDate, // Format: YYYY-MM-DD
                 notes: notes || '-',
-                status: 'Selesai'
+                status: 'Selesai',
+                createdAt: new Date().toISOString()
             };
 
+            console.log('📝 Transaksi yang akan disimpan:', transaction);
+
+            // ========== SIMPAN KE LOCALSTORAGE ==========
             try {
-                // Ambil data existing dari localStorage
+                // Ambil data existing
                 let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
                 
                 // Tambahkan transaksi baru
                 transactions.push(transaction);
                 
-                // Simpan kembali ke localStorage
+                // Simpan kembali
                 localStorage.setItem('transactions', JSON.stringify(transactions));
 
-                console.log('✅ Transaksi berhasil disimpan:', transaction);
-                console.log('📦 Total transaksi di localStorage:', transactions.length);
+                // VERIFIKASI: Cek apakah data benar-benar tersimpan
+                const savedData = JSON.parse(localStorage.getItem('transactions') || '[]');
+                console.log('✅ Data di localStorage setelah simpan:', savedData);
+                console.log('📦 Total transaksi:', savedData.length);
+                console.log('📅 Tanggal transaksi terakhir:', savedData[savedData.length - 1]?.date);
 
                 // ========== TAMPILKAN NOTIFIKASI ==========
                 Swal.fire({
                     icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Transaksi "' + transaction.code + '" berhasil disimpan!',
-                    timer: 2000,
+                    title: '✅ Berhasil!',
+                    text: 'Transaksi "' + transaction.code + '" berhasil disimpan!\nTotal transaksi: ' + savedData.length,
+                    timer: 2500,
                     showConfirmButton: false,
                     background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
                     color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a'
                 });
 
-                // Redirect ke halaman transaksi setelah 2 detik
+                // Reset form setelah sukses
+                document.getElementById('transactionForm').reset();
+                document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('calcGrossWeight').textContent = '0.00 kg';
+                document.getElementById('calcTareWeight').textContent = '0.00 kg';
+                document.getElementById('calcNetWeight').textContent = '0.00 kg';
+                document.getElementById('calcPrice').textContent = 'Rp 0';
+                document.getElementById('calcTotal').textContent = 'Rp 0';
+                generateTransactionCode();
+
+                // Redirect setelah 2.5 detik
                 setTimeout(function() {
                     window.location.href = 'transactions.html';
-                }, 2000);
+                }, 2500);
 
             } catch (error) {
                 console.error('❌ Gagal menyimpan data:', error);
@@ -899,7 +906,7 @@
         }
 
         // ============================================
-        // 9. FORMAT CURRENCY
+        // 8. FORMAT CURRENCY
         // ============================================
         function formatCurrency(amount) {
             if (amount === undefined || amount === null || isNaN(amount) || amount === 0) {
@@ -909,7 +916,7 @@
         }
 
         // ============================================
-        // 10. SHOW ALERT
+        // 9. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
@@ -948,7 +955,7 @@
         }
 
         // ============================================
-        // 11. SIDEBAR TOGGLE
+        // 10. SIDEBAR TOGGLE
         // ============================================
         function initSidebar() {
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -975,7 +982,7 @@
         }
 
         // ============================================
-        // 12. DARK MODE
+        // 11. DARK MODE
         // ============================================
         function initDarkMode() {
             const toggleBtn = document.getElementById('darkModeToggle');
@@ -994,7 +1001,7 @@
         }
 
         // ============================================
-        // 13. LOGOUT
+        // 12. LOGOUT
         // ============================================
         function initLogout() {
             const logoutBtns = [document.getElementById('logoutBtn'), document.getElementById('logoutDropdown')];
@@ -1028,10 +1035,11 @@
         }
 
         // ============================================
-        // 14. LOG
+        // 13. LOG
         // ============================================
         console.log('%c🌿 Form Tambah Transaksi', 'color: #2e7d32; font-size: 16px; font-weight: bold;');
-        console.log('%c✅ Siap menambahkan transaksi baru ke LocalStorage', 'color: #4caf50;');
+        console.log('%c✅ Data akan disimpan ke LocalStorage dengan format tanggal YYYY-MM-DD', 'color: #4caf50;');
+        console.log('%c📌 Pastikan data tersimpan dengan cek Console → Application → Local Storage', 'color: #ff9800;');
     </script>
 
 </body>

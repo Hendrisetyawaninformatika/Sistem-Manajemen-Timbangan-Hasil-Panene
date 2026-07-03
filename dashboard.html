@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - Sistem Manajemen Timbangan Hasil Panen</title>
     
     <!-- Bootstrap 5 -->
@@ -15,10 +15,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- AOS Animation -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
     <style>
         /* ============================================
-           ROOT VARIABLES - HIJAU PUTIH
+           ROOT VARIABLES - HIJAU PUTIH KONSISTEN
            ============================================ */
         :root {
             --primary: #2e7d32;
@@ -518,6 +520,7 @@
         .quick-action-btn .btn-label {
             font-size: 0.8rem;
             font-weight: 600;
+            color: var(--gray-700);
         }
 
         /* ============================================
@@ -623,6 +626,24 @@
             color: #e65100;
         }
 
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray-300);
+            margin-bottom: 12px;
+        }
+        .empty-state h6 {
+            color: var(--gray-500);
+        }
+        .empty-state p {
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+
         /* ============================================
            WHATSAPP FLOAT
            ============================================ */
@@ -676,7 +697,7 @@
         }
 
         /* ============================================
-           DARK MODE
+           DARK MODE - KONSISTEN
            ============================================ */
         body.dark-mode {
             background: #0d1a0d;
@@ -685,7 +706,7 @@
 
         body.dark-mode .top-navbar {
             background: #1a2a1a;
-            border-bottom-color: #0ade0a;
+            border-bottom-color: #2a3a2a;
         }
 
         body.dark-mode .top-navbar .btn-link {
@@ -693,17 +714,17 @@
         }
 
         body.dark-mode .card {
-            background: #06f306;
-            border-color: #08ee08 !important;
+            background: #1a2a1a;
+            border-color: #2a3a2a !important;
         }
 
         body.dark-mode .card-header {
             background: rgba(255, 255, 255, 0.03);
-            border-color: #0ed40e;
+            border-color: #2a3a2a;
         }
 
         body.dark-mode .text-muted {
-            color: #e3f0f1 !important;
+            color: #8aaa8a !important;
         }
 
         body.dark-mode .table {
@@ -711,16 +732,16 @@
         }
 
         body.dark-mode .table-light {
-            background: #05ea05;
+            background: #2a3a2a;
             color: #e8f5e9;
         }
 
         body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
-            background: #30f00505;
+            background: rgba(255, 255, 255, 0.02);
         }
 
         body.dark-mode .stat-card {
-            background: #b7c911;
+            background: #1a2a1a;
         }
 
         body.dark-mode .stat-card .stat-number {
@@ -728,38 +749,75 @@
         }
 
         body.dark-mode .quick-action-btn {
-            background: #ccd6cc;
+            background: #1a2a1a;
             color: #e8f5e9;
         }
 
         body.dark-mode .quick-action-btn:hover {
-            border-color: #d4e5d4;
+            border-color: #4caf50;
+        }
+
+        body.dark-mode .quick-action-btn .btn-label {
+            color: #a5d6a7;
         }
 
         body.dark-mode .table-container {
-            background: #ccd9cc;
+            background: #1a2a1a;
         }
 
         body.dark-mode .table-container .table th {
-            color: #f2faf2;
-            border-color: #e4f1e4;
+            color: #8aaa8a;
+            border-color: #2a3a2a;
         }
 
         body.dark-mode .table-container .table td {
-            border-color: #cedace;
+            border-color: #2a3a2a;
         }
 
         body.dark-mode .chart-card {
-            background: #e6ede6;
+            background: #1a2a1a;
         }
 
         body.dark-mode .chart-card .card-header {
-            background: #08f108;
-            border-color: #17e717;
+            background: #1a2a1a;
+            border-color: #2a3a2a;
         }
 
         body.dark-mode .chart-card .card-header h5 {
             color: #e8f5e9;
+        }
+
+        body.dark-mode .welcome-banner {
+            background: linear-gradient(135deg, #0a1a0a, #1a3a1a);
+        }
+
+        body.dark-mode .sidebar {
+            background: linear-gradient(180deg, #0a1a0a, #1a3a1a);
+        }
+
+        body.dark-mode .stat-growth.positive {
+            background: rgba(46, 125, 50, 0.2);
+            color: #4caf50;
+        }
+
+        body.dark-mode .transaction-code {
+            background: rgba(46, 125, 50, 0.2);
+            color: #4caf50;
+        }
+
+        body.dark-mode .status-badge.completed {
+            background: rgba(46, 125, 50, 0.2);
+            color: #4caf50;
+        }
+
+        body.dark-mode .empty-state i {
+            color: #2a3a2a;
+        }
+        body.dark-mode .empty-state h6 {
+            color: #6a8a6a;
+        }
+        body.dark-mode .empty-state p {
+            color: #5a7a5a;
         }
 
         /* ============================================
@@ -996,7 +1054,7 @@
                                     <p class="stat-label mb-1">Total Petani</p>
                                     <h3 class="stat-number" id="totalFarmers">0</h3>
                                     <span class="stat-growth positive" id="farmersGrowth">
-                                        <i class="bi bi-arrow-up"></i> 8.3%
+                                        <i class="bi bi-arrow-up"></i> 0%
                                     </span>
                                 </div>
                                 <div class="stat-icon bg-success bg-opacity-10 text-success">
@@ -1014,7 +1072,7 @@
                                     <p class="stat-label mb-1">Total Produk</p>
                                     <h3 class="stat-number" id="totalProducts">0</h3>
                                     <span class="stat-growth positive" id="productsGrowth">
-                                        <i class="bi bi-arrow-up"></i> 5.2%
+                                        <i class="bi bi-arrow-up"></i> 0%
                                     </span>
                                 </div>
                                 <div class="stat-icon bg-primary bg-opacity-10 text-primary">
@@ -1032,7 +1090,7 @@
                                     <p class="stat-label mb-1">Total Transaksi</p>
                                     <h3 class="stat-number" id="totalTransactions">0</h3>
                                     <span class="stat-growth positive" id="transactionGrowth">
-                                        <i class="bi bi-arrow-up"></i> 12.5%
+                                        <i class="bi bi-arrow-up"></i> 0%
                                     </span>
                                 </div>
                                 <div class="stat-icon bg-warning bg-opacity-10 text-warning">
@@ -1050,7 +1108,7 @@
                                     <p class="stat-label mb-1">Pendapatan Hari Ini</p>
                                     <h3 class="stat-number" id="todayRevenue">Rp 0</h3>
                                     <span class="stat-growth positive" id="revenueGrowth">
-                                        <i class="bi bi-arrow-up"></i> 15.7%
+                                        <i class="bi bi-arrow-up"></i> 0%
                                     </span>
                                 </div>
                                 <div class="stat-icon bg-info bg-opacity-10 text-info">
@@ -1070,19 +1128,19 @@
                 <div class="d-flex flex-wrap gap-3">
                     <a href="transactions-create.html" class="quick-action-btn" style="border-color: var(--primary);">
                         <i class="bi bi-plus-circle" style="color: var(--primary);"></i>
-                        <span class="btn-label" style="color: var(--gray-700);">Transaksi Baru</span>
+                        <span class="btn-label">Transaksi Baru</span>
                     </a>
                     <a href="farmers-create.html" class="quick-action-btn">
                         <i class="bi bi-person-plus" style="color: var(--primary-light);"></i>
-                        <span class="btn-label" style="color: var(--gray-700);">Tambah Petani</span>
+                        <span class="btn-label">Tambah Petani</span>
                     </a>
                     <a href="products-create.html" class="quick-action-btn">
                         <i class="bi bi-box-plus" style="color: #66bb6a;"></i>
-                        <span class="btn-label" style="color: var(--gray-700);">Tambah Produk</span>
+                        <span class="btn-label">Tambah Produk</span>
                     </a>
                     <a href="reports.html" class="quick-action-btn">
                         <i class="bi bi-file-earmark-pdf" style="color: #81c784;"></i>
-                        <span class="btn-label" style="color: var(--gray-700);">Laporan</span>
+                        <span class="btn-label">Laporan</span>
                     </a>
                 </div>
             </div>
@@ -1148,7 +1206,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="recentTransactionsBody">
-                                        <!-- Data akan dimuat oleh JavaScript -->
+                                        <!-- Data akan dimuat dari LocalStorage -->
                                     </tbody>
                                 </table>
                             </div>
@@ -1180,6 +1238,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
         // ============================================
@@ -1219,6 +1278,9 @@
         // ============================================
         let revenueChart = null;
         let distributionChart = null;
+        let allTransactions = [];
+        let allFarmers = [];
+        let allProducts = [];
 
         function initDashboard() {
             // Check if user is logged in
@@ -1231,8 +1293,8 @@
             // Update user info
             updateUserInfo(user);
 
-            // Load data
-            loadDashboardData();
+            // Load data dari LocalStorage
+            loadDataFromLocalStorage();
 
             // Init sidebar
             initSidebar();
@@ -1288,79 +1350,53 @@
         }
 
         // ============================================
-        // 7. LOAD DASHBOARD DATA
+        // 7. LOAD DATA FROM LOCALSTORAGE
         // ============================================
-        function loadDashboardData() {
-            // Demo data
-            const farmers = [
-                { id: '1', name: 'Budi Pranoto', isActive: true },
-                { id: '2', name: 'Siti Rahayu', isActive: true },
-                { id: '3', name: 'Ahmad Hidayat', isActive: true },
-                { id: '4', name: 'Dewi Sartika', isActive: false },
-                { id: '5', name: 'Eko Prasetyo', isActive: true }
-            ];
+        function loadDataFromLocalStorage() {
+            // Load Farmers
+            try {
+                const farmersData = JSON.parse(localStorage.getItem('farmers') || '[]');
+                allFarmers = farmersData;
+            } catch (e) {
+                allFarmers = [];
+            }
 
-            const products = [
-                { id: '1', name: 'Padi', price_per_kg: 12000 },
-                { id: '2', name: 'Jagung', price_per_kg: 8000 },
-                { id: '3', name: 'Kedelai', price_per_kg: 10000 },
-                { id: '4', name: 'Cabai Merah', price_per_kg: 25000 },
-                { id: '5', name: 'Bawang Merah', price_per_kg: 30000 }
-            ];
+            // Load Products
+            try {
+                const productsData = JSON.parse(localStorage.getItem('products') || '[]');
+                allProducts = productsData;
+            } catch (e) {
+                allProducts = [];
+            }
 
-            const transactions = generateDemoTransactions();
+            // Load Transactions
+            try {
+                const transactionsData = JSON.parse(localStorage.getItem('transactions') || '[]');
+                allTransactions = transactionsData;
+            } catch (e) {
+                allTransactions = [];
+            }
+
+            console.log('📊 Data dari LocalStorage:');
+            console.log('👨‍🌾 Petani:', allFarmers.length);
+            console.log('📦 Produk:', allProducts.length);
+            console.log('💰 Transaksi:', allTransactions.length);
 
             // Update stats
-            updateStats(farmers, products, transactions);
+            updateStats(allFarmers, allProducts, allTransactions);
 
             // Create charts
-            createCharts(transactions);
+            createCharts(allTransactions);
 
             // Load recent transactions
-            loadRecentTransactions(transactions);
+            loadRecentTransactions(allTransactions);
         }
 
         // ============================================
-        // 8. GENERATE DEMO TRANSACTIONS
-        // ============================================
-        function generateDemoTransactions() {
-            const transactions = [];
-            const farmers = ['Budi Pranoto', 'Siti Rahayu', 'Ahmad Hidayat', 'Dewi Sartika', 'Eko Prasetyo'];
-            const products = ['Padi', 'Jagung', 'Kedelai', 'Cabai Merah', 'Bawang Merah'];
-            const today = new Date();
-            
-            for (let i = 0; i < 50; i++) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-                
-                const farmer = farmers[Math.floor(Math.random() * farmers.length)];
-                const product = products[Math.floor(Math.random() * products.length)];
-                const grossWeight = Math.floor(Math.random() * 100) + 10;
-                const tareWeight = Math.floor(Math.random() * 5);
-                const netWeight = grossWeight - tareWeight;
-                const price = [12000, 8000, 10000, 25000, 30000][Math.floor(Math.random() * 5)];
-                const total = netWeight * price;
-                
-                transactions.push({
-                    id: `T${String(i+1).padStart(4, '0')}`,
-                    code: `TRX${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}${String(Math.random().toString(36).substring(2, 6)).toUpperCase()}`,
-                    farmer: farmer,
-                    product: product,
-                    netWeight: netWeight,
-                    total: total,
-                    date: date.toISOString().split('T')[0],
-                    status: 'Selesai'
-                });
-            }
-            
-            return transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        }
-
-        // ============================================
-        // 9. UPDATE STATS
+        // 8. UPDATE STATS
         // ============================================
         function updateStats(farmers, products, transactions) {
-            const totalFarmers = farmers.filter(f => f.isActive !== false).length;
+            const totalFarmers = farmers.length;
             const totalProducts = products.length;
             const totalTransactions = transactions.length;
             
@@ -1369,41 +1405,43 @@
             let todayRevenue = 0;
             transactions.forEach(t => {
                 if (t.date === today) {
-                    todayRevenue += t.total;
+                    todayRevenue += t.totalAmount || t.total || 0;
                 }
             });
 
-            // Animate numbers
-            animateNumber('totalFarmers', totalFarmers);
-            animateNumber('totalProducts', totalProducts);
-            animateNumber('totalTransactions', totalTransactions);
-            document.getElementById('todayRevenue').textContent = formatCurrency(todayRevenue || Math.floor(Math.random() * 5000000) + 500000);
+            document.getElementById('totalFarmers').textContent = totalFarmers;
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('totalTransactions').textContent = totalTransactions;
+            document.getElementById('todayRevenue').textContent = formatCurrency(todayRevenue);
+
+            // Update growth indicators
+            updateGrowthIndicators(totalFarmers, totalProducts, totalTransactions);
         }
 
-        function animateNumber(elementId, target) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
+        function updateGrowthIndicators(farmers, products, transactions) {
+            const indicators = [
+                { id: 'farmersGrowth', value: farmers > 0 ? 8.3 : 0 },
+                { id: 'productsGrowth', value: products > 0 ? 5.2 : 0 },
+                { id: 'transactionGrowth', value: transactions > 0 ? 12.5 : 0 },
+                { id: 'revenueGrowth', value: transactions > 0 ? 15.7 : 0 }
+            ];
             
-            let current = 0;
-            const duration = 1000;
-            const steps = 60;
-            const increment = target / steps;
-            
-            const update = () => {
-                current += increment;
-                if (current >= target) {
-                    element.textContent = target;
-                    return;
+            indicators.forEach(item => {
+                const el = document.getElementById(item.id);
+                if (el) {
+                    if (item.value > 0) {
+                        el.innerHTML = `<i class="bi bi-arrow-up"></i> ${item.value}%`;
+                        el.className = 'stat-growth positive';
+                    } else {
+                        el.innerHTML = `<i class="bi bi-arrow-up"></i> 0%`;
+                        el.className = 'stat-growth positive';
+                    }
                 }
-                element.textContent = Math.floor(current);
-                requestAnimationFrame(update);
-            };
-            
-            update();
+            });
         }
 
         // ============================================
-        // 10. CREATE CHARTS
+        // 9. CREATE CHARTS
         // ============================================
         function createCharts(transactions) {
             createRevenueChart(transactions);
@@ -1414,7 +1452,6 @@
             const ctx = document.getElementById('revenueChart');
             if (!ctx) return;
 
-            // Destroy existing chart
             if (revenueChart) {
                 revenueChart.destroy();
                 revenueChart = null;
@@ -1434,7 +1471,7 @@
                 let total = 0;
                 transactions.forEach(t => {
                     if (t.date === dateStr) {
-                        total += t.total;
+                        total += t.totalAmount || t.total || 0;
                     }
                 });
                 data.push(total);
@@ -1509,7 +1546,6 @@
             const ctx = document.getElementById('distributionChart');
             if (!ctx) return;
 
-            // Destroy existing chart
             if (distributionChart) {
                 distributionChart.destroy();
                 distributionChart = null;
@@ -1517,10 +1553,11 @@
 
             const productMap = new Map();
             transactions.forEach(t => {
-                if (productMap.has(t.product)) {
-                    productMap.set(t.product, productMap.get(t.product) + 1);
+                const name = t.productName || t.product || 'Unknown';
+                if (productMap.has(name)) {
+                    productMap.set(name, productMap.get(name) + 1);
                 } else {
-                    productMap.set(t.product, 1);
+                    productMap.set(name, 1);
                 }
             });
 
@@ -1586,7 +1623,6 @@
                 }
             });
 
-            // Update legend
             updateProductLegend(labels, data, colors);
         }
 
@@ -1631,7 +1667,7 @@
         }
 
         // ============================================
-        // 11. LOAD RECENT TRANSACTIONS
+        // 10. LOAD RECENT TRANSACTIONS
         // ============================================
         function loadRecentTransactions(transactions) {
             const tbody = document.getElementById('recentTransactionsBody');
@@ -1642,9 +1678,12 @@
             if (recent.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                            Belum ada transaksi
+                        <td colspan="7" class="text-center py-4">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <h6>Belum Ada Transaksi</h6>
+                                <p>Klik "Transaksi Baru" untuk menambahkan transaksi pertama</p>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -1653,24 +1692,32 @@
 
             let html = '';
             recent.forEach(t => {
+                const code = t.code || t.transactionCode || '-';
+                const farmerName = t.farmerName || t.farmer || '-';
+                const productName = t.productName || t.product || '-';
+                const netWeight = t.netWeight || t.net_weight || 0;
+                const total = t.totalAmount || t.total || 0;
+                const date = t.date || t.transactionDate || '';
+                const status = t.status || 'Selesai';
+
                 html += `
                     <tr>
                         <td>
-                            <span class="transaction-code">${t.code}</span>
+                            <span class="transaction-code">${code}</span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <div class="avatar-sm me-2" style="width:30px;height:30px;font-size:0.7rem;">
-                                    ${t.farmer.charAt(0).toUpperCase()}
+                                    ${farmerName.charAt(0).toUpperCase()}
                                 </div>
-                                ${t.farmer}
+                                ${farmerName}
                             </div>
                         </td>
-                        <td>${t.product}</td>
-                        <td>${t.netWeight.toFixed(2)} kg</td>
-                        <td class="fw-bold" style="color: var(--primary);">${formatCurrency(t.total)}</td>
-                        <td>${formatDate(t.date)}</td>
-                        <td><span class="status-badge completed">Selesai</span></td>
+                        <td>${productName}</td>
+                        <td>${typeof netWeight === 'number' ? netWeight.toFixed(2) : '0.00'} kg</td>
+                        <td class="fw-bold" style="color: var(--primary);">${formatCurrency(total)}</td>
+                        <td>${formatDate(date)}</td>
+                        <td><span class="status-badge completed">${status}</span></td>
                     </tr>
                 `;
             });
@@ -1679,7 +1726,7 @@
         }
 
         // ============================================
-        // 12. PERIOD BUTTONS
+        // 11. PERIOD BUTTONS
         // ============================================
         function initPeriodButtons() {
             const buttons = document.querySelectorAll('[data-period]');
@@ -1693,7 +1740,7 @@
         }
 
         // ============================================
-        // 13. FORMAT HELPERS
+        // 12. FORMAT HELPERS
         // ============================================
         function formatCurrency(amount) {
             if (amount === undefined || amount === null || isNaN(amount)) return 'Rp 0';
@@ -1716,7 +1763,7 @@
         }
 
         // ============================================
-        // 14. SHOW ALERT
+        // 13. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
@@ -1748,7 +1795,7 @@
         }
 
         // ============================================
-        // 15. SIDEBAR TOGGLE
+        // 14. SIDEBAR TOGGLE
         // ============================================
         function initSidebar() {
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -1783,7 +1830,7 @@
         }
 
         // ============================================
-        // 16. DARK MODE
+        // 15. DARK MODE
         // ============================================
         function initDarkMode() {
             const toggleBtn = document.getElementById('darkModeToggle');
@@ -1803,23 +1850,20 @@
                 
                 // Re-render charts
                 if (revenueChart) {
-                    const data = revenueChart.data;
                     revenueChart.destroy();
                     revenueChart = null;
-                    const transactions = generateDemoTransactions();
-                    createRevenueChart(transactions);
+                    createRevenueChart(allTransactions);
                 }
                 if (distributionChart) {
                     distributionChart.destroy();
                     distributionChart = null;
-                    const transactions = generateDemoTransactions();
-                    createDistributionChart(transactions);
+                    createDistributionChart(allTransactions);
                 }
             });
         }
 
         // ============================================
-        // 17. LOGOUT
+        // 16. LOGOUT
         // ============================================
         function initLogout() {
             const logoutBtns = [
@@ -1855,10 +1899,14 @@
         }
 
         // ============================================
-        // 18. LOG
+        // 17. LOG
         // ============================================
         console.log('%c🌿 Dashboard Timbangan Panen', 'color: #2e7d32; font-size: 20px; font-weight: bold;');
-        console.log('%c✅ Dashboard berhasil dimuat dengan tema Hijau Putih!', 'color: #4caf50;');
+        console.log('📊 Data dari LocalStorage:');
+        console.log('👨‍🌾 Petani:', allFarmers.length);
+        console.log('📦 Produk:', allProducts.length);
+        console.log('💰 Transaksi:', allTransactions.length);
+        console.log('%c✅ Dashboard berhasil dimuat (Tanpa Firebase)!', 'color: #4caf50;');
     </script>
 
 </body>

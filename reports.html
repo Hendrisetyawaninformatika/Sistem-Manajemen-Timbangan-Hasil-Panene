@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<!-- Firebase Config -->
-<script src="js/firebase-config.js"></script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Laporan - Sistem Manajemen Timbangan Hasil Panen</title>
     
     <!-- Bootstrap 5 -->
@@ -18,615 +11,390 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- DataTables -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
     <style>
-        /* ============================================
-           RESET & BASE
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --primary-bg: #e8f5e9;
+            --primary-gradient: linear-gradient(135deg, #2e7d32, #43a047);
+            --white: #ffffff;
+            --gray-50: #f8faf8;
+            --gray-200: #e8ece8;
+            --gray-300: #d5ddd5;
+            --gray-400: #a8b8a8;
+            --gray-500: #7a8a7a;
+            --gray-600: #5a6a5a;
+            --gray-700: #3a4a3a;
+            --gray-900: #1a2a1a;
+            --shadow-sm: 0 2px 12px rgba(46, 125, 50, 0.08);
+            --shadow-md: 0 8px 32px rgba(46, 125, 50, 0.12);
+            --radius: 20px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f0f2f5;
+            background: var(--gray-50);
             overflow-x: hidden;
-            transition: background 0.3s ease;
         }
 
-        /* ============================================
-           LOADING SCREEN
-           ============================================ */
+        /* Loading Screen */
         #loadingScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #dc3545, #b02a37);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--primary-gradient);
+            display: flex; justify-content: center; align-items: center;
             z-index: 99999;
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
-
-        #loadingScreen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .loader-container {
-            text-align: center;
-            color: white;
-        }
-
+        #loadingScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-container { text-align: center; color: white; }
         .loader {
-            width: 70px;
-            height: 70px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
+            width: 70px; height: 70px;
+            border: 5px solid rgba(255,255,255,0.2);
             border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 0 auto;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-            animation: bounceIcon 1.5s ease-in-out infinite;
-        }
-
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-icon { font-size: 3rem; display: block; animation: bounceIcon 1.5s ease-in-out infinite; }
         @keyframes bounceIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-15px); }
         }
-
-        .loader-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-top: 1rem;
-        }
-
-        .loader-subtext {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-top: 0.3rem;
-        }
-
+        .loader-text { font-size: 1.2rem; font-weight: 600; margin-top: 1rem; }
+        .loader-subtext { font-size: 0.9rem; opacity: 0.7; margin-top: 0.3rem; }
         .loader-progress {
-            width: 200px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.2);
+            width: 200px; height: 3px;
+            background: rgba(255,255,255,0.2);
             border-radius: 10px;
             margin: 20px auto 0;
             overflow: hidden;
         }
-
         .loader-progress-bar {
-            height: 100%;
-            background: white;
+            height: 100%; background: white;
             border-radius: 10px;
             width: 0%;
             animation: progressBar 2s ease-in-out infinite;
         }
-
         @keyframes progressBar {
             0% { width: 0%; }
             50% { width: 70%; }
             100% { width: 100%; }
         }
 
-        /* ============================================
-           SIDEBAR
-           ============================================ */
+        /* Sidebar */
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 260px;
-            background: linear-gradient(180deg, #0a0e27 0%, #1a1a3e 100%);
+            position: fixed; top: 0; left: 0;
+            height: 100vh; width: 260px;
+            background: linear-gradient(180deg, #1a3a1a 0%, #2e7d32 100%);
             color: white;
             transition: all 0.3s ease;
             z-index: 1000;
             overflow-y: auto;
             overflow-x: hidden;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
         }
-
-        .sidebar::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         .sidebar-header {
             padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; gap: 12px;
         }
-
-        .sidebar-header h5 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 1.1rem;
-            white-space: nowrap;
-        }
-
-        .sidebar-header i {
-            font-size: 1.6rem;
-            color: #4fc3f7;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 4px;
-        }
-
+        .sidebar-header h5 { margin: 0; font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+        .sidebar-header i { font-size: 1.6rem; color: #a5d6a7; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 16px 0; }
+        .sidebar-menu li { margin-bottom: 4px; }
         .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            display: flex; align-items: center; gap: 14px;
             padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.65);
+            color: rgba(255,255,255,0.7);
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
             font-size: 0.95rem;
             text-decoration: none;
         }
+        .sidebar-menu a:hover { color: white; border-left-color: #81c784; background: rgba(255,255,255,0.05); }
+        .sidebar-menu a.active { color: white; border-left-color: #81c784; background: rgba(255,255,255,0.08); }
+        .sidebar-menu a i { font-size: 1.3rem; width: 24px; text-align: center; }
+        .sidebar-menu hr { border-color: rgba(255,255,255,0.08); margin: 16px 20px; }
 
-        .sidebar-menu a:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-            border-left-color: #dc3545;
-        }
+        /* Main Content */
+        .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
 
-        .sidebar-menu a.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: #dc3545;
-        }
-
-        .sidebar-menu a i {
-            font-size: 1.3rem;
-            width: 24px;
-            text-align: center;
-        }
-
-        .sidebar-menu hr {
-            border-color: rgba(255, 255, 255, 0.08);
-            margin: 16px 20px;
-        }
-
-        /* ============================================
-           MAIN CONTENT
-           ============================================ */
-        .main-content {
-            margin-left: 260px;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* ============================================
-           TOP NAVBAR
-           ============================================ */
+        /* Top Navbar */
         .top-navbar {
-            background: white;
+            background: var(--white);
             padding: 12px 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            position: sticky;
-            top: 0;
-            z-index: 999;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            position: sticky; top: 0; z-index: 999;
+            border-bottom: 2px solid var(--primary-bg);
         }
-
-        .top-navbar .btn-link {
-            color: #212529;
-            padding: 0;
+        .top-navbar .btn-link { color: var(--gray-700); padding: 0; transition: var(--transition); }
+        .top-navbar .btn-link:hover { color: var(--primary); transform: scale(1.1); }
+        .avatar-sm {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.8rem;
+            background: var(--primary-gradient);
+            color: white;
+            transition: var(--transition);
         }
+        .avatar-sm:hover { transform: scale(1.1); }
 
-        .top-navbar .btn-link:hover {
-            color: #dc3545;
-        }
-
-        /* ============================================
-           PAGE HEADER
-           ============================================ */
+        /* Page Header */
         .page-header {
-            background: linear-gradient(135deg, #dc3545, #b02a37);
-            border-radius: 20px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius);
             padding: 30px;
             color: white;
             position: relative;
             overflow: hidden;
             margin-bottom: 30px;
         }
-
         .page-header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
+            top: -50%; right: -10%;
+            width: 300px; height: 300px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255,255,255,0.05);
+            animation: pulseBg 8s ease-in-out infinite;
         }
-
+        @keyframes pulseBg {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
         .page-header .header-icon {
             font-size: 3rem;
             animation: floatIcon 3s ease-in-out infinite;
         }
-
         @keyframes floatIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
 
-        /* ============================================
-           AVATAR
-           ============================================ */
-        .avatar-sm {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        /* ============================================
-           FILTER SECTION
-           ============================================ */
+        /* Filter Section */
         .filter-section {
-            background: white;
-            border-radius: 16px;
+            background: var(--white);
+            border-radius: var(--radius);
             padding: 20px 24px;
             margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
-
+        .filter-section:hover { box-shadow: var(--shadow-md); }
         .filter-section .form-control,
         .filter-section .form-select {
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            padding: 8px 14px;
-            font-size: 0.9rem;
+            border-radius: 10px; border: 2px solid var(--gray-200);
+            padding: 8px 14px; font-size: 0.9rem;
+            transition: var(--transition);
         }
-
         .filter-section .form-control:focus,
         .filter-section .form-select:focus {
-            border-color: #dc3545;
-            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
         }
-
         .filter-section .btn-filter {
-            border-radius: 10px;
-            padding: 8px 32px;
+            border-radius: 10px; padding: 8px 32px;
+            transition: var(--transition);
         }
+        .filter-section .btn-filter:hover { transform: translateY(-2px); }
 
-        /* ============================================
-           REPORT SUMMARY
-           ============================================ */
+        /* Report Summary Cards */
         .report-summary-card {
             border-radius: 16px;
             padding: 16px 20px;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             border: none;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
         }
-
         .report-summary-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-md);
         }
-
         .report-summary-card .summary-icon {
             font-size: 2rem;
             opacity: 0.6;
         }
-
         .report-summary-card .summary-value {
             font-size: 1.5rem;
             font-weight: 700;
+            color: var(--gray-900);
         }
 
-        /* ============================================
-           CHART
-           ============================================ */
+        /* Chart */
         .chart-container {
             position: relative;
             height: 280px;
         }
 
-        /* ============================================
-           TABLE
-           ============================================ */
+        /* Table */
         .table-container {
-            border-radius: 16px;
+            border-radius: var(--radius);
             overflow: hidden;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
         }
-
         .table-container .card-header {
-            border-bottom: none;
-            padding: 16px 20px;
+            background: var(--white);
+            border-bottom: 2px solid var(--primary-bg);
+            padding: 16px 24px;
         }
-
-        .table-container .card-body {
-            padding: 0 20px 20px;
+        .table-container .card-body { padding: 0 24px 24px; }
+        .table-container .table { margin-bottom: 0; }
+        .table-container .table th {
+            font-weight: 600; color: var(--gray-600);
+            font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--gray-200);
+            padding: 12px 8px;
+        }
+        .table-container .table td {
+            padding: 12px 8px; vertical-align: middle;
+            border-bottom: 1px solid var(--gray-100);
         }
 
         .transaction-code {
             font-family: 'Courier New', monospace;
             font-weight: 700;
             font-size: 0.8rem;
+            background: var(--primary-bg);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 50px;
         }
 
-        /* ============================================
-           WHATSAPP FLOAT
-           ============================================ */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 56px;
-            height: 56px;
-            background: #25d366;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-            z-index: 999;
-            transition: all 0.3s ease;
-            animation: pulseWA 2s ease-in-out infinite;
-            text-decoration: none;
-        }
+        /* Empty State */
+        .empty-state { padding: 80px 20px; text-align: center; }
+        .empty-state i { font-size: 5rem; color: var(--gray-300); margin-bottom: 20px; }
+        .empty-state h4 { color: var(--gray-600); margin-bottom: 8px; }
+        .empty-state p { color: var(--gray-400); }
 
-        .whatsapp-float:hover {
-            transform: scale(1.1) rotate(-5deg);
-            color: white;
-            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
-        }
-
-        @keyframes pulseWA {
-            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
-            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6); }
-        }
-
-        /* ============================================
-           DARK MODE
-           ============================================ */
-        body.dark-mode {
-            background-color: #0a0e1a;
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .top-navbar {
-            background: #141824;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        body.dark-mode .top-navbar .btn-link {
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .card {
-            background: #141824;
-            border-color: #2a2f45 !important;
-        }
-
-        body.dark-mode .card-header {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: #2a2f45;
-        }
-
-        body.dark-mode .text-muted {
-            color: #8a8f9e !important;
-        }
-
-        body.dark-mode .table {
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .table-light {
-            background: #1a1f33;
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        body.dark-mode .page-header {
-            background: linear-gradient(135deg, #0a0e27, #1a1a3e);
-        }
-
-        body.dark-mode .filter-section {
-            background: #141824;
-        }
-
-        body.dark-mode .filter-section .form-control,
-        body.dark-mode .filter-section .form-select {
-            background: #1a1f33;
-            border-color: #2a2f45;
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .filter-section .form-control:focus,
-        body.dark-mode .filter-section .form-select:focus {
-            border-color: #dc3545;
-        }
-
-        body.dark-mode .report-summary-card {
-            background: #141824 !important;
-        }
-
-        body.dark-mode .report-period {
-            background: #1a1f33;
-            color: #8a8f9e;
-        }
-
-        /* ============================================
-           REPORT PERIOD
-           ============================================ */
         .report-period {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--gray-500);
             padding: 6px 16px;
-            background: #f8f9fa;
+            background: var(--gray-50);
             border-radius: 50px;
             display: inline-block;
         }
 
-        /* ============================================
-           EMPTY STATE
-           ============================================ */
-        .empty-state {
-            padding: 60px 20px;
-            text-align: center;
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 56px; height: 56px;
+            background: #25d366; color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+            z-index: 999;
+            transition: var(--transition);
+            animation: pulseWA 2s ease-in-out infinite;
+            text-decoration: none;
+        }
+        .whatsapp-float:hover { transform: scale(1.1) rotate(-5deg); color: white; box-shadow: 0 6px 30px rgba(37,211,102,0.5); }
+        @keyframes pulseWA {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.4); }
+            50% { box-shadow: 0 4px 40px rgba(37,211,102,0.6); }
         }
 
-        .empty-state i {
-            font-size: 4rem;
-            color: #dee2e6;
-            margin-bottom: 16px;
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #0d1a0d; color: #e8f5e9;
+        }
+        body.dark-mode .top-navbar {
+            background: #1a2a1a; border-bottom-color: #2a3a2a;
+        }
+        body.dark-mode .top-navbar .btn-link { color: #a5d6a7; }
+        body.dark-mode .card { background: #1a2a1a; border-color: #2a3a2a !important; }
+        body.dark-mode .card-header { background: rgba(255,255,255,0.03); border-color: #2a3a2a; }
+        body.dark-mode .text-muted { color: #8aaa8a !important; }
+        body.dark-mode .page-header {
+            background: linear-gradient(135deg, #0a1a0a, #1a3a1a);
+        }
+        body.dark-mode .filter-section {
+            background: #1a2a1a;
+        }
+        body.dark-mode .filter-section .form-control,
+        body.dark-mode .filter-section .form-select {
+            background: #1a2a1a; border-color: #2a3a2a; color: #e8f5e9;
+        }
+        body.dark-mode .filter-section .form-control:focus,
+        body.dark-mode .filter-section .form-select:focus {
+            border-color: var(--primary);
+        }
+        body.dark-mode .report-summary-card {
+            background: #1a2a1a;
+        }
+        body.dark-mode .report-summary-card .summary-value {
+            color: #e8f5e9;
+        }
+        body.dark-mode .table { color: #e8f5e9; }
+        body.dark-mode .table-light { background: #2a3a2a; color: #e8f5e9; }
+        body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) { background: rgba(255,255,255,0.02); }
+        body.dark-mode .empty-state i { color: #2a3a2a; }
+        body.dark-mode .empty-state h4 { color: #6a8a6a; }
+        body.dark-mode .empty-state p { color: #5a7a5a; }
+        body.dark-mode .report-period {
+            background: #1a2a1a;
+            color: #8aaa8a;
+        }
+        body.dark-mode .dataTables_wrapper .dataTables_filter input {
+            background: #1a2a1a !important;
+            border-color: #2a3a2a !important;
+            color: #e8f5e9 !important;
         }
 
-        .empty-state h5 {
-            color: #6c757d;
-        }
-
-        .empty-state p {
-            color: #adb5bd;
-        }
-
-        body.dark-mode .empty-state i {
-            color: #2a2f45;
-        }
-
-        body.dark-mode .empty-state h5 {
-            color: #8a8f9e;
-        }
-
-        body.dark-mode .empty-state p {
-            color: #6c757d;
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
+        /* Responsive */
         @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-            }
-            
-            .sidebar-overlay.active {
-                display: block;
-            }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+            .sidebar-overlay.active { display: block; }
         }
-
         @media (max-width: 576px) {
-            .page-header {
-                padding: 20px;
-            }
-            
-            .page-header h4 {
-                font-size: 1.1rem;
-            }
-            
-            .whatsapp-float {
-                width: 48px;
-                height: 48px;
-                font-size: 1.5rem;
-                bottom: 16px;
-                right: 16px;
-            }
-            
-            .filter-section .row {
-                gap: 12px;
-            }
-            
-            .report-summary-card .summary-value {
-                font-size: 1.2rem;
-            }
+            .page-header { padding: 20px; }
+            .page-header h4 { font-size: 1.1rem; }
+            .whatsapp-float { width: 48px; height: 48px; font-size: 1.5rem; bottom: 16px; right: 16px; }
+            .filter-section .row { gap: 12px; }
+            .report-summary-card .summary-value { font-size: 1.2rem; }
         }
-
-        /* ============================================
-           SIDEBAR OVERLAY
-           ============================================ */
         .sidebar-overlay {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
             z-index: 999;
         }
-
-        .sidebar-overlay.active {
-            display: block;
+        .sidebar-overlay.active { display: block; }
+        #alertContainer { min-height: 50px; }
+        .alert { border-radius: 12px; padding: 12px 16px; font-size: 0.9rem; animation: slideDown 0.4s ease; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================
-    LOADING SCREEN
-    ============================================ -->
+    <!-- Loading Screen -->
     <div id="loadingScreen">
         <div class="loader-container">
             <i class="bi bi-file-text loader-icon"></i>
@@ -639,64 +407,25 @@
         </div>
     </div>
 
-    <!-- ============================================
-    SIDEBAR OVERLAY (Mobile)
-    ============================================ -->
+    <!-- Sidebar Overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- ============================================
-    SIDEBAR
-    ============================================ -->
+    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5>
-                <i class="bi bi-scale"></i> Timbangan Panen
-            </h5>
+            <h5><i class="bi bi-tree"></i> Timbangan Panen</h5>
         </div>
         <ul class="sidebar-menu">
-            <li>
-                <a href="dashboard.html">
-                    <i class="bi bi-grid"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="farmers.html">
-                    <i class="bi bi-people"></i>
-                    <span>Data Petani</span>
-                </a>
-            </li>
-            <li>
-                <a href="products.html">
-                    <i class="bi bi-box-seam"></i>
-                    <span>Jenis Hasil Panen</span>
-                </a>
-            </li>
-            <li>
-                <a href="transactions.html">
-                    <i class="bi bi-cash-stack"></i>
-                    <span>Transaksi</span>
-                </a>
-            </li>
-            <li>
-                <a href="reports.html" class="active">
-                    <i class="bi bi-file-text"></i>
-                    <span>Laporan</span>
-                </a>
-            </li>
-            <li class="mt-4">
-                <hr>
-                <a href="#" id="logoutBtn">
-                    <i class="bi bi-box-arrow-right text-danger"></i>
-                    <span class="text-danger">Logout</span>
-                </a>
-            </li>
+            <li><a href="dashboard.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></li>
+            <li><a href="farmers.html"><i class="bi bi-people-fill"></i> Data Petani</a></li>
+            <li><a href="products.html"><i class="bi bi-box-seam-fill"></i> Jenis Hasil Panen</a></li>
+            <li><a href="transactions.html"><i class="bi bi-cash-stack"></i> Transaksi</a></li>
+            <li><a href="reports.html" class="active"><i class="bi bi-file-text-fill"></i> Laporan</a></li>
+            <li class="mt-4"><hr><a href="#" id="logoutBtn"><i class="bi bi-box-arrow-right text-danger"></i> <span class="text-danger">Logout</span></a></li>
         </ul>
     </nav>
 
-    <!-- ============================================
-    MAIN CONTENT
-    ============================================ -->
+    <!-- Main Content -->
     <div class="main-content">
 
         <!-- Top Navbar -->
@@ -704,23 +433,17 @@
             <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-link" id="toggleSidebar">
-                            <i class="bi bi-list fs-4"></i>
-                        </button>
-                        <div class="d-none d-md-block">
-                            <span class="text-muted">Laporan</span>
-                        </div>
+                        <button class="btn btn-link" id="toggleSidebar"><i class="bi bi-list fs-4"></i></button>
+                        <span class="fw-semibold d-none d-md-block" style="color: var(--gray-700);">
+                            <i class="bi bi-tree-fill text-success me-1"></i> Laporan
+                        </span>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-link" id="darkModeToggle">
-                            <i class="bi bi-moon fs-5"></i>
-                        </button>
+                        <button class="btn btn-link" id="darkModeToggle"><i class="bi bi-moon fs-5"></i></button>
                         <div class="dropdown">
                             <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                                <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
-                                    <span id="userInitial">A</span>
-                                </div>
-                                <span id="userNameDisplay" class="d-none d-md-inline">Admin</span>
+                                <div class="avatar-sm"><span id="userInitial">A</span></div>
+                                <span id="userNameDisplay" class="d-none d-md-inline fw-semibold" style="color: var(--gray-700);">Admin</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profil</a></li>
@@ -742,9 +465,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="header-icon">
-                                <i class="bi bi-file-text"></i>
-                            </div>
+                            <div class="header-icon"><i class="bi bi-file-text"></i></div>
                             <div>
                                 <h4 class="fw-bold mb-1">Laporan Transaksi</h4>
                                 <p class="mb-0 opacity-75">Analisis dan laporan transaksi penimbangan</p>
@@ -761,7 +482,7 @@
             <div class="filter-section">
                 <form id="reportForm" class="row g-3 align-items-end">
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Jenis Laporan</label>
+                        <label class="form-label small fw-bold" style="color: var(--gray-600);">Jenis Laporan</label>
                         <select class="form-select" id="reportType">
                             <option value="daily">Harian</option>
                             <option value="weekly" selected>Mingguan</option>
@@ -771,16 +492,16 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Dari Tanggal</label>
+                        <label class="form-label small fw-bold" style="color: var(--gray-600);">Dari Tanggal</label>
                         <input type="date" class="form-control" id="dateFrom">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Sampai Tanggal</label>
+                        <label class="form-label small fw-bold" style="color: var(--gray-600);">Sampai Tanggal</label>
                         <input type="date" class="form-control" id="dateTo">
                     </div>
                     <div class="col-md-3">
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-danger btn-filter w-100">
+                            <button type="submit" class="btn btn-success btn-filter w-100">
                                 <i class="bi bi-search"></i> Tampilkan
                             </button>
                             <button type="reset" class="btn btn-outline-secondary btn-filter" id="resetFilter">
@@ -795,40 +516,33 @@
             <div id="reportContainer">
                 <!-- Report akan di-render oleh JavaScript -->
                 <div class="text-center py-5" id="reportLoading">
-                    <div class="spinner-border text-danger" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-3 text-muted">Pilih periode dan klik Tampilkan untuk melihat laporan</p>
+                    <i class="bi bi-file-earmark-text" style="font-size: 4rem; color: var(--gray-300);"></i>
+                    <h5 class="mt-3" style="color: var(--gray-500);">Belum Ada Laporan</h5>
+                    <p class="text-muted">Pilih periode dan klik Tampilkan untuk melihat laporan</p>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- ============================================
-    WHATSAPP FLOATING BUTTON
-    ============================================ -->
+    <!-- WhatsApp Float -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
-       class="whatsapp-float" 
-       target="_blank"
-       title="Hubungi Admin via WhatsApp">
+       class="whatsapp-float" target="_blank">
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- ============================================
-    SCRIPTS
-    ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
         // ============================================
-        // 1. HIDE LOADING SCREEN - MULTI FALLBACK
+        // 1. HIDE LOADING SCREEN
         // ============================================
-        
         document.addEventListener('DOMContentLoaded', function() {
             hideLoading();
             initPage();
@@ -836,15 +550,12 @@
 
         setTimeout(hideLoading, 1500);
         setTimeout(hideLoading, 3000);
-        setTimeout(hideLoading, 5000);
 
         function hideLoading() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
                 loadingScreen.classList.add('hidden');
-                setTimeout(function() {
-                    loadingScreen.style.display = 'none';
-                }, 800);
+                setTimeout(function() { loadingScreen.style.display = 'none'; }, 800);
             }
         }
 
@@ -856,53 +567,30 @@
         let allTransactions = [];
 
         function initPage() {
-            // Check if user is logged in
             const user = getUser();
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
+            if (!user) { 
+                console.log('⚠️ User tidak login, tetap bisa akses');
             }
-
-            // Update user info
             updateUserInfo(user);
 
-            // Init sidebar
+            // Load data dari localStorage
+            loadTransactionData();
+            
             initSidebar();
-
-            // Init dark mode
             initDarkMode();
-
-            // Init logout
             initLogout();
-
-            // Set default dates
-            setDefaultDates();
-
-            // Init form
             initForm();
-
-            // Load initial report
-            generateReport();
+            setDefaultDates();
         }
 
-        // ============================================
-        // 3. GET USER
-        // ============================================
         function getUser() {
             try {
                 const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
-                if (userData) {
-                    return JSON.parse(userData);
-                }
-            } catch (e) {
-                console.error('Error getting user:', e);
-            }
+                if (userData) return JSON.parse(userData);
+            } catch (e) { console.error('Error getting user:', e); }
             return null;
         }
 
-        // ============================================
-        // 4. UPDATE USER INFO
-        // ============================================
         function updateUserInfo(user) {
             const name = user?.name || 'Admin';
             document.getElementById('userNameDisplay').textContent = name;
@@ -910,7 +598,32 @@
         }
 
         // ============================================
-        // 5. SET DEFAULT DATES
+        // 3. LOAD TRANSACTIONS FROM LOCALSTORAGE
+        // ============================================
+        function loadTransactionData() {
+            const saved = localStorage.getItem('transactions');
+            if (saved) {
+                try {
+                    allTransactions = JSON.parse(saved);
+                    console.log('📊 Memuat ' + allTransactions.length + ' transaksi dari localStorage');
+                } catch (e) {
+                    allTransactions = [];
+                    console.log('⚠️ Error parsing localStorage');
+                }
+            } else {
+                allTransactions = [];
+                console.log('📊 Tidak ada data transaksi di localStorage');
+            }
+            
+            // Log data untuk debugging
+            if (allTransactions.length > 0) {
+                console.log('📅 Contoh tanggal transaksi:', allTransactions[0].date);
+                console.log('📅 Semua tanggal:', allTransactions.map(t => t.date).join(', '));
+            }
+        }
+
+        // ============================================
+        // 4. SET DEFAULT DATES
         // ============================================
         function setDefaultDates() {
             const today = new Date();
@@ -922,49 +635,9 @@
         }
 
         // ============================================
-        // 6. GENERATE TRANSACTIONS DATA
-        // ============================================
-        function generateTransactions() {
-            const farmers = ['Budi Pranoto', 'Siti Rahayu', 'Ahmad Hidayat', 'Dewi Sartika', 'Eko Prasetyo', 'Ratna Dewi', 'Bambang Susanto', 'Lina Marlina', 'Rudi Hartono', 'Maya Sari'];
-            const products = ['Padi', 'Jagung', 'Kedelai', 'Cabai Merah', 'Bawang Merah', 'Bawang Putih', 'Tomat', 'Kentang', 'Mangga', 'Pisang'];
-            const prices = [12000, 8000, 10000, 25000, 30000, 35000, 15000, 18000, 22000, 14000];
-            const transactions = [];
-            const today = new Date();
-            
-            for (let i = 0; i < 100; i++) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - Math.floor(Math.random() * 60));
-                
-                const farmerIdx = Math.floor(Math.random() * farmers.length);
-                const productIdx = Math.floor(Math.random() * products.length);
-                const grossWeight = Math.floor(Math.random() * 150) + 10;
-                const tareWeight = Math.floor(Math.random() * 10);
-                const netWeight = grossWeight - tareWeight;
-                const totalAmount = netWeight * prices[productIdx];
-                
-                transactions.push({
-                    id: `T${String(i+1).padStart(4, '0')}`,
-                    code: `TRX${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}${String(Math.random().toString(36).substring(2, 6)).toUpperCase()}`,
-                    farmer: farmers[farmerIdx],
-                    product: products[productIdx],
-                    grossWeight: grossWeight,
-                    tareWeight: tareWeight,
-                    netWeight: netWeight,
-                    pricePerKg: prices[productIdx],
-                    totalAmount: totalAmount,
-                    date: date.toISOString().split('T')[0]
-                });
-            }
-            
-            return transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        }
-
-        // ============================================
-        // 7. INIT FORM
+        // 5. INIT FORM
         // ============================================
         function initForm() {
-            const form = document.getElementById('reportForm');
-            
             // Report type change
             document.getElementById('reportType').addEventListener('change', function() {
                 const type = this.value;
@@ -993,8 +666,8 @@
                 document.getElementById('dateTo').value = today.toISOString().split('T')[0];
             });
 
-            // Form submit
-            form.addEventListener('submit', function(e) {
+            // Form submit - GENERATE REPORT
+            document.getElementById('reportForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 generateReport();
             });
@@ -1009,7 +682,7 @@
         }
 
         // ============================================
-        // 8. GENERATE REPORT
+        // 6. GENERATE REPORT - FIX FILTER
         // ============================================
         function generateReport() {
             const dateFrom = document.getElementById('dateFrom').value;
@@ -1021,45 +694,54 @@
                 return;
             }
 
-            // Show loading
-            showReportLoading();
+            console.log('📅 Filter tanggal:', dateFrom, 'sampai', dateTo);
+            console.log('📊 Total transaksi di database:', allTransactions.length);
 
-            // Get data
-            allTransactions = generateTransactions();
+            // Filter data by date range - PASTIKAN FORMAT SAMA (YYYY-MM-DD)
+            const filtered = allTransactions.filter(t => {
+                const transDate = t.date || t.transactionDate || '';
+                // Pastikan format tanggal sama
+                return transDate >= dateFrom && transDate <= dateTo;
+            });
 
-            // Filter by date range
-            const filtered = allTransactions.filter(t => 
-                t.date >= dateFrom && t.date <= dateTo
-            );
+            console.log('📊 Transaksi ditemukan setelah filter:', filtered.length);
 
-            // Render report
+            if (filtered.length === 0) {
+                showAlert('Tidak ada transaksi dalam periode ini!', 'warning');
+                renderEmptyReport(dateFrom, dateTo, reportType);
+                return;
+            }
+
             renderReport(filtered, dateFrom, dateTo, reportType);
-
-            // Hide loading
-            hideReportLoading();
         }
 
         // ============================================
-        // 9. RENDER REPORT
+        // 7. RENDER EMPTY REPORT
+        // ============================================
+        function renderEmptyReport(dateFrom, dateTo, reportType) {
+            const container = document.getElementById('reportContainer');
+            container.innerHTML = `
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <h4>Tidak Ada Data Transaksi</h4>
+                            <p>Periode: ${formatDate(dateFrom)} - ${formatDate(dateTo)}</p>
+                            <p class="text-muted">Belum ada transaksi pada periode ini.</p>
+                            <a href="transactions-create.html" class="btn btn-success mt-3">
+                                <i class="bi bi-plus-circle"></i> Tambah Transaksi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // 8. RENDER REPORT
         // ============================================
         function renderReport(transactions, dateFrom, dateTo, reportType) {
             const container = document.getElementById('reportContainer');
-            if (!container) return;
-
-            if (transactions.length === 0) {
-                container.innerHTML = `
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="empty-state">
-                                <i class="bi bi-inbox"></i>
-                                <h5>Tidak ada data untuk periode ini</h5>
-                                <p>Silakan pilih rentang tanggal yang berbeda</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
 
             // Calculate summary
             let totalTransactions = transactions.length;
@@ -1069,11 +751,14 @@
             const farmers = {};
 
             transactions.forEach(t => {
-                totalRevenue += t.totalAmount;
-                totalNetWeight += t.netWeight;
+                totalRevenue += t.totalAmount || t.total || 0;
+                totalNetWeight += t.netWeight || t.net_weight || 0;
                 
-                products[t.product] = (products[t.product] || 0) + 1;
-                farmers[t.farmer] = (farmers[t.farmer] || 0) + t.totalAmount;
+                const productName = t.productName || t.product || 'Unknown';
+                products[productName] = (products[productName] || 0) + 1;
+                
+                const farmerName = t.farmerName || t.farmer || 'Unknown';
+                farmers[farmerName] = (farmers[farmerName] || 0) + (t.totalAmount || t.total || 0);
             });
 
             // Build report HTML
@@ -1081,11 +766,11 @@
                 <div class="report-header mb-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
-                            <h5 class="fw-bold mb-1">Laporan Transaksi</h5>
+                            <h5 class="fw-bold mb-1">📊 Laporan Transaksi</h5>
                             <span class="report-period">
                                 <i class="bi bi-calendar3 me-1"></i>
                                 ${formatDate(dateFrom)} - ${formatDate(dateTo)}
-                                <span class="badge bg-danger ms-2">${reportType.toUpperCase()}</span>
+                                <span class="badge bg-success ms-2">${reportType.toUpperCase()}</span>
                             </span>
                         </div>
                         <div class="d-flex gap-2">
@@ -1105,61 +790,53 @@
                 <!-- Summary Cards -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-3">
-                        <div class="card report-summary-card bg-primary bg-opacity-10 border-0">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-muted">Total Transaksi</h6>
-                                        <h3 class="fw-bold">${totalTransactions}</h3>
-                                    </div>
-                                    <div class="summary-icon text-primary">
-                                        <i class="bi bi-cash-stack"></i>
-                                    </div>
+                        <div class="report-summary-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Total Transaksi</h6>
+                                    <h3 class="fw-bold">${totalTransactions}</h3>
+                                </div>
+                                <div class="summary-icon text-success">
+                                    <i class="bi bi-cash-stack"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card report-summary-card bg-success bg-opacity-10 border-0">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-muted">Total Pendapatan</h6>
-                                        <h3 class="fw-bold text-success">${formatCurrency(totalRevenue)}</h3>
-                                    </div>
-                                    <div class="summary-icon text-success">
-                                        <i class="bi bi-coin"></i>
-                                    </div>
+                        <div class="report-summary-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Total Pendapatan</h6>
+                                    <h3 class="fw-bold text-success">${formatCurrency(totalRevenue)}</h3>
+                                </div>
+                                <div class="summary-icon text-success">
+                                    <i class="bi bi-coin"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card report-summary-card bg-info bg-opacity-10 border-0">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-muted">Total Berat Bersih</h6>
-                                        <h3 class="fw-bold text-info">${totalNetWeight.toFixed(2)} kg</h3>
-                                    </div>
-                                    <div class="summary-icon text-info">
-                                        <i class="bi bi-scale"></i>
-                                    </div>
+                        <div class="report-summary-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Total Berat Bersih</h6>
+                                    <h3 class="fw-bold text-success">${totalNetWeight.toFixed(2)} kg</h3>
+                                </div>
+                                <div class="summary-icon text-success">
+                                    <i class="bi bi-scale"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card report-summary-card bg-warning bg-opacity-10 border-0">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-muted">Rata-rata per Transaksi</h6>
-                                        <h3 class="fw-bold text-warning">${formatCurrency(totalRevenue / totalTransactions)}</h3>
-                                    </div>
-                                    <div class="summary-icon text-warning">
-                                        <i class="bi bi-graph-up"></i>
-                                    </div>
+                        <div class="report-summary-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Rata-rata per Transaksi</h6>
+                                    <h3 class="fw-bold text-success">${formatCurrency(totalRevenue / totalTransactions)}</h3>
+                                </div>
+                                <div class="summary-icon text-success">
+                                    <i class="bi bi-graph-up"></i>
                                 </div>
                             </div>
                         </div>
@@ -1171,7 +848,7 @@
                     <div class="col-12">
                         <div class="card border-0 shadow-sm">
                             <div class="card-header bg-transparent">
-                                <h6 class="fw-bold mb-0">Grafik Pendapatan Per Hari</h6>
+                                <h6 class="fw-bold mb-0"><i class="bi bi-graph-up text-success"></i> Grafik Pendapatan Per Hari</h6>
                             </div>
                             <div class="card-body">
                                 <div class="chart-container">
@@ -1187,7 +864,7 @@
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm">
                             <div class="card-header bg-transparent">
-                                <h6 class="fw-bold mb-0"><i class="bi bi-box-seam text-primary"></i> Top 5 Produk Terlaris</h6>
+                                <h6 class="fw-bold mb-0"><i class="bi bi-box-seam text-success"></i> Top 5 Produk Terlaris</h6>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -1213,7 +890,7 @@
                                                             <td>${count}</td>
                                                             <td>
                                                                 <div class="progress" style="height:8px;width:80px;">
-                                                                    <div class="progress-bar bg-primary" style="width:${percentage}%;"></div>
+                                                                    <div class="progress-bar bg-success" style="width:${percentage}%;"></div>
                                                                 </div>
                                                                 <span class="small ms-2">${percentage}%</span>
                                                             </td>
@@ -1229,7 +906,7 @@
                     <div class="col-md-6">
                         <div class="card border-0 shadow-sm">
                             <div class="card-header bg-transparent">
-                                <h6 class="fw-bold mb-0"><i class="bi bi-people text-success"></i> Top 5 Petani Terbanyak</h6>
+                                <h6 class="fw-bold mb-0"><i class="bi bi-people text-success"></i> Top 5 Petani</h6>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -1292,15 +969,13 @@
                                     ${transactions.map(t => `
                                         <tr>
                                             <td>
-                                                <span class="badge bg-primary bg-opacity-10 text-primary transaction-code">
-                                                    ${t.code}
-                                                </span>
+                                                <span class="transaction-code">${t.code || t.transactionCode || '-'}</span>
                                             </td>
-                                            <td>${t.farmer}</td>
-                                            <td>${t.product}</td>
-                                            <td>${t.netWeight.toFixed(2)} kg</td>
-                                            <td class="fw-bold text-success">${formatCurrency(t.totalAmount)}</td>
-                                            <td>${formatDate(t.date)}</td>
+                                            <td>${t.farmerName || t.farmer || '-'}</td>
+                                            <td>${t.productName || t.product || '-'}</td>
+                                            <td>${(t.netWeight || t.net_weight || 0).toFixed(2)} kg</td>
+                                            <td class="fw-bold text-success">${formatCurrency(t.totalAmount || t.total || 0)}</td>
+                                            <td>${formatDate(t.date || t.transactionDate)}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1325,14 +1000,13 @@
                         url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
                     },
                     order: [[5, 'desc']],
-                    pageLength: 10,
-                    responsive: true
+                    pageLength: 10
                 });
             }
         }
 
         // ============================================
-        // 10. CREATE REPORT CHART
+        // 9. CREATE REPORT CHART
         // ============================================
         function createReportChart(transactions) {
             const ctx = document.getElementById('reportChart');
@@ -1347,10 +1021,11 @@
             // Group by date
             const dateMap = new Map();
             transactions.forEach(t => {
-                if (dateMap.has(t.date)) {
-                    dateMap.set(t.date, dateMap.get(t.date) + t.totalAmount);
+                const date = t.date || t.transactionDate;
+                if (dateMap.has(date)) {
+                    dateMap.set(date, dateMap.get(date) + (t.totalAmount || t.total || 0));
                 } else {
-                    dateMap.set(t.date, t.totalAmount);
+                    dateMap.set(date, t.totalAmount || t.total || 0);
                 }
             });
 
@@ -1359,7 +1034,7 @@
             const data = sortedDates.map(d => dateMap.get(d));
 
             const isDark = document.body.classList.contains('dark-mode');
-            const textColor = isDark ? '#e4e6eb' : '#212529';
+            const textColor = isDark ? '#e8f5e9' : '#2a3a2a';
             const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
 
             reportChart = new Chart(ctx, {
@@ -1369,11 +1044,11 @@
                     datasets: [{
                         label: 'Pendapatan (Rp)',
                         data: data,
-                        borderColor: '#dc3545',
-                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        borderColor: '#2e7d32',
+                        backgroundColor: 'rgba(46, 125, 50, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: '#dc3545',
+                        pointBackgroundColor: '#2e7d32',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                         pointRadius: 4
@@ -1430,17 +1105,127 @@
         }
 
         // ============================================
-        // 11. EXPORT FUNCTIONS
+        // 10. EXPORT EXCEL
         // ============================================
-        function exportPDF() {
-            showAlert('Fitur export PDF sedang dalam pengembangan', 'info');
-        }
-        window.exportPDF = exportPDF;
-
         function exportExcel() {
-            showAlert('Fitur export Excel sedang dalam pengembangan', 'info');
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const transactions = allTransactions.filter(t => {
+                const transDate = t.date || t.transactionDate || '';
+                return transDate >= dateFrom && transDate <= dateTo;
+            });
+            
+            if (transactions.length === 0) {
+                showAlert('Tidak ada data untuk diexport!', 'warning');
+                return;
+            }
+
+            try {
+                const exportData = transactions.map((t, index) => ({
+                    'No': index + 1,
+                    'Kode Transaksi': t.code || t.transactionCode || '-',
+                    'Petani': t.farmerName || t.farmer || '-',
+                    'Produk': t.productName || t.product || '-',
+                    'Berat Bersih (kg)': (t.netWeight || t.net_weight || 0).toFixed(2),
+                    'Total (Rp)': t.totalAmount || t.total || 0,
+                    'Tanggal': t.date || t.transactionDate || '-'
+                }));
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(exportData);
+                XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
+                XLSX.writeFile(wb, `laporan_${new Date().toISOString().split('T')[0]}.xlsx`);
+                
+                showAlert('✅ Data berhasil diexport ke Excel!', 'success');
+            } catch (error) {
+                console.error('Export Excel error:', error);
+                showAlert('Gagal export Excel: ' + error.message, 'danger');
+            }
         }
         window.exportExcel = exportExcel;
+
+        // ============================================
+        // 11. EXPORT PDF
+        // ============================================
+        function exportPDF() {
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            const transactions = allTransactions.filter(t => {
+                const transDate = t.date || t.transactionDate || '';
+                return transDate >= dateFrom && transDate <= dateTo;
+            });
+            
+            if (transactions.length === 0) {
+                showAlert('Tidak ada data untuk diexport!', 'warning');
+                return;
+            }
+
+            try {
+                const container = document.createElement('div');
+                container.style.padding = '20px';
+                container.style.fontFamily = 'Inter, sans-serif';
+                
+                let tableHtml = `
+                    <div style="text-align:center;margin-bottom:20px;border-bottom:2px solid #2e7d32;padding-bottom:10px;">
+                        <h1 style="color:#2e7d32;font-size:24px;">📊 Laporan Transaksi</h1>
+                        <p style="color:#6c757d;">Periode: ${formatDate(dateFrom)} - ${formatDate(dateTo)}</p>
+                        <p style="color:#6c757d;">Total: ${transactions.length} transaksi</p>
+                    </div>
+                    <table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:12px;">
+                        <thead>
+                            <tr style="background:#2e7d32;color:white;">
+                                <th>#</th>
+                                <th>Kode</th>
+                                <th>Petani</th>
+                                <th>Produk</th>
+                                <th>Berat Bersih</th>
+                                <th>Total</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                transactions.forEach((t, index) => {
+                    tableHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${t.code || t.transactionCode || '-'}</td>
+                            <td>${t.farmerName || t.farmer || '-'}</td>
+                            <td>${t.productName || t.product || '-'}</td>
+                            <td>${(t.netWeight || t.net_weight || 0).toFixed(2)} kg</td>
+                            <td>${formatCurrency(t.totalAmount || t.total || 0)}</td>
+                            <td>${formatDate(t.date || t.transactionDate)}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHtml += `
+                        </tbody>
+                    </table>
+                    <div style="text-align:center;margin-top:20px;border-top:2px solid #e9ecef;padding-top:10px;color:#6c757d;font-size:12px;">
+                        Dicetak pada: ${new Date().toLocaleString('id-ID')}
+                    </div>
+                `;
+
+                container.innerHTML = tableHtml;
+
+                const opt = {
+                    margin: 10,
+                    filename: `laporan_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                };
+
+                html2pdf().set(opt).from(container).save();
+                showAlert('✅ Data berhasil diexport ke PDF!', 'success');
+            } catch (error) {
+                console.error('Export PDF error:', error);
+                showAlert('Gagal export PDF: ' + error.message, 'danger');
+            }
+        }
+        window.exportPDF = exportPDF;
 
         // ============================================
         // 12. FORMAT HELPERS
@@ -1466,28 +1251,7 @@
         }
 
         // ============================================
-        // 13. REPORT LOADING
-        // ============================================
-        function showReportLoading() {
-            const container = document.getElementById('reportContainer');
-            if (container) {
-                container.innerHTML = `
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-danger" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-3 text-muted">Memuat data laporan...</p>
-                    </div>
-                `;
-            }
-        }
-
-        function hideReportLoading() {
-            // Content will be replaced by renderReport
-        }
-
-        // ============================================
-        // 14. SHOW ALERT
+        // 13. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
@@ -1500,11 +1264,18 @@
                 info: 'bi-info-circle-fill'
             };
 
+            const colors = {
+                success: '#d4edda',
+                danger: '#f8d7da',
+                warning: '#fff3cd',
+                info: '#cce5ff'
+            };
+
             container.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <div class="alert alert-${type} alert-dismissible fade show" style="background: ${colors[type]}; border-radius: 12px;">
                     <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-2"></i>
                     ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
 
@@ -1513,62 +1284,49 @@
                 if (alert) {
                     alert.style.transition = 'opacity 0.5s ease';
                     alert.style.opacity = '0';
-                    setTimeout(() => {
-                        if (alert.parentNode) alert.remove();
-                    }, 500);
+                    setTimeout(() => { if (alert.parentNode) alert.remove(); }, 500);
                 }
             }, 5000);
         }
-        window.showAlert = showAlert;
 
         // ============================================
-        // 15. SIDEBAR TOGGLE
+        // 14. SIDEBAR TOGGLE
         // ============================================
         function initSidebar() {
             const toggleBtn = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-
             if (!toggleBtn || !sidebar) return;
-
             toggleBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 sidebar.classList.toggle('active');
-                if (overlay) {
-                    overlay.classList.toggle('active');
-                }
+                if (overlay) overlay.classList.toggle('active');
             });
-
             if (overlay) {
                 overlay.addEventListener('click', function() {
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
                 });
             }
-
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
-                    if (overlay) {
-                        overlay.classList.remove('active');
-                    }
+                    if (overlay) overlay.classList.remove('active');
                 }
             });
         }
 
         // ============================================
-        // 16. DARK MODE
+        // 15. DARK MODE
         // ============================================
         function initDarkMode() {
             const toggleBtn = document.getElementById('darkModeToggle');
             if (!toggleBtn) return;
-
             const darkMode = localStorage.getItem('darkMode') === 'true';
             if (darkMode) {
                 document.body.classList.add('dark-mode');
                 toggleBtn.innerHTML = '<i class="bi bi-sun fs-5"></i>';
             }
-
             toggleBtn.addEventListener('click', function() {
                 document.body.classList.toggle('dark-mode');
                 const isDark = document.body.classList.contains('dark-mode');
@@ -1576,29 +1334,21 @@
                 this.innerHTML = isDark ? '<i class="bi bi-sun fs-5"></i>' : '<i class="bi bi-moon fs-5"></i>';
                 
                 // Re-render chart if exists
-                if (reportChart) {
-                    const data = reportChart.data;
-                    reportChart.destroy();
-                    reportChart = null;
-                    // Recreate chart with new colors
-                    const transactions = allTransactions.filter(t => 
-                        t.date >= document.getElementById('dateFrom').value && 
-                        t.date <= document.getElementById('dateTo').value
-                    );
-                    createReportChart(transactions);
-                }
+                const dateFrom = document.getElementById('dateFrom').value;
+                const dateTo = document.getElementById('dateTo').value;
+                const filtered = allTransactions.filter(t => {
+                    const transDate = t.date || t.transactionDate || '';
+                    return transDate >= dateFrom && transDate <= dateTo;
+                });
+                createReportChart(filtered);
             });
         }
 
         // ============================================
-        // 17. LOGOUT
+        // 16. LOGOUT
         // ============================================
         function initLogout() {
-            const logoutBtns = [
-                document.getElementById('logoutBtn'),
-                document.getElementById('logoutDropdown')
-            ];
-
+            const logoutBtns = [document.getElementById('logoutBtn'), document.getElementById('logoutDropdown')];
             logoutBtns.forEach(btn => {
                 if (btn) {
                     btn.addEventListener('click', function(e) {
@@ -1611,7 +1361,9 @@
                             confirmButtonColor: '#dc3545',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: 'Ya, Logout!',
-                            cancelButtonText: 'Batal'
+                            cancelButtonText: 'Batal',
+                            background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
+                            color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 localStorage.removeItem('user');
@@ -1627,10 +1379,13 @@
         }
 
         // ============================================
-        // 18. LOG
+        // 17. LOG
         // ============================================
-        console.log('%c✅ Halaman Laporan berhasil dimuat!', 'color: #dc3545; font-size: 16px; font-weight: bold;');
-        console.log('%c📊 Siap menampilkan laporan transaksi', 'color: #20c997;');
+        console.log('%c🌿 Halaman Laporan', 'color: #2e7d32; font-size: 16px; font-weight: bold;');
+        console.log('📊 Total ' + allTransactions.length + ' transaksi tersedia');
+        console.log('%c✅ Siap menampilkan laporan transaksi', 'color: #4caf50;');
+        console.log('%c💡 Data dari LocalStorage (Tanpa Firebase)', 'color: #ff9800;');
+        console.log('%c📅 Format tanggal: YYYY-MM-DD', 'color: #6a8a6a;');
     </script>
 
 </body>

@@ -2,58 +2,82 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - Sistem Manajemen Timbangan Hasil Panen</title>
     
-    <!-- Bootstrap 5 dari CDN -->
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
-        /* ============================================
-           RESET & BASE
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --primary-bg: #e8f5e9;
+            --white: #ffffff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --text-dark: #1a2a1a;
+            --text-muted: #6c757d;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0a0e27, #1a1a3e);
+            min-height: 100dvh;
+            background: linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 50%, #0a1a0a 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
             position: relative;
             overflow: hidden;
         }
 
-        /* Background animasi */
         body::before {
             content: '';
-            position: absolute;
+            position: fixed;
             top: -50%;
-            right: -20%;
-            width: 600px;
-            height: 600px;
+            right: -30%;
+            width: 400px;
+            height: 400px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(13, 110, 253, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(46,125,50,0.08) 0%, transparent 70%);
             animation: pulseBg 8s ease-in-out infinite;
+            pointer-events: none;
         }
 
         body::after {
             content: '';
-            position: absolute;
+            position: fixed;
             bottom: -30%;
-            left: -10%;
-            width: 400px;
-            height: 400px;
+            left: -20%;
+            width: 300px;
+            height: 300px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(111, 66, 193, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(76,175,80,0.06) 0%, transparent 70%);
             animation: pulseBg 10s ease-in-out infinite reverse;
+            pointer-events: none;
         }
 
         @keyframes pulseBg {
@@ -61,16 +85,14 @@
             50% { transform: scale(1.2); opacity: 1; }
         }
 
-        /* ============================================
-           LOADING SCREEN
-           ============================================ */
+        /* Loading Screen */
         #loadingScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -87,52 +109,52 @@
         .loader-container {
             text-align: center;
             color: white;
+            padding: 20px;
+        }
+
+        .loader-icon {
+            font-size: 3.5rem;
+            display: block;
+            animation: bounceLoader 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounceLoader {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.1); }
         }
 
         .loader {
-            width: 70px;
-            height: 70px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.15);
             border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 0 auto;
+            margin: 12px auto 0;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .loader-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-            animation: bounceIcon 1.5s ease-in-out infinite;
-        }
-
-        @keyframes bounceIcon {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
         .loader-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 12px;
         }
 
         .loader-subtext {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             opacity: 0.7;
-            margin-top: 0.3rem;
+            margin-top: 2px;
         }
 
         .loader-progress {
-            width: 200px;
+            width: 150px;
             height: 3px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             border-radius: 10px;
-            margin: 20px auto 0;
+            margin: 16px auto 0;
             overflow: hidden;
         }
 
@@ -150,262 +172,427 @@
             100% { width: 100%; }
         }
 
-        /* ============================================
-           LOGIN CARD
-           ============================================ */
+        /* Auth Card */
         .auth-card {
-            border-radius: 24px;
-            background: rgba(255, 255, 255, 0.97);
-            backdrop-filter: blur(20px);
-            border: none;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
+            background: #ffffff;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+            padding: 28px 24px;
             position: relative;
-            z-index: 1;
-            animation: slideUp 0.6s ease;
+            z-index: 10;
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .auth-card::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .auth-card::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .auth-card::-webkit-scrollbar-thumb {
+            background: #d5ddd5;
+            border-radius: 10px;
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .auth-card .card-body {
-            padding: 40px;
+            from { 
+                opacity: 0; 
+                transform: translateY(30px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
 
         /* Logo */
         .auth-logo {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
         .auth-logo .logo-icon {
-            width: 75px;
-            height: 75px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: white;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 24px rgba(46,125,50,0.2);
             animation: floatLogo 3s ease-in-out infinite;
-            box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
         }
 
         @keyframes floatLogo {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(-3deg); }
+            50% { transform: translateY(-5px) rotate(-2deg); }
         }
 
         .auth-logo h3 {
             font-weight: 700;
-            color: #0a0e27;
-            font-size: 1.6rem;
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
         }
 
         .auth-logo p {
-            color: #6c757d;
-            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
             margin-bottom: 0;
         }
 
         /* Form */
-        .auth-card .form-label {
+        .form-label {
             font-weight: 600;
-            font-size: 0.9rem;
-            color: #495057;
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            margin-bottom: 4px;
         }
 
-        .auth-card .form-control {
-            border-radius: 12px;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
+        .input-group {
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--gray-100);
+            border: 2px solid var(--gray-300);
             transition: all 0.3s ease;
-            font-size: 0.95rem;
         }
 
-        .auth-card .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+        .input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
         }
 
-        .auth-card .form-control.is-invalid {
+        .input-group.has-error {
             border-color: #dc3545;
         }
 
-        .auth-card .form-control.is-invalid:focus {
-            box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.12);
+        .input-group.has-error:focus-within {
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
         }
 
-        .auth-card .input-group-text {
-            border-radius: 12px 0 0 12px;
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-right: none;
-            color: #6c757d;
-            font-size: 1rem;
-        }
-
-        .auth-card .input-group .form-control {
-            border-radius: 0 12px 12px 0;
-        }
-
-        .auth-card .btn-login {
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+        .input-group-text {
+            background: transparent;
             border: none;
-            color: white;
-            width: 100%;
+            color: var(--gray-500);
+            padding: 0 0 0 12px;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            border: none;
+            background: transparent;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            border-radius: 0;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .form-control::placeholder {
+            color: var(--gray-400);
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        .form-control.is-invalid {
+            background: transparent;
+        }
+
+        .toggle-password {
+            background: transparent;
+            border: none;
+            color: var(--gray-500);
+            padding: 0 12px 0 0;
             cursor: pointer;
-            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
         }
 
-        .auth-card .btn-login:hover {
+        .toggle-password:hover {
+            color: var(--gray-700);
+        }
+
+        .invalid-feedback {
+            font-size: 0.75rem;
+            color: #dc3545;
+            margin-top: 3px;
+            display: none;
+        }
+
+        .invalid-feedback.show {
+            display: block;
+        }
+
+        /* Button */
+        .btn-login {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            background: linear-gradient(135deg, #2e7d32, #43a047);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(13, 110, 253, 0.35);
+            box-shadow: 0 6px 24px rgba(46,125,50,0.3);
         }
 
-        .auth-card .btn-login:disabled {
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        .btn-login:disabled {
             opacity: 0.7;
             transform: none;
             cursor: not-allowed;
         }
 
-        .auth-card .btn-login .spinner-border {
-            width: 20px;
-            height: 20px;
+        .btn-login .spinner-border {
+            width: 16px;
+            height: 16px;
+            border-width: 2px;
         }
 
-        .auth-card .toggle-password {
-            border-radius: 0 12px 12px 0;
-            border: 2px solid #e9ecef;
-            border-left: none;
-            background: #f8f9fa;
-            color: #6c757d;
-            padding: 0 16px;
+        /* Checkbox */
+        .form-check {
+            padding-left: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            border-radius: 4px;
+            border: 2px solid var(--gray-400);
             cursor: pointer;
             transition: all 0.3s ease;
+            flex-shrink: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            margin-top: 0;
         }
 
-        .auth-card .toggle-password:hover {
-            background: #e9ecef;
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
         }
 
-        .auth-card .form-check-label {
-            font-size: 0.9rem;
-            color: #6c757d;
+        .form-check-input:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
         }
 
-        .auth-card .auth-link {
-            color: #0d6efd;
+        .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+        }
+
+        .form-check-label {
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            cursor: pointer;
+        }
+
+        .auth-link {
+            color: var(--primary);
             text-decoration: none;
             font-weight: 600;
         }
 
-        .auth-card .auth-link:hover {
+        .auth-link:hover {
             text-decoration: underline;
         }
 
-        .auth-card .divider {
+        /* Divider */
+        .divider {
             display: flex;
             align-items: center;
-            margin: 24px 0;
+            margin: 18px 0;
         }
 
-        .auth-card .divider::before,
-        .auth-card .divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid var(--gray-300);
         }
 
-        .auth-card .divider span {
-            padding: 0 16px;
-            color: #6c757d;
-            font-size: 0.85rem;
+        .divider span {
+            padding: 0 14px;
+            color: var(--gray-500);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* Alert */
-        #alertContainer {
-            margin-bottom: 16px;
-            min-height: 50px;
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 16px;
         }
 
-        .alert {
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 0.9rem;
-            animation: slideDown 0.4s ease;
+        .auth-footer p {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            margin-bottom: 0;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .auth-footer .auth-link {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
         }
 
-        .alert i {
-            margin-right: 8px;
+        .auth-footer .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .auth-footer .back-link {
+            display: inline-block;
+            margin-top: 6px;
+            color: var(--gray-500);
+            font-size: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .auth-footer .back-link:hover {
+            color: var(--gray-700);
         }
 
         /* Demo Credentials */
         .demo-credentials {
             margin-top: 16px;
-            padding: 14px 16px;
-            background: #f0f4ff;
-            border-radius: 12px;
-            border: 1px solid rgba(13, 110, 253, 0.15);
+            padding: 12px 14px;
+            background: var(--primary-bg);
+            border-radius: 10px;
+            border: 1px solid rgba(46,125,50,0.12);
         }
 
         .demo-credentials small {
             display: block;
             text-align: center;
-            color: #6c757d;
-            font-size: 0.75rem;
-            margin-bottom: 6px;
+            color: var(--gray-600);
+            font-size: 0.7rem;
+            margin-bottom: 4px;
         }
 
         .demo-credentials .row {
-            font-size: 0.8rem;
-            color: #495057;
+            font-size: 0.75rem;
+            color: var(--gray-700);
         }
 
         .demo-credentials .row strong {
-            color: #0d6efd;
+            color: var(--primary);
         }
 
-        .demo-credentials .badge-demo {
-            background: rgba(13, 110, 253, 0.1);
-            color: #0d6efd;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-size: 0.7rem;
+        /* Alert */
+        #alertContainer {
+            margin-bottom: 12px;
+            min-height: 38px;
         }
 
-        /* ============================================
-           WHATSAPP FLOAT
-           ============================================ */
+        .alert {
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border: none;
+            animation: slideDown 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .alert i {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .alert .btn-close {
+            padding: 3px;
+            font-size: 0.6rem;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* WhatsApp Float */
         .whatsapp-float {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 56px;
-            height: 56px;
+            bottom: 16px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
             background: #25d366;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            font-size: 1.5rem;
+            box-shadow: 0 4px 16px rgba(37,211,102,0.3);
             z-index: 999;
             transition: all 0.3s ease;
             animation: pulseWA 2s ease-in-out infinite;
@@ -415,72 +602,90 @@
         .whatsapp-float:hover {
             transform: scale(1.1) rotate(-5deg);
             color: white;
-            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
+            box-shadow: 0 6px 24px rgba(37,211,102,0.4);
         }
 
         @keyframes pulseWA {
-            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
-            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6); }
+            0%, 100% { box-shadow: 0 4px 16px rgba(37,211,102,0.3); }
+            50% { box-shadow: 0 4px 32px rgba(37,211,102,0.5); }
         }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media (max-width: 576px) {
-            .auth-card .card-body {
-                padding: 24px;
-            }
-            .auth-logo .logo-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-            }
-            .auth-logo h3 {
-                font-size: 1.2rem;
-            }
-            .whatsapp-float {
-                width: 48px;
-                height: 48px;
-                font-size: 1.5rem;
-                bottom: 16px;
-                right: 16px;
-            }
-            .demo-credentials .row {
-                font-size: 0.7rem;
-            }
-        }
-
-        /* ============================================
-           SHAKE ANIMATION (untuk error)
-           ============================================ */
+        /* Shake */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-15px); }
-            40% { transform: translateX(15px); }
-            60% { transform: translateX(-10px); }
-            80% { transform: translateX(10px); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
         }
 
         .shake {
-            animation: shake 0.5s ease;
+            animation: shake 0.4s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+
+            .auth-card {
+                padding: 20px 16px;
+                border-radius: 16px;
+                max-height: 94vh;
+            }
+
+            .auth-logo .logo-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+                border-radius: 14px;
+            }
+
+            .auth-logo h3 {
+                font-size: 1.1rem;
+            }
+
+            .auth-logo p {
+                font-size: 0.75rem;
+            }
+
+            .form-control {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+
+            .form-label {
+                font-size: 0.75rem;
+            }
+
+            .btn-login {
+                padding: 9px;
+                font-size: 0.85rem;
+            }
+
+            .whatsapp-float {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                bottom: 12px;
+                right: 12px;
+            }
+
+            .demo-credentials .row {
+                font-size: 0.65rem;
+            }
         }
     </style>
 </head>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<!-- Firebase Config -->
-<script src="js/firebase-config.js"></script>
 <body>
 
-    <!-- ============================================
-    LOADING SCREEN
-    ============================================ -->
+    <!-- Loading Screen -->
     <div id="loadingScreen">
         <div class="loader-container">
-            <i class="bi bi-scale loader-icon"></i>
+            <i class="bi bi-tree loader-icon"></i>
             <div class="loader"></div>
             <div class="loader-text">Memuat...</div>
             <div class="loader-subtext">Sistem Manajemen Timbangan Hasil Panen</div>
@@ -490,142 +695,156 @@
         </div>
     </div>
 
-    <!-- ============================================
-    LOGIN CARD
-    ============================================ -->
+    <!-- Login Card -->
     <div class="auth-card" id="authCard">
-        <div class="card-body">
-            <!-- Logo -->
-            <div class="auth-logo">
-                <div class="logo-icon">
-                    <i class="bi bi-scale"></i>
+        <div class="auth-logo">
+            <div class="logo-icon">
+                <i class="bi bi-tree"></i>
+            </div>
+            <h3>Sistem Timbangan Panen</h3>
+            <p>Masuk untuk mengelola transaksi</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="loginForm" novalidate>
+            <div class="mb-3">
+                <label for="email" class="form-label">
+                    <i class="bi bi-envelope me-1"></i> Email
+                </label>
+                <div class="input-group" id="emailGroup">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" 
+                           class="form-control" 
+                           id="email" 
+                           placeholder="admin@timbanganpanen.com" 
+                           value="admin@timbanganpanen.com"
+                           autofocus
+                           required>
                 </div>
-                <h3>Sistem Timbangan Panen</h3>
-                <p>Masuk untuk mengelola transaksi</p>
+                <div class="invalid-feedback" id="emailFeedback">Email wajib diisi</div>
             </div>
 
-            <!-- Alert Container -->
-            <div id="alertContainer"></div>
-
-            <!-- Login Form -->
-            <form id="loginForm" novalidate>
-                <div class="mb-3">
-                    <label for="email" class="form-label">
-                        <i class="bi bi-envelope me-1"></i> Email
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" 
-                               class="form-control" 
-                               id="email" 
-                               placeholder="admin@timbanganpanen.com" 
-                               value="admin@timbanganpanen.com"
-                               autofocus
-                               required>
-                    </div>
-                    <div class="invalid-feedback" id="emailFeedback">Email wajib diisi</div>
+            <div class="mb-3">
+                <label for="password" class="form-label">
+                    <i class="bi bi-lock me-1"></i> Password
+                </label>
+                <div class="input-group" id="passwordGroup">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           placeholder="Masukkan password"
+                           value="admin123"
+                           required>
+                    <button class="toggle-password" type="button" id="togglePassword">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
                 </div>
-
-                <div class="mb-3">
-                    <label for="password" class="form-label">
-                        <i class="bi bi-lock me-1"></i> Password
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                        <input type="password" 
-                               class="form-control" 
-                               id="password" 
-                               placeholder="Masukkan password"
-                               value="admin123"
-                               required>
-                        <button class="toggle-password" type="button" id="togglePassword">
-                            <i class="bi bi-eye" id="toggleIcon"></i>
-                        </button>
-                    </div>
-                    <div class="invalid-feedback" id="passwordFeedback">Password wajib diisi</div>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="remember">
-                        <label class="form-check-label" for="remember">Ingat saya</label>
-                    </div>
-                    <a href="#" class="auth-link small">Lupa password?</a>
-                </div>
-
-                <button type="submit" class="btn-login" id="loginBtn">
-                    <i class="bi bi-box-arrow-in-right"></i> Masuk
-                </button>
-            </form>
-
-            <div class="divider">
-                <span>atau</span>
+                <div class="invalid-feedback" id="passwordFeedback">Password wajib diisi</div>
             </div>
 
-            <div class="text-center">
-                <p class="text-muted mb-0">
-                    Belum punya akun? <a href="register.html" class="auth-link">Daftar sekarang</a>
-                </p>
-                <a href="index.html" class="text-muted text-decoration-none small mt-2 d-inline-block">
-                    <i class="bi bi-arrow-left"></i> Kembali ke beranda
-                </a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="remember">
+                    <label class="form-check-label" for="remember">Ingat saya</label>
+                </div>
+                <a href="#" class="auth-link small">Lupa password?</a>
             </div>
 
-            <!-- Demo Credentials -->
-            <div class="demo-credentials">
-                <small>
-                    <i class="bi bi-info-circle"></i> 
-                    Akun Demo 
-                    <span class="badge-demo">Gratis</span>
-                </small>
-                <div class="row text-center">
-                    <div class="col-6">
-                        <span class="text-muted">Email</span><br>
-                        <strong>admin@timbanganpanen.com</strong>
-                    </div>
-                    <div class="col-6">
-                        <span class="text-muted">Password</span><br>
-                        <strong>admin123</strong>
-                    </div>
+            <button type="submit" class="btn-login" id="loginBtn">
+                <i class="bi bi-box-arrow-in-right"></i> Masuk
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>atau</span>
+        </div>
+
+        <div class="auth-footer">
+            <p>
+                Belum punya akun? <a href="register.html" class="auth-link">Daftar sekarang</a>
+            </p>
+            <a href="index.html" class="back-link">
+                <i class="bi bi-arrow-left"></i> Kembali ke beranda
+            </a>
+        </div>
+
+        <div class="demo-credentials">
+            <small>
+                <i class="bi bi-info-circle"></i> Akun Demo
+            </small>
+            <div class="row text-center">
+                <div class="col-6">
+                    <span class="text-muted">Email</span><br>
+                    <strong>admin@timbanganpanen.com</strong>
+                </div>
+                <div class="col-6">
+                    <span class="text-muted">Password</span><br>
+                    <strong>admin123</strong>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============================================
-    WHATSAPP FLOATING BUTTON
-    ============================================ -->
+    <!-- WhatsApp Float -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
        class="whatsapp-float" 
-       target="_blank"
-       title="Hubungi Admin via WhatsApp">
+       target="_blank">
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- ============================================
-    SCRIPTS - SEMUA INLINE, TIDAK PERLU FILE EKSTERNAL
-    ============================================ -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-        // Bootstrap JS untuk alert dismiss
-    </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // ============================================
-        // 1. HIDE LOADING SCREEN - MULTI FALLBACK
+        // 1. FIREBASE CONFIGURATION
         // ============================================
-        
-        // Method 1: DOM Ready
+        const firebaseConfig = {
+            apiKey: "AIzaSyDi_zEip2snQx_TlCN--tcgm5WZLXgZq4Q",
+            authDomain: "manajement-petani.firebaseapp.com",
+            databaseURL: "https://manajement-petani-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "manajement-petani",
+            storageBucket: "manajement-petani.firebasestorage.app",
+            messagingSenderId: "795537405486",
+            appId: "1:795537405486:web:7819bc9ac5da03d352d1bf",
+            measurementId: "G-QCW5W6FVCP"
+        };
+
+        // ============================================
+        // 2. INITIALIZE FIREBASE
+        // ============================================
+        let auth = null;
+        let db = null;
+        let firebaseReady = false;
+
+        try {
+            if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                firebaseReady = true;
+                console.log('✅ Firebase initialized successfully!');
+                console.log('🔥 Project: manajement-petani');
+            } else {
+                console.warn('⚠️ Firebase already initialized or SDK not loaded');
+            }
+        } catch (error) {
+            console.warn('⚠️ Firebase initialization failed:', error.message);
+            console.log('💡 Using demo mode (LocalStorage)');
+        }
+
+        // ============================================
+        // 3. HIDE LOADING SCREEN
+        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            hideLoading();
+            setTimeout(hideLoading, 500);
         });
 
-        // Method 2: 1.5 detik
         setTimeout(hideLoading, 1500);
-
-        // Method 3: 3 detik (PASTI)
         setTimeout(hideLoading, 3000);
-
-        // Method 4: 5 detik (ULTIMATE FALLBACK)
         setTimeout(hideLoading, 5000);
 
         function hideLoading() {
@@ -634,12 +853,12 @@
                 loadingScreen.classList.add('hidden');
                 setTimeout(function() {
                     loadingScreen.style.display = 'none';
-                }, 800);
+                }, 600);
             }
         }
 
         // ============================================
-        // 2. TOGGLE PASSWORD VISIBILITY
+        // 4. TOGGLE PASSWORD
         // ============================================
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
@@ -655,10 +874,17 @@
         });
 
         // ============================================
-        // 3. SHOW ALERT FUNCTION
+        // 5. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
+            
+            const alertClass = {
+                success: 'alert-success',
+                danger: 'alert-danger',
+                warning: 'alert-warning',
+                info: 'alert-info'
+            };
             
             const icons = {
                 success: 'bi-check-circle-fill',
@@ -667,22 +893,14 @@
                 info: 'bi-info-circle-fill'
             };
             
-            const colors = {
-                success: '#d1e7dd',
-                danger: '#f8d7da',
-                warning: '#fff3cd',
-                info: '#cfe2ff'
-            };
-            
             container.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="background: ${colors[type] || '#e9ecef'};">
-                    <i class="bi ${icons[type] || 'bi-info-circle-fill'}"></i>
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert ${alertClass[type]} alert-dismissible fade show" style="border-radius: 10px; padding: 8px 12px; font-size: 0.8rem;">
+                    <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-1"></i>
+                    <span style="flex:1;">${message}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding:3px;"></button>
                 </div>
             `;
             
-            // Auto hide after 5 seconds
             setTimeout(() => {
                 const alert = container.querySelector('.alert');
                 if (alert) {
@@ -692,11 +910,11 @@
                         if (alert.parentNode) alert.remove();
                     }, 500);
                 }
-            }, 5000);
+            }, 4000);
         }
 
         // ============================================
-        // 4. LOGIN HANDLER
+        // 6. LOGIN HANDLER - PRIORITAS LOCALSTORAGE
         // ============================================
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -705,18 +923,22 @@
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
 
-            // Reset validasi
-            document.getElementById('email').classList.remove('is-invalid');
-            document.getElementById('password').classList.remove('is-invalid');
+            // Reset validation
+            document.getElementById('emailGroup').classList.remove('has-error');
+            document.getElementById('passwordGroup').classList.remove('has-error');
+            document.getElementById('emailFeedback').classList.remove('show');
+            document.getElementById('passwordFeedback').classList.remove('show');
 
-            // Validasi
+            // Validate
             let isValid = true;
             if (!email) {
-                document.getElementById('email').classList.add('is-invalid');
+                document.getElementById('emailGroup').classList.add('has-error');
+                document.getElementById('emailFeedback').classList.add('show');
                 isValid = false;
             }
             if (!password) {
-                document.getElementById('password').classList.add('is-invalid');
+                document.getElementById('passwordGroup').classList.add('has-error');
+                document.getElementById('passwordFeedback').classList.add('show');
                 isValid = false;
             }
 
@@ -729,59 +951,183 @@
             const loginBtn = document.getElementById('loginBtn');
             const originalText = loginBtn.innerHTML;
             loginBtn.innerHTML = `
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                 Memproses...
             `;
             loginBtn.disabled = true;
 
-            // SIMULASI LOGIN (Demo Mode)
-            setTimeout(function() {
-                // Cek kredensial
-                if (email === 'admin@timbanganpanen.com' && password === 'admin123') {
-                    // Login BERHASIL
+            // ==========================================
+            // PRIORITAS 1: CEK LOCALSTORAGE (dari registrasi)
+            // ==========================================
+            let userFound = false;
+            try {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const foundUser = users.find(u => u.email === email && u.password === password);
+                
+                if (foundUser) {
+                    userFound = true;
                     const userData = {
-                        id: 'user_' + Date.now(),
-                        name: 'Admin',
+                        id: foundUser.id || 'user_' + Date.now(),
+                        name: foundUser.name || 'User',
                         email: email,
-                        role: 'admin',
-                        loginTime: new Date().toISOString()
+                        role: 'admin'
                     };
 
-                    // Simpan session
                     if (remember) {
                         localStorage.setItem('user', JSON.stringify(userData));
-                        localStorage.setItem('session', 'true');
                     } else {
                         sessionStorage.setItem('user', JSON.stringify(userData));
-                        sessionStorage.setItem('session', 'true');
                     }
 
-                    showAlert('✅ Login berhasil! Selamat datang, Admin!', 'success');
+                    showAlert('✅ Login berhasil! Selamat datang, ' + userData.name + '!', 'success');
 
-                    // Redirect ke dashboard
-                    setTimeout(function() {
+                    setTimeout(() => {
                         window.location.href = 'dashboard.html';
                     }, 1000);
-
-                } else {
-                    // Login GAGAL
-                    showAlert('❌ Email atau password salah! Silakan coba lagi.', 'danger');
-                    
-                    // Shake animation
-                    document.getElementById('authCard').classList.add('shake');
-                    setTimeout(function() {
-                        document.getElementById('authCard').classList.remove('shake');
-                    }, 500);
-
-                    // Reset button
-                    loginBtn.innerHTML = originalText;
-                    loginBtn.disabled = false;
+                    return;
                 }
-            }, 1500);
+            } catch (e) {
+                console.log('LocalStorage check error:', e);
+            }
+
+            // ==========================================
+            // PRIORITAS 2: CEK AKUN DEMO
+            // ==========================================
+            if (email === 'admin@timbanganpanen.com' && password === 'admin123') {
+                const userData = {
+                    id: 'user_demo_' + Date.now(),
+                    name: 'Admin',
+                    email: email,
+                    role: 'admin'
+                };
+
+                if (remember) {
+                    localStorage.setItem('user', JSON.stringify(userData));
+                } else {
+                    sessionStorage.setItem('user', JSON.stringify(userData));
+                }
+
+                showAlert('✅ Login berhasil! Selamat datang, Admin!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+                return;
+            }
+
+            // ==========================================
+            // PRIORITAS 3: LOGIN DENGAN FIREBASE (jika tersedia)
+            // ==========================================
+            if (firebaseReady && auth && !userFound) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(async (userCredential) => {
+                        const user = userCredential.user;
+                        
+                        let userData = {
+                            id: user.uid,
+                            name: user.displayName || email.split('@')[0],
+                            email: user.email,
+                            role: 'admin'
+                        };
+
+                        try {
+                            if (db) {
+                                const doc = await db.collection('users').doc(user.uid).get();
+                                if (doc.exists) {
+                                    userData = { id: user.uid, ...doc.data() };
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Firestore not available');
+                        }
+
+                        if (remember) {
+                            localStorage.setItem('user', JSON.stringify(userData));
+                        } else {
+                            sessionStorage.setItem('user', JSON.stringify(userData));
+                        }
+
+                        showAlert('✅ Login berhasil! Selamat datang, ' + userData.name + '!', 'success');
+
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1000);
+                    })
+                    .catch((error) => {
+                        console.error('Firebase login error:', error);
+                        
+                        // Jika Firebase gagal, coba lagi cek LocalStorage untuk user yang sama
+                        try {
+                            const users = JSON.parse(localStorage.getItem('users') || '[]');
+                            const foundUser = users.find(u => u.email === email);
+                            
+                            if (foundUser) {
+                                const userData = {
+                                    id: foundUser.id || 'user_' + Date.now(),
+                                    name: foundUser.name || 'User',
+                                    email: email,
+                                    role: 'admin'
+                                };
+
+                                if (remember) {
+                                    localStorage.setItem('user', JSON.stringify(userData));
+                                } else {
+                                    sessionStorage.setItem('user', JSON.stringify(userData));
+                                }
+
+                                showAlert('✅ Login berhasil! (LocalStorage) Selamat datang, ' + userData.name + '!', 'success');
+
+                                setTimeout(() => {
+                                    window.location.href = 'dashboard.html';
+                                }, 1000);
+                                return;
+                            }
+                        } catch (e) {}
+
+                        let errorMessage = 'Login gagal! ';
+                        switch (error.code) {
+                            case 'auth/user-not-found':
+                                errorMessage += 'Email tidak terdaftar. Silakan daftar terlebih dahulu.';
+                                break;
+                            case 'auth/wrong-password':
+                                errorMessage += 'Password salah. Silakan coba lagi.';
+                                break;
+                            case 'auth/invalid-email':
+                                errorMessage += 'Format email tidak valid.';
+                                break;
+                            case 'auth/too-many-requests':
+                                errorMessage += 'Terlalu banyak percobaan. Coba lagi nanti.';
+                                break;
+                            default:
+                                errorMessage += error.message;
+                        }
+                        
+                        showAlert(errorMessage, 'danger');
+                        
+                        document.getElementById('authCard').classList.add('shake');
+                        setTimeout(() => {
+                            document.getElementById('authCard').classList.remove('shake');
+                        }, 400);
+
+                        loginBtn.innerHTML = originalText;
+                        loginBtn.disabled = false;
+                    });
+            } else {
+                // ==========================================
+                // PRIORITAS 4: FALLBACK - SEMUA GAGAL
+                // ==========================================
+                showAlert('❌ Email atau password salah! Silakan coba lagi.', 'danger');
+                document.getElementById('authCard').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('authCard').classList.remove('shake');
+                }, 400);
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }
         });
 
         // ============================================
-        // 5. ENTER KEY SUPPORT
+        // 7. ENTER KEY SUPPORT
         // ============================================
         document.getElementById('password').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -796,12 +1142,14 @@
         });
 
         // ============================================
-        // 6. CHECK IF ALREADY LOGGED IN
+        // 8. CHECK IF ALREADY LOGGED IN
         // ============================================
         try {
-            const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+            let user = sessionStorage.getItem('user');
+            if (!user) {
+                user = localStorage.getItem('user');
+            }
             if (user) {
-                // Redirect ke dashboard jika sudah login
                 window.location.href = 'dashboard.html';
             }
         } catch (e) {
@@ -809,12 +1157,14 @@
         }
 
         // ============================================
-        // 7. LOG
+        // 9. LOG
         // ============================================
-        console.log('%c✅ Sistem Manajemen Timbangan Hasil Panen', 'color: #0d6efd; font-size: 16px; font-weight: bold;');
+        console.log('%c🌿 Sistem Manajemen Timbangan Hasil Panen', 'color: #2e7d32; font-size: 16px; font-weight: bold;');
         console.log('%c📧 Email: admin@timbanganpanen.com', 'color: #6c757d;');
         console.log('%c🔑 Password: admin123', 'color: #6c757d;');
-        console.log('%c🚀 Silakan login untuk melanjutkan', 'color: #20c997;');
+        console.log('%c🔥 Mode: ' + (firebaseReady ? 'Firebase + LocalStorage ✅' : 'LocalStorage'), 'color: #6a8a6a;');
+        console.log('%c🚀 Silakan login untuk melanjutkan', 'color: #4caf50;');
+        console.log('%c💡 Tips: Data registrasi tersimpan di LocalStorage', 'color: #6c757d;');
     </script>
 
 </body>

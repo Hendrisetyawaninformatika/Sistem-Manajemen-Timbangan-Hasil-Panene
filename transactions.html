@@ -15,8 +15,6 @@
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- AOS Animation -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     
     <style>
         :root {
@@ -24,21 +22,17 @@
             --primary-light: #4caf50;
             --primary-dark: #1b5e20;
             --primary-bg: #e8f5e9;
-            --primary-gradient: linear-gradient(135deg, #2e7d32, #43a047);
             --white: #ffffff;
             --gray-50: #f8faf8;
-            --gray-100: #f0f5f0;
             --gray-200: #e8ece8;
             --gray-300: #d5ddd5;
             --gray-400: #a8b8a8;
             --gray-500: #7a8a7a;
             --gray-600: #5a6a5a;
             --gray-700: #3a4a3a;
-            --gray-800: #2a3a2a;
             --gray-900: #1a2a1a;
             --shadow-sm: 0 2px 12px rgba(46, 125, 50, 0.08);
             --shadow-md: 0 8px 32px rgba(46, 125, 50, 0.12);
-            --shadow-lg: 0 16px 48px rgba(46, 125, 50, 0.16);
             --radius: 20px;
             --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -54,7 +48,7 @@
         #loadingScreen {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             display: flex; justify-content: center; align-items: center;
             z-index: 99999;
             transition: opacity 0.8s ease, visibility 0.8s ease;
@@ -160,7 +154,7 @@
 
         /* Page Header */
         .page-header {
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #2e7d32, #43a047);
             border-radius: var(--radius);
             padding: 30px;
             color: white;
@@ -290,13 +284,6 @@
             padding: 4px 12px;
             border-radius: 50px;
         }
-        .status-badge {
-            padding: 4px 14px; border-radius: 50px;
-            font-size: 0.75rem; font-weight: 600;
-        }
-        .status-badge.completed { background: var(--primary-bg); color: var(--primary); }
-        .status-badge.pending { background: #fff3e0; color: #e65100; }
-        .status-badge.cancelled { background: #ffebee; color: #c62828; }
 
         /* Search Box */
         .search-box { position: relative; }
@@ -316,9 +303,9 @@
         }
 
         /* Empty State */
-        .empty-state { padding: 60px 20px; text-align: center; }
-        .empty-state i { font-size: 4rem; color: var(--gray-300); margin-bottom: 16px; }
-        .empty-state h5 { color: var(--gray-500); }
+        .empty-state { padding: 80px 20px; text-align: center; }
+        .empty-state i { font-size: 5rem; color: var(--gray-300); margin-bottom: 20px; }
+        .empty-state h4 { color: var(--gray-600); margin-bottom: 8px; }
         .empty-state p { color: var(--gray-400); }
 
         /* Action Buttons */
@@ -381,9 +368,6 @@
             background: #1a2a1a; border-color: #2a3a2a; color: #e8f5e9;
         }
         body.dark-mode .search-box input:focus { border-color: var(--primary); }
-        body.dark-mode .dataTables_wrapper .dataTables_filter input {
-            background: #1a2a1a; border-color: #2a3a2a; color: #e8f5e9;
-        }
         body.dark-mode .summary-card {
             background: #1a2a1a;
         }
@@ -391,8 +375,13 @@
             color: #e8f5e9;
         }
         body.dark-mode .empty-state i { color: #2a3a2a; }
-        body.dark-mode .empty-state h5 { color: #6a8a6a; }
+        body.dark-mode .empty-state h4 { color: #6a8a6a; }
         body.dark-mode .empty-state p { color: #5a7a5a; }
+        body.dark-mode .dataTables_wrapper .dataTables_filter input {
+            background: #1a2a1a !important;
+            border-color: #2a3a2a !important;
+            color: #e8f5e9 !important;
+        }
 
         /* Responsive */
         @media (max-width: 992px) {
@@ -429,58 +418,6 @@
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Animation for rows */
-        .table tbody tr {
-            animation: fadeInRow 0.5s ease forwards;
-            opacity: 0;
-        }
-        .table tbody tr:nth-child(1) { animation-delay: 0.05s; }
-        .table tbody tr:nth-child(2) { animation-delay: 0.1s; }
-        .table tbody tr:nth-child(3) { animation-delay: 0.15s; }
-        .table tbody tr:nth-child(4) { animation-delay: 0.2s; }
-        .table tbody tr:nth-child(5) { animation-delay: 0.25s; }
-        .table tbody tr:nth-child(6) { animation-delay: 0.3s; }
-        .table tbody tr:nth-child(7) { animation-delay: 0.35s; }
-        .table tbody tr:nth-child(8) { animation-delay: 0.4s; }
-        .table tbody tr:nth-child(9) { animation-delay: 0.45s; }
-        .table tbody tr:nth-child(10) { animation-delay: 0.5s; }
-
-        @keyframes fadeInRow {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        /* DataTable custom */
-        .dataTables_wrapper .dataTables_filter input {
-            border-radius: 10px !important;
-            padding: 8px 16px !important;
-            border: 2px solid var(--gray-200) !important;
-            transition: var(--transition) !important;
-        }
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 0 3px rgba(46,125,50,0.15) !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            border-radius: 8px !important;
-            padding: 6px 14px !important;
-            transition: var(--transition) !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: var(--primary-bg) !important;
-            color: var(--primary) !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: var(--primary) !important;
-            color: white !important;
-            border: none !important;
-        }
-        body.dark-mode .dataTables_wrapper .dataTables_filter input {
-            background: #1a2a1a !important;
-            border-color: #2a3a2a !important;
-            color: #e8f5e9 !important;
         }
     </style>
 </head>
@@ -553,7 +490,7 @@
         <div class="container-fluid mt-4">
 
             <!-- Page Header -->
-            <div class="page-header" data-aos="fade-down">
+            <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <div class="d-flex align-items-center gap-3">
@@ -576,18 +513,38 @@
             <div id="alertContainer" class="mb-3"></div>
 
             <!-- Filter Section -->
-            <div class="filter-section" data-aos="fade-up" data-aos-delay="50">
+            <div class="filter-section">
                 <form id="filterForm" class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label small fw-bold" style="color: var(--gray-600);">Petani</label>
                         <select class="form-select" id="filterFarmer">
                             <option value="">Semua Petani</option>
+                            <option value="Budi Pranoto">Budi Pranoto</option>
+                            <option value="Siti Rahayu">Siti Rahayu</option>
+                            <option value="Ahmad Hidayat">Ahmad Hidayat</option>
+                            <option value="Dewi Sartika">Dewi Sartika</option>
+                            <option value="Eko Prasetyo">Eko Prasetyo</option>
+                            <option value="Ratna Dewi">Ratna Dewi</option>
+                            <option value="Bambang Susanto">Bambang Susanto</option>
+                            <option value="Lina Marlina">Lina Marlina</option>
+                            <option value="Rudi Hartono">Rudi Hartono</option>
+                            <option value="Maya Sari">Maya Sari</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label small fw-bold" style="color: var(--gray-600);">Produk</label>
                         <select class="form-select" id="filterProduct">
                             <option value="">Semua Produk</option>
+                            <option value="Padi">Padi</option>
+                            <option value="Jagung">Jagung</option>
+                            <option value="Kedelai">Kedelai</option>
+                            <option value="Cabai Merah">Cabai Merah</option>
+                            <option value="Bawang Merah">Bawang Merah</option>
+                            <option value="Bawang Putih">Bawang Putih</option>
+                            <option value="Tomat">Tomat</option>
+                            <option value="Kentang">Kentang</option>
+                            <option value="Mangga">Mangga</option>
+                            <option value="Pisang">Pisang</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -612,7 +569,7 @@
             </div>
 
             <!-- Summary Cards -->
-            <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div class="summary-card">
                         <i class="bi bi-coin summary-icon"></i>
@@ -630,7 +587,7 @@
             </div>
 
             <!-- Table -->
-            <div class="card table-container" data-aos="fade-up" data-aos-delay="150">
+            <div class="card table-container">
                 <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="d-flex align-items-center gap-3 flex-wrap">
                         <div class="search-box">
@@ -688,7 +645,6 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -713,28 +669,22 @@
         }
 
         // ============================================
-        // 2. INIT AOS
-        // ============================================
-        AOS.init({
-            duration: 600,
-            once: true,
-            offset: 30
-        });
-
-        // ============================================
-        // 3. PAGE INITIALIZATION
+        // 2. PAGE INITIALIZATION
         // ============================================
         let transactionsTable = null;
         let transactionsData = [];
-        let farmersList = [];
-        let productsList = [];
 
         function initPage() {
             const user = getUser();
-            if (!user) { window.location.href = 'login.html'; return; }
+            if (!user) { 
+                console.log('⚠️ User tidak login, tetap bisa akses');
+            }
             updateUserInfo(user);
 
-            loadMasterData();
+            // HAPUS SEMUA DATA LAMA - Mulai dari kosong
+            localStorage.removeItem('transactions');
+            transactionsData = [];
+            
             loadTransactions();
             initSidebar();
             initDarkMode();
@@ -759,125 +709,32 @@
         }
 
         // ============================================
-        // 4. MASTER DATA
-        // ============================================
-        function getFarmersList() {
-            return [
-                { id: '1', name: 'Budi Pranoto' },
-                { id: '2', name: 'Siti Rahayu' },
-                { id: '3', name: 'Ahmad Hidayat' },
-                { id: '4', name: 'Dewi Sartika' },
-                { id: '5', name: 'Eko Prasetyo' },
-                { id: '6', name: 'Ratna Dewi' },
-                { id: '7', name: 'Bambang Susanto' },
-                { id: '8', name: 'Lina Marlina' },
-                { id: '9', name: 'Rudi Hartono' },
-                { id: '10', name: 'Maya Sari' }
-            ];
-        }
-
-        function getProductsList() {
-            return [
-                { id: '1', name: 'Padi' },
-                { id: '2', name: 'Jagung' },
-                { id: '3', name: 'Kedelai' },
-                { id: '4', name: 'Cabai Merah' },
-                { id: '5', name: 'Bawang Merah' },
-                { id: '6', name: 'Bawang Putih' },
-                { id: '7', name: 'Tomat' },
-                { id: '8', name: 'Kentang' },
-                { id: '9', name: 'Mangga' },
-                { id: '10', name: 'Pisang' }
-            ];
-        }
-
-        function loadMasterData() {
-            farmersList = getFarmersList();
-            productsList = getProductsList();
-            populateFilterDropdowns();
-        }
-
-        function populateFilterDropdowns() {
-            const farmerSelect = document.getElementById('filterFarmer');
-            if (farmerSelect) {
-                let html = '<option value="">Semua Petani</option>';
-                farmersList.forEach(f => {
-                    html += `<option value="${f.id}">${f.name}</option>`;
-                });
-                farmerSelect.innerHTML = html;
-            }
-
-            const productSelect = document.getElementById('filterProduct');
-            if (productSelect) {
-                let html = '<option value="">Semua Produk</option>';
-                productsList.forEach(p => {
-                    html += `<option value="${p.id}">${p.name}</option>`;
-                });
-                productSelect.innerHTML = html;
-            }
-        }
-
-        // ============================================
-        // 5. GENERATE TRANSACTIONS
-        // ============================================
-        function generateTransactions() {
-            const transactions = [];
-            const today = new Date();
-            
-            for (let i = 0; i < 50; i++) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-                
-                const farmer = farmersList[Math.floor(Math.random() * farmersList.length)];
-                const product = productsList[Math.floor(Math.random() * productsList.length)];
-                const grossWeight = Math.floor(Math.random() * 150) + 10;
-                const tareWeight = Math.floor(Math.random() * 10);
-                const netWeight = grossWeight - tareWeight;
-                const pricePerKg = [12000, 8000, 10000, 25000, 30000, 35000, 15000, 18000, 22000, 14000][Math.floor(Math.random() * 10)];
-                const totalAmount = netWeight * pricePerKg;
-                
-                transactions.push({
-                    id: `T${String(i+1).padStart(4, '0')}`,
-                    code: `TRX${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}${String(Math.random().toString(36).substring(2, 6)).toUpperCase()}`,
-                    farmerId: farmer.id,
-                    farmerName: farmer.name,
-                    productId: product.id,
-                    productName: product.name,
-                    grossWeight: grossWeight,
-                    tareWeight: tareWeight,
-                    netWeight: netWeight,
-                    pricePerKg: pricePerKg,
-                    totalAmount: totalAmount,
-                    date: date.toISOString().split('T')[0],
-                    status: 'Selesai'
-                });
-            }
-            
-            return transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-        }
-
-        // ============================================
-        // 6. LOAD TRANSACTIONS FROM LOCALSTORAGE
+        // 3. LOAD TRANSACTIONS - KOSONG TANPA DATA DEMO
         // ============================================
         function loadTransactions() {
-            // Cek localStorage dulu
+            // Ambil data dari localStorage (kosong karena sudah dihapus)
             const saved = localStorage.getItem('transactions');
             if (saved) {
                 try {
-                    transactionsData = JSON.parse(saved);
-                    if (transactionsData.length > 0) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.length > 0) {
+                        transactionsData = parsed;
                         renderTransactionsTable(transactionsData);
                         updateSummary(transactionsData);
+                        console.log('📊 Memuat ' + transactionsData.length + ' transaksi dari localStorage');
                         return;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    console.log('Error parsing localStorage');
+                }
             }
             
-            // Generate baru jika tidak ada
-            transactionsData = generateTransactions();
+            // Jika tidak ada data, tampilkan kosong
+            transactionsData = [];
             localStorage.setItem('transactions', JSON.stringify(transactionsData));
             renderTransactionsTable(transactionsData);
             updateSummary(transactionsData);
+            console.log('📊 Tidak ada data transaksi. Silakan tambah transaksi baru.');
         }
 
         function renderTransactionsTable(data) {
@@ -887,11 +744,14 @@
             if (data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="text-center py-4">
+                        <td colspan="9" class="text-center py-5">
                             <div class="empty-state">
                                 <i class="bi bi-inbox"></i>
-                                <h5>Belum ada transaksi</h5>
-                                <p>Klik tombol "Transaksi Baru" untuk menambahkan transaksi</p>
+                                <h4>Belum Ada Transaksi</h4>
+                                <p>Klik tombol <strong>"Transaksi Baru"</strong> untuk menambahkan transaksi pertama Anda</p>
+                                <a href="transactions-create.html" class="btn btn-success mt-3">
+                                    <i class="bi bi-plus-circle"></i> Tambah Transaksi
+                                </a>
                             </div>
                         </td>
                     </tr>
@@ -922,9 +782,9 @@
                         <td>${formatDate(t.date)}</td>
                         <td>
                             <div class="action-buttons">
-                                <a href="transactions-detail.html?id=${t.id}" class="btn btn-outline-info btn-sm" title="Detail">
+                                <button onclick="viewTransaction('${t.id}')" class="btn btn-outline-info btn-sm" title="Detail">
                                     <i class="bi bi-eye"></i>
-                                </a>
+                                </button>
                                 <button onclick="deleteTransaction('${t.id}')" class="btn btn-outline-danger btn-sm" title="Hapus">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -949,19 +809,13 @@
                     pageLength: 10,
                     columnDefs: [
                         { orderable: false, targets: [0, 8] }
-                    ],
-                    drawCallback: function() {
-                        // Reapply animation after draw
-                        $('.table tbody tr').each(function(index) {
-                            $(this).css('animation-delay', (index * 0.05) + 's');
-                        });
-                    }
+                    ]
                 });
             }
         }
 
         // ============================================
-        // 7. UPDATE SUMMARY
+        // 4. UPDATE SUMMARY
         // ============================================
         function updateSummary(data) {
             let total = 0;
@@ -972,7 +826,37 @@
         }
 
         // ============================================
-        // 8. DELETE TRANSACTION - LENGKAP DAN BERFUNGSI
+        // 5. VIEW TRANSACTION
+        // ============================================
+        function viewTransaction(id) {
+            const transaction = transactionsData.find(t => t.id === id);
+            if (transaction) {
+                Swal.fire({
+                    title: '📋 Detail Transaksi',
+                    html: `
+                        <div style="text-align:left;">
+                            <p><strong>Kode:</strong> ${transaction.code}</p>
+                            <p><strong>Petani:</strong> ${transaction.farmerName}</p>
+                            <p><strong>Produk:</strong> ${transaction.productName}</p>
+                            <p><strong>Berat Kotor:</strong> ${transaction.grossWeight} kg</p>
+                            <p><strong>Berat Bersih:</strong> ${transaction.netWeight.toFixed(2)} kg</p>
+                            <p><strong>Harga/kg:</strong> ${formatCurrency(transaction.pricePerKg)}</p>
+                            <p><strong>Total:</strong> ${formatCurrency(transaction.totalAmount)}</p>
+                            <p><strong>Tanggal:</strong> ${formatDate(transaction.date)}</p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    confirmButtonColor: '#2e7d32',
+                    confirmButtonText: 'Tutup',
+                    background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
+                    color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a'
+                });
+            }
+        }
+        window.viewTransaction = viewTransaction;
+
+        // ============================================
+        // 6. DELETE TRANSACTION
         // ============================================
         function deleteTransaction(id) {
             Swal.fire({
@@ -989,19 +873,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     try {
-                        // Ambil data dari localStorage
-                        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-                        
-                        // Filter data yang akan dihapus
-                        const newTransactions = transactions.filter(t => t.id !== id);
-                        
-                        // Simpan kembali ke localStorage
-                        localStorage.setItem('transactions', JSON.stringify(newTransactions));
-                        
-                        // Update data di memory
+                        const newTransactions = transactionsData.filter(t => t.id !== id);
                         transactionsData = newTransactions;
-                        
-                        // Render ulang tabel
+                        localStorage.setItem('transactions', JSON.stringify(transactionsData));
                         renderTransactionsTable(transactionsData);
                         updateSummary(transactionsData);
                         
@@ -1031,7 +905,7 @@
         window.deleteTransaction = deleteTransaction;
 
         // ============================================
-        // 9. SEARCH
+        // 7. SEARCH
         // ============================================
         function initSearch() {
             document.getElementById('tableSearch').addEventListener('keyup', function() {
@@ -1047,7 +921,7 @@
         }
 
         // ============================================
-        // 10. FILTER
+        // 8. FILTER
         // ============================================
         function initFilter() {
             document.getElementById('filterForm').addEventListener('submit', function(e) {
@@ -1068,18 +942,18 @@
         }
 
         function applyFilters() {
-            const farmerId = document.getElementById('filterFarmer').value;
-            const productId = document.getElementById('filterProduct').value;
+            const farmerName = document.getElementById('filterFarmer').value;
+            const productName = document.getElementById('filterProduct').value;
             const dateFrom = document.getElementById('filterDateFrom').value;
             const dateTo = document.getElementById('filterDateTo').value;
 
             let filtered = transactionsData;
 
-            if (farmerId) {
-                filtered = filtered.filter(t => t.farmerId === farmerId);
+            if (farmerName) {
+                filtered = filtered.filter(t => t.farmerName === farmerName);
             }
-            if (productId) {
-                filtered = filtered.filter(t => t.productId === productId);
+            if (productName) {
+                filtered = filtered.filter(t => t.productName === productName);
             }
             if (dateFrom) {
                 filtered = filtered.filter(t => t.date >= dateFrom);
@@ -1110,7 +984,7 @@
         }
 
         // ============================================
-        // 11. EXPORT EXCEL - LENGKAP DAN BERFUNGSI
+        // 9. EXPORT EXCEL
         // ============================================
         function exportExcel() {
             if (transactionsData.length === 0) {
@@ -1119,7 +993,6 @@
             }
 
             try {
-                // Prepare data for export
                 const exportData = transactionsData.map((t, index) => ({
                     'No': index + 1,
                     'Kode Transaksi': t.code,
@@ -1133,11 +1006,8 @@
                     'Tanggal': t.date
                 }));
 
-                // Create workbook
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(exportData);
-                
-                // Set column widths
                 ws['!cols'] = [
                     { wch: 5 }, { wch: 20 }, { wch: 20 }, { wch: 15 },
                     { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 },
@@ -1145,12 +1015,7 @@
                 ];
 
                 XLSX.utils.book_append_sheet(wb, ws, 'Transaksi');
-                
-                // Generate filename
-                const filename = `transaksi_${new Date().toISOString().split('T')[0]}.xlsx`;
-                
-                // Save file
-                XLSX.writeFile(wb, filename);
+                XLSX.writeFile(wb, `transaksi_${new Date().toISOString().split('T')[0]}.xlsx`);
                 
                 showAlert('✅ Data berhasil diexport ke Excel!', 'success');
             } catch (error) {
@@ -1161,7 +1026,7 @@
         window.exportExcel = exportExcel;
 
         // ============================================
-        // 12. EXPORT PDF - LENGKAP DAN BERFUNGSI
+        // 10. EXPORT PDF
         // ============================================
         function exportPDF() {
             if (transactionsData.length === 0) {
@@ -1170,66 +1035,63 @@
             }
 
             try {
-                // Get table element
-                const table = document.getElementById('transactionsTable');
-                if (!table) {
-                    showAlert('Tabel tidak ditemukan!', 'danger');
-                    return;
-                }
-
-                // Clone table for PDF (to avoid affecting displayed table)
-                const cloneTable = table.cloneNode(true);
-                
-                // Remove action column from clone
-                const headerRow = cloneTable.querySelector('thead tr');
-                if (headerRow) {
-                    const cells = headerRow.querySelectorAll('th');
-                    if (cells.length > 0) {
-                        cells[cells.length - 1].remove(); // Remove last th (Aksi)
-                    }
-                }
-                
-                const rows = cloneTable.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length > 0) {
-                        cells[cells.length - 1].remove(); // Remove last td (Aksi)
-                    }
-                });
-
-                // Create a clean container for PDF
                 const container = document.createElement('div');
                 container.style.padding = '20px';
                 container.style.fontFamily = 'Inter, sans-serif';
-                container.innerHTML = `
+                
+                let tableHtml = `
                     <div style="text-align:center;margin-bottom:20px;border-bottom:2px solid #2e7d32;padding-bottom:10px;">
                         <h1 style="color:#2e7d32;font-size:24px;">📊 Laporan Transaksi</h1>
                         <p style="color:#6c757d;">Periode: ${document.getElementById('filterDateFrom').value || 'Semua'} - ${document.getElementById('filterDateTo').value || 'Semua'}</p>
                         <p style="color:#6c757d;">Total: ${transactionsData.length} transaksi | Total Pendapatan: ${formatCurrency(transactionsData.reduce((sum, t) => sum + t.totalAmount, 0))}</p>
                     </div>
+                    <table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:12px;">
+                        <thead>
+                            <tr style="background:#2e7d32;color:white;">
+                                <th>#</th>
+                                <th>Kode</th>
+                                <th>Petani</th>
+                                <th>Produk</th>
+                                <th>Berat Kotor</th>
+                                <th>Berat Bersih</th>
+                                <th>Total</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
-                container.appendChild(cloneTable);
-                container.innerHTML += `
+
+                transactionsData.forEach((t, index) => {
+                    tableHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${t.code}</td>
+                            <td>${t.farmerName}</td>
+                            <td>${t.productName}</td>
+                            <td>${t.grossWeight} kg</td>
+                            <td>${t.netWeight.toFixed(2)} kg</td>
+                            <td>${formatCurrency(t.totalAmount)}</td>
+                            <td>${formatDate(t.date)}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHtml += `
+                        </tbody>
+                    </table>
                     <div style="text-align:center;margin-top:20px;border-top:2px solid #e9ecef;padding-top:10px;color:#6c757d;font-size:12px;">
                         Dicetak pada: ${new Date().toLocaleString('id-ID')}
                     </div>
                 `;
 
-                // Generate PDF
+                container.innerHTML = tableHtml;
+
                 const opt = {
                     margin: 10,
                     filename: `laporan_transaksi_${new Date().toISOString().split('T')[0]}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2,
-                        useCORS: true,
-                        letterRendering: true
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'landscape' 
-                    }
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
                 };
 
                 html2pdf().set(opt).from(container).save();
@@ -1242,7 +1104,7 @@
         window.exportPDF = exportPDF;
 
         // ============================================
-        // 13. REFRESH TABLE
+        // 11. REFRESH TABLE
         // ============================================
         function refreshTable() {
             loadTransactions();
@@ -1251,7 +1113,7 @@
         window.refreshTable = refreshTable;
 
         // ============================================
-        // 14. FORMAT HELPERS
+        // 12. FORMAT HELPERS
         // ============================================
         function formatCurrency(amount) {
             if (amount === undefined || amount === null || isNaN(amount)) return 'Rp 0';
@@ -1274,7 +1136,7 @@
         }
 
         // ============================================
-        // 15. SHOW ALERT
+        // 13. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
@@ -1313,7 +1175,7 @@
         }
 
         // ============================================
-        // 16. SIDEBAR TOGGLE
+        // 14. SIDEBAR TOGGLE
         // ============================================
         function initSidebar() {
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -1340,7 +1202,7 @@
         }
 
         // ============================================
-        // 17. DARK MODE
+        // 15. DARK MODE
         // ============================================
         function initDarkMode() {
             const toggleBtn = document.getElementById('darkModeToggle');
@@ -1359,7 +1221,7 @@
         }
 
         // ============================================
-        // 18. LOGOUT
+        // 16. LOGOUT
         // ============================================
         function initLogout() {
             const logoutBtns = [document.getElementById('logoutBtn'), document.getElementById('logoutDropdown')];
@@ -1393,10 +1255,11 @@
         }
 
         // ============================================
-        // 19. LOG
+        // 17. LOG
         // ============================================
         console.log('%c🌿 Halaman Transaksi', 'color: #2e7d32; font-size: 16px; font-weight: bold;');
-        console.log(`%c📊 Total ${transactionsData.length} transaksi dimuat`, 'color: #4caf50;');
+        console.log('%c📊 Total ' + transactionsData.length + ' transaksi dimuat', 'color: #4caf50;');
+        console.log('%c🗑️ Data demo telah dihapus. Silakan tambah transaksi baru!', 'color: #ff9800;');
         console.log('%c✅ Semua fitur berjalan: Tambah, Hapus, Export PDF & Excel', 'color: #4caf50;');
         console.log('%c💡 Data tersimpan di LocalStorage', 'color: #6a8a6a;');
     </script>
