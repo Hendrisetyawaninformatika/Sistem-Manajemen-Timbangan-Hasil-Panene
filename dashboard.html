@@ -997,17 +997,29 @@
                             <i class="bi bi-moon fs-5"></i>
                         </button>
                         <div class="dropdown">
-                            <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                            <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" id="userDropdown">
                                 <div class="avatar-sm">
                                     <span id="userInitial">A</span>
                                 </div>
                                 <span id="userNameDisplay" class="d-none d-md-inline fw-semibold" style="color: var(--gray-700);">Admin</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profil</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Pengaturan</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" id="profileBtn">
+                                        <i class="bi bi-person"></i> Profil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" id="settingsBtn">
+                                        <i class="bi bi-gear"></i> Pengaturan
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#" id="logoutDropdown"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" id="logoutDropdown">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -1304,6 +1316,9 @@
 
             // Init logout
             initLogout();
+
+            // Init profile & settings
+            initProfileSettings();
 
             // Set current date
             setCurrentDate();
@@ -1899,7 +1914,88 @@
         }
 
         // ============================================
-        // 17. LOG
+        // 17. PROFIL & PENGATURAN - BERFUNGSI
+        // ============================================
+        function initProfileSettings() {
+            // Tombol Profil
+            document.getElementById('profileBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                const user = getUser();
+                if (user) {
+                    Swal.fire({
+                        title: '👤 Profil Pengguna',
+                        html: `
+                            <div style="text-align:left;">
+                                <p><strong>Nama:</strong> ${user.name || 'Admin'}</p>
+                                <p><strong>Email:</strong> ${user.email || 'admin@timbanganpanen.com'}</p>
+                                <p><strong>Role:</strong> ${user.role || 'Admin'}</p>
+                                <p><strong>ID:</strong> ${user.id || '-'}</p>
+                            </div>
+                        `,
+                        icon: 'info',
+                        confirmButtonColor: '#2e7d32',
+                        confirmButtonText: 'Tutup',
+                        background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
+                        color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a'
+                    });
+                } else {
+                    showAlert('Data pengguna tidak ditemukan!', 'warning');
+                }
+            });
+
+            // Tombol Pengaturan
+            document.getElementById('settingsBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: '⚙️ Pengaturan',
+                    html: `
+                        <div style="text-align:left;">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="settingsDarkMode" ${document.body.classList.contains('dark-mode') ? 'checked' : ''}>
+                                <label class="form-check-label" for="settingsDarkMode">Mode Gelap</label>
+                            </div>
+                            <hr>
+                            <p><strong>Versi Aplikasi:</strong> 1.0.0</p>
+                            <p><strong>Database:</strong> LocalStorage</p>
+                            <p><strong>Total Data:</strong> ${allFarmers.length} Petani, ${allProducts.length} Produk, ${allTransactions.length} Transaksi</p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    confirmButtonColor: '#2e7d32',
+                    confirmButtonText: 'Tutup',
+                    background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
+                    color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a',
+                    didOpen: () => {
+                        const darkModeToggle = document.getElementById('settingsDarkMode');
+                        if (darkModeToggle) {
+                            darkModeToggle.addEventListener('change', function() {
+                                document.body.classList.toggle('dark-mode');
+                                localStorage.setItem('darkMode', this.checked);
+                                // Update tombol dark mode di navbar
+                                const mainToggle = document.getElementById('darkModeToggle');
+                                if (mainToggle) {
+                                    mainToggle.innerHTML = this.checked ? '<i class="bi bi-sun fs-5"></i>' : '<i class="bi bi-moon fs-5"></i>';
+                                }
+                                // Re-render charts
+                                if (revenueChart) {
+                                    revenueChart.destroy();
+                                    revenueChart = null;
+                                    createRevenueChart(allTransactions);
+                                }
+                                if (distributionChart) {
+                                    distributionChart.destroy();
+                                    distributionChart = null;
+                                    createDistributionChart(allTransactions);
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // ============================================
+        // 18. LOG
         // ============================================
         console.log('%c🌿 Dashboard Timbangan Panen', 'color: #2e7d32; font-size: 20px; font-weight: bold;');
         console.log('📊 Data dari LocalStorage:');
@@ -1907,6 +2003,8 @@
         console.log('📦 Produk:', allProducts.length);
         console.log('💰 Transaksi:', allTransactions.length);
         console.log('%c✅ Dashboard berhasil dimuat (Tanpa Firebase)!', 'color: #4caf50;');
+        console.log('%c👤 Klik Profil untuk melihat data pengguna', 'color: #6a8a6a;');
+        console.log('%c⚙️ Klik Pengaturan untuk mengatur aplikasi', 'color: #6a8a6a;');
     </script>
 
 </body>
