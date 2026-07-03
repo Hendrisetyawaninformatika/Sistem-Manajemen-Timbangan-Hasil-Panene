@@ -4,13 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Manajemen Timbangan Hasil Panen</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- AOS Animation -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    
     <style>
-        /* Additional landing page styles */
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           LOADING SCREEN
+           ============================================ */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-container {
+            text-align: center;
+            color: white;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .loader-subtext {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px auto 0;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            animation: progress 2s ease-in-out infinite;
+            width: 0%;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .loader-icon {
+            font-size: 3.5rem;
+            animation: bounce 1.5s ease-in-out infinite;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .navbar {
+            padding: 16px 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-scrolled {
+            background: rgba(13, 110, 253, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+            margin-right: 10px;
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
         .hero-section {
             min-height: 90vh;
             display: flex;
@@ -18,6 +167,7 @@
             background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
             position: relative;
             overflow: hidden;
+            padding: 80px 0;
         }
 
         .hero-section::before {
@@ -29,10 +179,10 @@
             height: 600px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(13, 110, 253, 0.08) 0%, transparent 70%);
-            animation: pulse-bg 8s ease-in-out infinite;
+            animation: pulseBg 8s ease-in-out infinite;
         }
 
-        @keyframes pulse-bg {
+        @keyframes pulseBg {
             0%, 100% { transform: scale(1); opacity: 0.5; }
             50% { transform: scale(1.2); opacity: 1; }
         }
@@ -42,113 +192,122 @@
             z-index: 1;
         }
 
+        .text-gradient {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca, #6f42c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         .hero-image-wrapper {
             position: relative;
             z-index: 1;
-            animation: float-image 6s ease-in-out infinite;
+            animation: floatImage 6s ease-in-out infinite;
         }
 
-        @keyframes float-image {
+        @keyframes floatImage {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
 
-        .floating-shapes {
-            position: absolute;
+        .hero-image {
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
+            transition: transform 0.5s ease;
             width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            overflow: hidden;
+            max-width: 550px;
         }
 
-        .shape {
+        .hero-image:hover {
+            transform: scale(1.02) rotate(-1deg);
+        }
+
+        /* Floating Icons */
+        .floating-icons {
+            position: relative;
+            height: 100px;
+            margin-bottom: 30px;
+        }
+
+        .icon-float {
             position: absolute;
-            border-radius: 50%;
-            opacity: 0.1;
-            animation: float-shape 20s infinite linear;
+            font-size: 2.8rem;
+            opacity: 0.3;
+            animation: floatIcon 4s ease-in-out infinite;
         }
 
-        .shape:nth-child(1) {
-            width: 300px;
-            height: 300px;
-            background: #0d6efd;
-            top: -100px;
-            right: -100px;
+        .icon-float:nth-child(1) {
+            left: 5%;
+            top: 0;
+            color: #0d6efd;
             animation-delay: 0s;
         }
 
-        .shape:nth-child(2) {
-            width: 200px;
-            height: 200px;
-            background: #20c997;
-            bottom: -50px;
-            left: -50px;
-            animation-delay: -5s;
+        .icon-float:nth-child(2) {
+            left: 30%;
+            top: 20%;
+            color: #20c997;
+            animation-delay: 1s;
         }
 
-        .shape:nth-child(3) {
-            width: 150px;
-            height: 150px;
-            background: #ffc107;
-            top: 50%;
+        .icon-float:nth-child(3) {
             right: 30%;
-            animation-delay: -10s;
+            top: 10%;
+            color: #ffc107;
+            animation-delay: 2s;
         }
 
-        @keyframes float-shape {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(30px, -20px) rotate(90deg); }
-            50% { transform: translate(-20px, 30px) rotate(180deg); }
-            75% { transform: translate(20px, -30px) rotate(270deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+        .icon-float:nth-child(4) {
+            right: 5%;
+            top: 30%;
+            color: #dc3545;
+            animation-delay: 3s;
         }
 
+        @keyframes floatIcon {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-25px) rotate(10deg);
+            }
+        }
+
+        /* ============================================
+           FEATURES
+           ============================================ */
         .feature-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(13, 110, 253, 0.05), rgba(13, 110, 253, 0.01));
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
+            padding: 8px 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .feature-card:hover {
             transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 20px 60px rgba(13, 110, 253, 0.15) !important;
+            box-shadow: 0 20px 60px rgba(13, 110, 253, 0.12) !important;
+            border-color: rgba(13, 110, 253, 0.1);
         }
 
-        .feature-icon-wrapper {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-size: 2.2rem;
+            margin-bottom: 16px;
             transition: all 0.4s ease;
         }
 
-        .feature-card:hover .feature-icon-wrapper {
+        .feature-card:hover .feature-icon {
             transform: scale(1.1) rotate(-5deg);
         }
 
+        /* ============================================
+           STATS
+           ============================================ */
         .counter-box {
             transition: all 0.3s ease;
         }
@@ -157,61 +316,140 @@
             transform: scale(1.05);
         }
 
-        .counter-box h3 {
-            transition: all 0.3s ease;
+        .stat-number {
+            display: inline-block;
+            font-weight: 800;
         }
 
-        .testimonial-card {
-            border-radius: 20px;
-            transition: all 0.4s ease;
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
-        }
-
-        .testimonial-avatar {
+        /* ============================================
+           WHATSAPP FLOAT
+           ============================================ */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
             width: 60px;
             height: 60px;
+            background: #25d366;
+            color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 2rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: pulseWhatsApp 2s ease-in-out infinite;
+            text-decoration: none;
         }
 
-        .pricing-card {
-            border-radius: 20px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .pricing-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .pricing-card.popular {
-            border: 2px solid #0d6efd;
-            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.15);
-        }
-
-        .pricing-badge {
-            position: absolute;
-            top: 20px;
-            right: -30px;
-            transform: rotate(45deg);
-            background: #0d6efd;
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(-5deg);
             color: white;
-            padding: 5px 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
         }
 
-        @keyframes slide-in-left {
+        @keyframes pulseWhatsApp {
+            0%, 100% {
+                box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6);
+            }
+        }
+
+        .whatsapp-tooltip {
+            position: absolute;
+            right: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .whatsapp-float:hover .whatsapp-tooltip {
+            opacity: 1;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            background: #0a0e27;
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .hero-section {
+                min-height: auto;
+                padding: 40px 0;
+            }
+
+            .hero-section .display-3 {
+                font-size: 2.2rem;
+            }
+
+            .floating-icons {
+                display: none;
+            }
+
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .loader-text {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section .display-3 {
+                font-size: 1.8rem;
+            }
+            
+            .btn-lg {
+                font-size: 0.9rem;
+                padding: 10px 24px;
+            }
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        .animate-slide-left {
+            animation: slideLeft 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideLeft {
             from {
                 opacity: 0;
                 transform: translateX(-50px);
@@ -222,108 +460,65 @@
             }
         }
 
-        @keyframes slide-in-right {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-slide-left {
-            animation: slide-in-left 0.8s ease forwards;
-        }
-
-        .animate-slide-right {
-            animation: slide-in-right 0.8s ease forwards;
-        }
-
-        .animate-fade-up {
-            animation: fade-in-up 0.8s ease forwards;
-        }
-
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
         .delay-4 { animation-delay: 0.4s; }
         .delay-5 { animation-delay: 0.5s; }
 
-        /* Stats animation */
-        .stat-number {
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-
-        /* Dark mode adjustments */
+        /* Dark Mode */
         body.dark-mode .hero-section {
             background: linear-gradient(180deg, #0a0e1a 0%, #141824 100%);
         }
 
-        body.dark-mode .hero-section::before {
-            background: radial-gradient(circle, rgba(13, 110, 253, 0.15) 0%, transparent 70%);
-        }
-
         body.dark-mode .feature-card {
             background: #141824 !important;
-        }
-
-        body.dark-mode .pricing-card {
-            background: #141824 !important;
-        }
-
-        body.dark-mode .testimonial-card {
-            background: #141824 !important;
+            border-color: #2a2f45;
         }
 
         body.dark-mode .counter-box {
             background: transparent !important;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-section {
-                min-height: auto;
-                padding: 60px 0;
-            }
-            
-            .hero-section .display-3 {
-                font-size: 2.2rem;
-            }
-            
-            .floating-shapes {
-                display: none;
-            }
+        body.dark-mode .bg-light {
+            background: #141824 !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #8a8f9e !important;
         }
     </style>
 </head>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Config -->
+<script src="js/firebase-config.js"></script>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
+
+    <!-- ============================================
+    LOADING SCREEN
+    ============================================ -->
+    <div id="loadingScreen">
         <div class="loader-container">
+            <i class="bi bi-scale loader-icon"></i>
             <div class="loader"></div>
-            <div class="loader-text mt-3">Memuat Sistem...</div>
+            <div class="loader-text">Memuat Sistem...</div>
             <div class="loader-subtext">Sistem Manajemen Timbangan Hasil Panen</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" id="mainNav">
+    <!-- ============================================
+    NAVBAR
+    ============================================ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top" id="mainNav">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="index.html">
+            <a class="navbar-brand" href="index.html">
                 <i class="bi bi-scale"></i>
                 <span>Timbangan Panen</span>
             </a>
@@ -333,29 +528,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#home">
-                            <i class="bi bi-house"></i> Beranda
-                        </a>
+                        <a class="nav-link active" href="#home">Beranda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#features">
-                            <i class="bi bi-grid"></i> Fitur
-                        </a>
+                        <a class="nav-link" href="#features">Fitur</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">
-                            <i class="bi bi-info-circle"></i> Tentang
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#pricing">
-                            <i class="bi bi-tag"></i> Harga
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#testimonials">
-                            <i class="bi bi-chat-quote"></i> Testimoni
-                        </a>
+                        <a class="nav-link" href="#about">Tentang</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn btn-light btn-sm ms-2 px-4" href="login.html">
@@ -367,13 +546,10 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
     <section id="home" class="hero-section">
-        <div class="floating-shapes">
-            <div class="shape"></div>
-            <div class="shape"></div>
-            <div class="shape"></div>
-        </div>
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 hero-content">
@@ -392,7 +568,6 @@
                     <div class="d-flex flex-wrap gap-3 animate-slide-left delay-3">
                         <a href="register.html" class="btn btn-primary btn-lg px-5 py-3">
                             <i class="bi bi-person-plus"></i> Mulai Sekarang
-                            <span class="badge bg-light text-primary ms-2">Gratis</span>
                         </a>
                         <a href="#features" class="btn btn-outline-primary btn-lg px-5 py-3">
                             <i class="bi bi-play-circle"></i> Lihat Fitur
@@ -407,36 +582,55 @@
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
                             <span class="text-muted">Tanpa Kartu Kredit</span>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            <span class="text-muted">Support 24/7</span>
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center hero-image-wrapper">
-                    <div class="position-relative">
-                        <div class="floating-icons">
-                            <i class="bi bi-scale icon-float" style="animation-delay: 0s; font-size: 3rem; color: #0d6efd;"></i>
-                            <i class="bi bi-cash-stack icon-float" style="animation-delay: 1.5s; font-size: 2.5rem; color: #20c997;"></i>
-                            <i class="bi bi-graph-up icon-float" style="animation-delay: 3s; font-size: 2.8rem; color: #ffc107;"></i>
-                            <i class="bi bi-file-pdf icon-float" style="animation-delay: 4.5s; font-size: 2.2rem; color: #dc3545;"></i>
+                    <div class="floating-icons">
+                        <i class="bi bi-scale icon-float"></i>
+                        <i class="bi bi-cash-stack icon-float"></i>
+                        <i class="bi bi-graph-up icon-float"></i>
+                        <i class="bi bi-file-pdf icon-float"></i>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-4">
+                        <div class="bg-white p-4 rounded-3 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-bold">Dashboard</span>
+                                <span class="badge bg-success">Live</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <small class="text-muted">Transaksi</small>
+                                        <h5 class="fw-bold mb-0">1,234</h5>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <small class="text-muted">Petani</small>
+                                        <h5 class="fw-bold mb-0">567</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 bg-light p-2 rounded-3">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small">Pendapatan Hari Ini</span>
+                                    <span class="fw-bold text-success">Rp 2.450.000</span>
+                                </div>
+                            </div>
                         </div>
-                        <img src="https://via.placeholder.com/550x400/0d6efd/ffffff?text=Dashboard+Preview" 
-                             alt="Dashboard Preview" 
-                             class="img-fluid rounded-4 shadow-lg hero-image"
-                             data-aos="fade-left"
-                             data-aos-duration="1000">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="py-5 bg-light" id="stats">
+    <!-- ============================================
+    STATS SECTION
+    ============================================ -->
+    <section class="py-5 bg-light">
         <div class="container">
             <div class="row text-center g-4">
-                <div class="col-md-3" data-aos="fade-up" data-aos-delay="0">
+                <div class="col-md-3" data-aos="fade-up">
                     <div class="counter-box p-4">
                         <div class="display-4 fw-bold text-primary">
                             <span class="stat-number" data-count="5000">0</span>+
@@ -472,7 +666,9 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- ============================================
+    FEATURES SECTION
+    ============================================ -->
     <section id="features" class="py-5">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
@@ -483,102 +679,78 @@
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
                     <div class="card feature-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon-wrapper bg-primary bg-opacity-10 text-primary mx-auto">
+                            <div class="feature-icon bg-primary bg-opacity-10 text-primary">
                                 <i class="bi bi-people"></i>
                             </div>
                             <h5 class="card-title fw-bold">Manajemen Petani</h5>
                             <p class="card-text text-muted">
                                 Kelola data petani dengan mudah, lengkap dengan NIK, kontak, dan alamat.
                             </p>
-                            <div class="mt-3">
-                                <span class="badge bg-primary bg-opacity-10 text-primary">CRUD</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Validasi</span>
-                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="card feature-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon-wrapper bg-success bg-opacity-10 text-success mx-auto">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success">
                                 <i class="bi bi-box-seam"></i>
                             </div>
                             <h5 class="card-title fw-bold">Jenis Hasil Panen</h5>
                             <p class="card-text text-muted">
                                 Kelola berbagai jenis hasil panen dengan harga per kg yang fleksibel.
                             </p>
-                            <div class="mt-3">
-                                <span class="badge bg-primary bg-opacity-10 text-primary">CRUD</span>
-                                <span class="badge bg-warning bg-opacity-10 text-warning">Harga</span>
-                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="card feature-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon-wrapper bg-warning bg-opacity-10 text-warning mx-auto">
+                            <div class="feature-icon bg-warning bg-opacity-10 text-warning">
                                 <i class="bi bi-calculator"></i>
                             </div>
                             <h5 class="card-title fw-bold">Transaksi Otomatis</h5>
                             <p class="card-text text-muted">
                                 Perhitungan berat bersih dan total pembayaran otomatis tanpa kesalahan.
                             </p>
-                            <div class="mt-3">
-                                <span class="badge bg-info bg-opacity-10 text-info">Otomatis</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Akurat</span>
-                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                     <div class="card feature-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon-wrapper bg-info bg-opacity-10 text-info mx-auto">
+                            <div class="feature-icon bg-info bg-opacity-10 text-info">
                                 <i class="bi bi-graph-up"></i>
                             </div>
                             <h5 class="card-title fw-bold">Dashboard & Grafik</h5>
                             <p class="card-text text-muted">
                                 Pantau statistik dan tren penimbangan dengan grafik interaktif.
                             </p>
-                            <div class="mt-3">
-                                <span class="badge bg-primary bg-opacity-10 text-primary">Chart.js</span>
-                                <span class="badge bg-info bg-opacity-10 text-info">Real-time</span>
-                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
                     <div class="card feature-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon-wrapper bg-danger bg-opacity-10 text-danger mx-auto">
+                            <div class="feature-icon bg-danger bg-opacity-10 text-danger">
                                 <i class="bi bi-file-pdf"></i>
                             </div>
                             <h5 class="card-title fw-bold">Export PDF & Excel</h5>
                             <p class="card-text text-muted">
                                 Ekspor laporan dalam format PDF dan Excel untuk dokumentasi.
                             </p>
-                            <div class="mt-3">
-                                <span class="badge bg-danger bg-opacity-10 text-danger">PDF</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Excel</span>
-                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
                     <div class="card feature-card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
-                            <div class="feature-icon-wrapper bg-success bg-opacity-10 text-success mx-auto">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success">
                                 <i class="bi bi-whatsapp"></i>
                             </div>
                             <h5 class="card-title fw-bold">Integrasi WhatsApp</h5>
                             <p class="card-text text-muted">
                                 Hubungi admin langsung via WhatsApp dengan satu klik.
                             </p>
-                            <div class="mt-3">
-                                <span class="badge bg-success bg-opacity-10 text-success">WhatsApp</span>
-                                <span class="badge bg-primary bg-opacity-10 text-primary">Support</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -586,7 +758,9 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- ============================================
+    ABOUT SECTION
+    ============================================ -->
     <section id="about" class="py-5 bg-light">
         <div class="container">
             <div class="row align-items-center">
@@ -597,223 +771,42 @@
                         yang membantu tempat penimbangan hasil panen dalam mengelola 
                         transaksi secara efisien.
                     </p>
-                    <div class="row mt-4 g-3">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
-                                <div>
-                                    <h6 class="fw-bold">Akurat</h6>
-                                    <p class="text-muted small">Perhitungan otomatis menghilangkan kesalahan manual</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                                <div>
-                                    <h6 class="fw-bold">Cepat</h6>
-                                    <p class="text-muted small">Proses transaksi hanya dalam hitungan detik</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <i class="bi bi-check-circle-fill text-info me-2 mt-1"></i>
-                                <div>
-                                    <h6 class="fw-bold">Online</h6>
-                                    <p class="text-muted small">Akses data dari mana saja dan kapan saja</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-start">
-                                <i class="bi bi-check-circle-fill text-warning me-2 mt-1"></i>
-                                <div>
-                                    <h6 class="fw-bold">Terintegrasi</h6>
-                                    <p class="text-muted small">Laporan dan ekspor data yang lengkap</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="register.html" class="btn btn-primary btn-lg mt-4">
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2"></i>
+                            <strong>Akurat:</strong> Perhitungan otomatis menghilangkan kesalahan manual
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <strong>Cepat:</strong> Proses transaksi hanya dalam hitungan detik
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-info me-2"></i>
+                            <strong>Online:</strong> Akses data dari mana saja dan kapan saja
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
+                            <strong>Terintegrasi:</strong> Laporan dan ekspor data yang lengkap
+                        </li>
+                    </ul>
+                    <a href="register.html" class="btn btn-primary btn-lg mt-3">
                         <i class="bi bi-person-plus"></i> Daftar Sekarang
                     </a>
                 </div>
                 <div class="col-lg-6" data-aos="fade-left">
-                    <div class="position-relative">
-                        <img src="https://via.placeholder.com/600x400/0d6efd/ffffff?text=About+Us" 
+                    <div class="bg-white p-4 rounded-4 shadow-sm">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='300'%3E%3Crect width='100%25' height='300' fill='%230d6efd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-size='24' font-family='Arial'%3ETimbangan Panen%3C/text%3E%3C/svg%3E" 
                              alt="About Us" 
-                             class="img-fluid rounded-4 shadow-lg">
-                        <div class="position-absolute bottom-0 end-0 bg-white p-3 rounded-4 shadow-lg m-3">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-star-fill text-warning fs-4 me-2"></i>
-                                <div>
-                                    <div class="fw-bold">4.9/5</div>
-                                    <small class="text-muted">Rating Pengguna</small>
-                                </div>
-                            </div>
-                        </div>
+                             class="img-fluid rounded-3">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-5">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="display-5 fw-bold">Pilih Paket Anda</h2>
-                <p class="text-muted">Pilih paket yang sesuai dengan kebutuhan bisnis Anda</p>
-            </div>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
-                    <div class="card pricing-card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <h5 class="fw-bold">Gratis</h5>
-                            <div class="display-6 fw-bold mb-2">Rp 0</div>
-                            <p class="text-muted small">Coba fitur dasar</p>
-                            <hr>
-                            <ul class="list-unstyled text-start">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 5 Transaksi/hari</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 10 Petani</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 5 Produk</li>
-                                <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Export Laporan</li>
-                                <li class="mb-2"><i class="bi bi-x-circle-fill text-danger me-2"></i> Support 24/7</li>
-                            </ul>
-                            <a href="register.html" class="btn btn-outline-primary w-100 mt-3">Mulai Gratis</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card pricing-card h-100 border-0 shadow-sm popular">
-                        <div class="pricing-badge">POPULER</div>
-                        <div class="card-body text-center p-4">
-                            <h5 class="fw-bold">Pro</h5>
-                            <div class="display-6 fw-bold mb-2">Rp 299k <small class="fs-6 text-muted">/bulan</small></div>
-                            <p class="text-muted small">Untuk bisnis berkembang</p>
-                            <hr>
-                            <ul class="list-unstyled text-start">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Unlimited Transaksi</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Unlimited Petani</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Unlimited Produk</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Export Laporan</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Support 24/7</li>
-                            </ul>
-                            <a href="register.html" class="btn btn-primary w-100 mt-3">Pilih Pro</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card pricing-card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <h5 class="fw-bold">Enterprise</h5>
-                            <div class="display-6 fw-bold mb-2">Rp 599k <small class="fs-6 text-muted">/bulan</small></div>
-                            <p class="text-muted small">Untuk perusahaan besar</p>
-                            <hr>
-                            <ul class="list-unstyled text-start">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Semua Fitur Pro</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Multi User</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> API Access</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Custom Domain</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Dedicated Support</li>
-                            </ul>
-                            <a href="register.html" class="btn btn-outline-primary w-100 mt-3">Hubungi Kami</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="py-5 bg-light">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="display-5 fw-bold">Apa Kata Mereka</h2>
-                <p class="text-muted">Testimoni dari pengguna yang telah merasakan manfaatnya</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
-                    <div class="card testimonial-card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="testimonial-avatar bg-primary bg-opacity-10 text-primary me-3">
-                                    BP
-                                </div>
-                                <div>
-                                    <h6 class="fw-bold mb-0">Budi Pranoto</h6>
-                                    <small class="text-muted">Pemilik Timbangan</small>
-                                </div>
-                            </div>
-                            <p class="text-muted">
-                                "Sistem ini sangat membantu usaha timbangan saya. Proses pencatatan jadi lebih cepat dan akurat. Para petani juga puas dengan layanan yang lebih profesional."
-                            </p>
-                            <div class="text-warning">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card testimonial-card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="testimonial-avatar bg-success bg-opacity-10 text-success me-3">
-                                    SR
-                                </div>
-                                <div>
-                                    <h6 class="fw-bold mb-0">Siti Rahayu</h6>
-                                    <small class="text-muted">Petani</small>
-                                </div>
-                            </div>
-                            <p class="text-muted">
-                                "Sekarang saya bisa melihat riwayat penimbangan dengan mudah. Tidak perlu khawatir data hilang atau salah catat. Sangat direkomendasikan!"
-                            </p>
-                            <div class="text-warning">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card testimonial-card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="testimonial-avatar bg-info bg-opacity-10 text-info me-3">
-                                    AH
-                                </div>
-                                <div>
-                                    <h6 class="fw-bold mb-0">Ahmad Hidayat</h6>
-                                    <small class="text-muted">Pengelola Timbangan</small>
-                                </div>
-                            </div>
-                            <p class="text-muted">
-                                "Fitur laporan dan ekspor data sangat membantu untuk membuat laporan keuangan. Grafiknya juga memudahkan melihat tren penimbangan."
-                            </p>
-                            <div class="text-warning">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-half"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
+    <!-- ============================================
+    CTA SECTION
+    ============================================ -->
     <section class="py-5 bg-primary text-white">
         <div class="container text-center" data-aos="zoom-in">
             <h2 class="display-5 fw-bold mb-3">Siap Memulai?</h2>
@@ -831,8 +824,10 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-5">
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer>
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-4">
@@ -840,34 +835,20 @@
                         <i class="bi bi-scale"></i> Timbangan Panen
                     </h5>
                     <p class="text-muted">Sistem Manajemen Timbangan Hasil Panen</p>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-muted"><i class="bi bi-facebook fs-5"></i></a>
-                        <a href="#" class="text-muted"><i class="bi bi-instagram fs-5"></i></a>
-                        <a href="#" class="text-muted"><i class="bi bi-youtube fs-5"></i></a>
-                        <a href="#" class="text-muted"><i class="bi bi-linkedin fs-5"></i></a>
-                    </div>
                 </div>
-                <div class="col-md-2">
-                    <h6 class="fw-bold">Menu</h6>
+                <div class="col-md-4">
+                    <h6>Menu</h6>
                     <ul class="list-unstyled">
-                        <li><a href="index.html" class="text-muted text-decoration-none">Beranda</a></li>
-                        <li><a href="#features" class="text-muted text-decoration-none">Fitur</a></li>
-                        <li><a href="#pricing" class="text-muted text-decoration-none">Harga</a></li>
+                        <li><a href="index.html">Beranda</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Daftar</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3">
-                    <h6 class="fw-bold">Akun</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="login.html" class="text-muted text-decoration-none">Login</a></li>
-                        <li><a href="register.html" class="text-muted text-decoration-none">Daftar</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h6 class="fw-bold">Kontak</h6>
+                <div class="col-md-4">
+                    <h6>Kontak</h6>
                     <p class="text-muted">
                         <i class="bi bi-whatsapp"></i> 0812-4814-1031<br>
-                        <i class="bi bi-envelope"></i> support@timbanganpanen.com<br>
-                        <i class="bi bi-clock"></i> 24/7 Support
+                        <i class="bi bi-envelope"></i> support@timbanganpanen.com
                     </p>
                 </div>
             </div>
@@ -878,7 +859,9 @@
         </div>
     </footer>
 
-    <!-- WhatsApp Floating Button -->
+    <!-- ============================================
+    WHATSAPP FLOATING BUTTON
+    ============================================ -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
        class="whatsapp-float" 
        target="_blank"
@@ -887,54 +870,35 @@
         <span class="whatsapp-tooltip">Hubungi Admin</span>
     </a>
 
-    <!-- Scripts -->
+    <!-- ============================================
+    SCRIPTS
+    ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="js/app.js"></script>
+
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
-
-        // Counter animation
+        // ============================================
+        // HIDE LOADING SCREEN
+        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            const counters = document.querySelectorAll('.stat-number');
-            
-            const animateCounter = (counter) => {
-                const target = parseInt(counter.getAttribute('data-count'));
-                const duration = 2000;
-                const steps = 60;
-                const increment = target / steps;
-                let current = 0;
-                
-                const update = () => {
-                    current += increment;
-                    if (current >= target) {
-                        counter.textContent = target;
-                        return;
-                    }
-                    counter.textContent = Math.floor(current);
-                    requestAnimationFrame(update);
-                };
-                
-                update();
-            };
+            // Hide loading screen after 1.5 seconds
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    // Remove from DOM after transition
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 600);
+                }
+            }, 1500);
 
-            // Intersection Observer for counters
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const counter = entry.target;
-                        animateCounter(counter);
-                        observer.unobserve(counter);
-                    }
-                });
-            }, { threshold: 0.5 });
-
-            counters.forEach(counter => observer.observe(counter));
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50
+            });
 
             // Navbar scroll effect
             const navbar = document.getElementById('mainNav');
@@ -945,7 +909,65 @@
                     navbar.classList.remove('navbar-scrolled');
                 }
             });
+
+            // Counter animation
+            animateCounters();
         });
+
+        // ============================================
+        // COUNTER ANIMATION
+        // ============================================
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                if (isNaN(target)) return;
+                
+                const duration = 2000;
+                const steps = 60;
+                const increment = target / steps;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target + (target > 100 ? '+' : '%');
+                        return;
+                    }
+                    counter.textContent = Math.floor(current);
+                    requestAnimationFrame(updateCounter);
+                };
+                
+                // Start animation when element is in view
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            updateCounter();
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                observer.observe(counter);
+            });
+        }
+
+        // ============================================
+        // FALLBACK: Force hide loading screen after 5 seconds
+        // ============================================
+        setTimeout(function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                loadingScreen.classList.add('hidden');
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 600);
+            }
+        }, 5000);
+
+        console.log('✅ Sistem Manajemen Timbangan Hasil Panen berhasil dimuat!');
     </script>
+
 </body>
 </html>

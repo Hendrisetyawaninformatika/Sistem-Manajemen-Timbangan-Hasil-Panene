@@ -1,15 +1,261 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Config -->
+<script src="js/firebase-config.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transaksi Baru - Sistem Manajemen Timbangan Hasil Panen</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
     <style>
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* ============================================
+           LOADING SCREEN
+           ============================================ */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-container {
+            text-align: center;
+            color: white;
+        }
+
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            animation: bounceIcon 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .loader-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .loader-subtext {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px auto 0;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            width: 0%;
+            animation: progressBar 2s ease-in-out infinite;
+        }
+
+        @keyframes progressBar {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* ============================================
+           SIDEBAR
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1a3e 100%);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .sidebar-header i {
+            font-size: 1.6rem;
+            color: #4fc3f7;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.65);
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-left-color: #6f42c1;
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #6f42c1;
+        }
+
+        .sidebar-menu a i {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-menu hr {
+            border-color: rgba(255, 255, 255, 0.08);
+            margin: 16px 20px;
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ============================================
+           TOP NAVBAR
+           ============================================ */
+        .top-navbar {
+            background: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .top-navbar .btn-link {
+            color: #212529;
+            padding: 0;
+        }
+
+        .top-navbar .btn-link:hover {
+            color: #6f42c1;
+        }
+
+        /* ============================================
+           FORM CARD
+           ============================================ */
         .form-card {
             border-radius: 20px;
             overflow: hidden;
@@ -24,10 +270,10 @@
 
         .form-card .card-header .header-icon {
             font-size: 2rem;
-            animation: float-icon 3s ease-in-out infinite;
+            animation: floatIcon 3s ease-in-out infinite;
         }
 
-        @keyframes float-icon {
+        @keyframes floatIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
@@ -36,6 +282,9 @@
             padding: 30px;
         }
 
+        /* ============================================
+           FORM ELEMENTS
+           ============================================ */
         .form-control, .form-select {
             border-radius: 12px;
             padding: 10px 16px;
@@ -50,6 +299,10 @@
 
         .form-control.is-invalid, .form-select.is-invalid {
             border-color: #dc3545;
+        }
+
+        .form-control.is-invalid:focus, .form-select.is-invalid:focus {
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
         }
 
         .form-label {
@@ -86,6 +339,9 @@
             margin-right: 8px;
         }
 
+        /* ============================================
+           BUTTONS
+           ============================================ */
         .btn-submit {
             border-radius: 12px;
             padding: 12px 40px;
@@ -109,6 +365,9 @@
             font-weight: 600;
         }
 
+        /* ============================================
+           CALCULATION DISPLAY
+           ============================================ */
         .calculation-display {
             background: #f8f9fa;
             border-radius: 16px;
@@ -139,6 +398,103 @@
         .calculation-display .calc-value.total {
             color: #6f42c1;
             font-size: 1.3rem;
+        }
+
+        /* ============================================
+           TRANSACTION CODE
+           ============================================ */
+        .transaction-code-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #6f42c1;
+            background: rgba(111, 66, 193, 0.1);
+            padding: 8px 16px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        body.dark-mode .transaction-code-display {
+            background: rgba(111, 66, 193, 0.2);
+        }
+
+        /* ============================================
+           AVATAR
+           ============================================ */
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* ============================================
+           WHATSAPP FLOAT
+           ============================================ */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: pulseWA 2s ease-in-out infinite;
+            text-decoration: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(-5deg);
+            color: white;
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
+        }
+
+        @keyframes pulseWA {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6); }
+        }
+
+        /* ============================================
+           DARK MODE
+           ============================================ */
+        body.dark-mode {
+            background-color: #0a0e1a;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .top-navbar {
+            background: #141824;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .top-navbar .btn-link {
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .card {
+            background: #141824;
+            border-color: #2a2f45 !important;
+        }
+
+        body.dark-mode .card-header {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: #2a2f45;
+        }
+
+        body.dark-mode .text-muted {
+            color: #8a8f9e !important;
         }
 
         body.dark-mode .form-control,
@@ -181,6 +537,79 @@
             color: #8a8f9e;
         }
 
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-card .card-body {
+                padding: 20px;
+            }
+            
+            .whatsapp-float {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+                bottom: 16px;
+                right: 16px;
+            }
+            
+            .btn-submit, .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ============================================
+           SIDEBAR OVERLAY
+           ============================================ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ============================================
+           WEIGHT INPUT GROUP
+           ============================================ */
         .weight-input-group .input-group-text {
             border-radius: 12px 0 0 12px;
             font-weight: 600;
@@ -198,39 +627,36 @@
             border-color: #2a2f45;
             color: #e4e6eb;
         }
-
-        .transaction-code-display {
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #6f42c1;
-            background: rgba(111, 66, 193, 0.1);
-            padding: 8px 16px;
-            border-radius: 10px;
-            display: inline-block;
-        }
-
-        body.dark-mode .transaction-code-display {
-            background: rgba(111, 66, 193, 0.2);
-        }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
+
+    <!-- ============================================
+    LOADING SCREEN
+    ============================================ -->
+    <div id="loadingScreen">
         <div class="loader-container">
+            <i class="bi bi-plus-circle loader-icon"></i>
             <div class="loader"></div>
-            <div class="loader-text mt-3">Memuat Form...</div>
+            <div class="loader-text">Memuat Form...</div>
+            <div class="loader-subtext">Sistem Manajemen Timbangan Hasil Panen</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Sidebar Overlay -->
+    <!-- ============================================
+    SIDEBAR OVERLAY (Mobile)
+    ============================================ -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- Sidebar -->
+    <!-- ============================================
+    SIDEBAR
+    ============================================ -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5 class="fw-bold">
+            <h5>
                 <i class="bi bi-scale"></i> Timbangan Panen
             </h5>
         </div>
@@ -275,8 +701,11 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
     <div class="main-content">
+
         <!-- Top Navbar -->
         <nav class="top-navbar">
             <div class="container-fluid">
@@ -312,15 +741,16 @@
             </div>
         </nav>
 
-        <!-- Page Content -->
+        <!-- Content -->
         <div class="container-fluid mt-4">
             <div class="row">
                 <div class="col-lg-8">
+
                     <!-- Alert Container -->
                     <div id="alertContainer" class="mb-3"></div>
 
                     <!-- Form Card -->
-                    <div class="card border-0 shadow-sm form-card" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm form-card">
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="header-icon">
@@ -354,22 +784,32 @@
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label for="farmer_id" class="form-label">Petani <span class="text-danger">*</span></label>
-                                            <select class="form-select" id="farmer_id" required>
+                                            <label for="farmerId" class="form-label">Petani <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="farmerId" required>
                                                 <option value="">Pilih Petani</option>
+                                                <option value="1">Budi Pranoto</option>
+                                                <option value="2">Siti Rahayu</option>
+                                                <option value="3">Ahmad Hidayat</option>
+                                                <option value="4">Dewi Sartika</option>
+                                                <option value="5">Eko Prasetyo</option>
                                             </select>
                                             <div class="invalid-feedback">Silakan pilih petani</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="product_id" class="form-label">Produk <span class="text-danger">*</span></label>
-                                            <select class="form-select" id="product_id" required>
+                                            <label for="productId" class="form-label">Produk <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="productId" required>
                                                 <option value="">Pilih Produk</option>
+                                                <option value="1" data-price="12000">Padi</option>
+                                                <option value="2" data-price="8000">Jagung</option>
+                                                <option value="3" data-price="10000">Kedelai</option>
+                                                <option value="4" data-price="25000">Cabai Merah</option>
+                                                <option value="5" data-price="30000">Bawang Merah</option>
                                             </select>
                                             <div class="invalid-feedback">Silakan pilih produk</div>
                                         </div>
                                         <div class="col-md-12">
-                                            <label for="transaction_date" class="form-label">Tanggal Transaksi <span class="text-danger">*</span></label>
-                                            <input type="date" class="form-control" id="transaction_date" required>
+                                            <label for="transactionDate" class="form-label">Tanggal Transaksi <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="transactionDate" required>
                                             <div class="invalid-feedback">Tanggal transaksi wajib diisi</div>
                                         </div>
                                     </div>
@@ -382,11 +822,11 @@
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label for="gross_weight" class="form-label">Berat Kotor (kg) <span class="text-danger">*</span></label>
+                                            <label for="grossWeight" class="form-label">Berat Kotor (kg) <span class="text-danger">*</span></label>
                                             <div class="weight-input-group input-group">
                                                 <input type="number" 
                                                        class="form-control" 
-                                                       id="gross_weight" 
+                                                       id="grossWeight" 
                                                        placeholder="0.00"
                                                        min="0"
                                                        step="0.01"
@@ -396,11 +836,11 @@
                                             <div class="invalid-feedback">Berat kotor wajib diisi</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="tare_weight" class="form-label">Berat Tarra (kg)</label>
+                                            <label for="tareWeight" class="form-label">Berat Tarra (kg)</label>
                                             <div class="weight-input-group input-group">
                                                 <input type="number" 
                                                        class="form-control" 
-                                                       id="tare_weight" 
+                                                       id="tareWeight" 
                                                        placeholder="0.00"
                                                        min="0"
                                                        step="0.01">
@@ -418,12 +858,12 @@
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-12">
-                                            <label for="price_per_kg" class="form-label">Harga per kg <span class="text-danger">*</span></label>
+                                            <label for="pricePerKg" class="form-label">Harga per kg <span class="text-danger">*</span></label>
                                             <div class="weight-input-group input-group">
                                                 <span class="input-group-text">Rp</span>
                                                 <input type="number" 
                                                        class="form-control" 
-                                                       id="price_per_kg" 
+                                                       id="pricePerKg" 
                                                        placeholder="0"
                                                        min="0"
                                                        step="100"
@@ -457,7 +897,7 @@
                                     <a href="transactions.html" class="btn btn-outline-secondary btn-cancel">
                                         <i class="bi bi-arrow-left"></i> Kembali
                                     </a>
-                                    <button type="submit" class="btn btn-primary btn-submit">
+                                    <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
                                         <i class="bi bi-save"></i> Simpan Transaksi
                                     </button>
                                 </div>
@@ -467,7 +907,7 @@
                 </div>
 
                 <!-- Sidebar - Perhitungan -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-lg-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-transparent">
                             <h6 class="fw-bold mb-0"><i class="bi bi-calculator"></i> Ringkasan Perhitungan</h6>
@@ -519,7 +959,9 @@
         </div>
     </div>
 
-    <!-- WhatsApp Floating Button -->
+    <!-- ============================================
+    WHATSAPP FLOATING BUTTON
+    ============================================ -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
        class="whatsapp-float" 
        target="_blank"
@@ -527,14 +969,423 @@
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- Scripts -->
+    <!-- ============================================
+    SCRIPTS
+    ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/transactions.js"></script>
+
+    <script>
+        // ============================================
+        // 1. HIDE LOADING SCREEN - MULTI FALLBACK
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            hideLoading();
+            initPage();
+        });
+
+        setTimeout(hideLoading, 1500);
+        setTimeout(hideLoading, 3000);
+        setTimeout(hideLoading, 5000);
+
+        function hideLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                loadingScreen.classList.add('hidden');
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 800);
+            }
+        }
+
+        // ============================================
+        // 2. PAGE INITIALIZATION
+        // ============================================
+        function initPage() {
+            // Check if user is logged in
+            const user = getUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update user info
+            updateUserInfo(user);
+
+            // Generate transaction code
+            generateTransactionCode();
+
+            // Set default date
+            setDefaultDate();
+
+            // Init sidebar
+            initSidebar();
+
+            // Init dark mode
+            initDarkMode();
+
+            // Init logout
+            initLogout();
+
+            // Init form
+            initForm();
+
+            // Init calculations
+            initCalculations();
+        }
+
+        // ============================================
+        // 3. GET USER
+        // ============================================
+        function getUser() {
+            try {
+                const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+                if (userData) {
+                    return JSON.parse(userData);
+                }
+            } catch (e) {
+                console.error('Error getting user:', e);
+            }
+            return null;
+        }
+
+        // ============================================
+        // 4. UPDATE USER INFO
+        // ============================================
+        function updateUserInfo(user) {
+            const name = user?.name || 'Admin';
+            document.getElementById('userNameDisplay').textContent = name;
+            document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+        }
+
+        // ============================================
+        // 5. GENERATE TRANSACTION CODE
+        // ============================================
+        function generateTransactionCode() {
+            const prefix = 'TRX';
+            const date = new Date();
+            const dateStr = date.getFullYear() +
+                String(date.getMonth() + 1).padStart(2, '0') +
+                String(date.getDate()).padStart(2, '0');
+            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const code = prefix + dateStr + random;
+            document.getElementById('transactionCodeDisplay').textContent = code;
+        }
+
+        // ============================================
+        // 6. SET DEFAULT DATE
+        // ============================================
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('transactionDate').value = today;
+        }
+
+        // ============================================
+        // 7. INIT FORM
+        // ============================================
+        function initForm() {
+            const form = document.getElementById('transactionForm');
+
+            // Product change - auto fill price
+            document.getElementById('productId').addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                const price = selected.dataset.price;
+                if (price) {
+                    document.getElementById('pricePerKg').value = price;
+                    calculateTotal();
+                }
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveTransaction();
+            });
+        }
+
+        // ============================================
+        // 8. CALCULATIONS
+        // ============================================
+        function initCalculations() {
+            const grossWeight = document.getElementById('grossWeight');
+            const tareWeight = document.getElementById('tareWeight');
+            const pricePerKg = document.getElementById('pricePerKg');
+
+            grossWeight.addEventListener('input', calculateTotal);
+            tareWeight.addEventListener('input', calculateTotal);
+            pricePerKg.addEventListener('input', calculateTotal);
+        }
+
+        function calculateTotal() {
+            const grossWeight = parseFloat(document.getElementById('grossWeight').value) || 0;
+            const tareWeight = parseFloat(document.getElementById('tareWeight').value) || 0;
+            const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
+
+            const netWeight = grossWeight - tareWeight;
+            const total = netWeight * pricePerKg;
+
+            document.getElementById('calcGrossWeight').textContent = grossWeight.toFixed(2) + ' kg';
+            document.getElementById('calcTareWeight').textContent = tareWeight.toFixed(2) + ' kg';
+            document.getElementById('calcNetWeight').textContent = netWeight.toFixed(2) + ' kg';
+            document.getElementById('calcPrice').textContent = formatCurrency(pricePerKg);
+            document.getElementById('calcTotal').textContent = formatCurrency(total);
+        }
+
+        // ============================================
+        // 9. SAVE TRANSACTION
+        // ============================================
+        function saveTransaction() {
+            const farmerId = document.getElementById('farmerId').value;
+            const productId = document.getElementById('productId').value;
+            const transactionDate = document.getElementById('transactionDate').value;
+            const grossWeight = parseFloat(document.getElementById('grossWeight').value) || 0;
+            const tareWeight = parseFloat(document.getElementById('tareWeight').value) || 0;
+            const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
+            const notes = document.getElementById('notes').value.trim();
+
+            // Validate
+            let isValid = true;
+
+            if (!farmerId) {
+                document.getElementById('farmerId').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('farmerId').classList.remove('is-invalid');
+            }
+
+            if (!productId) {
+                document.getElementById('productId').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('productId').classList.remove('is-invalid');
+            }
+
+            if (!transactionDate) {
+                document.getElementById('transactionDate').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('transactionDate').classList.remove('is-invalid');
+            }
+
+            if (grossWeight <= 0) {
+                document.getElementById('grossWeight').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('grossWeight').classList.remove('is-invalid');
+            }
+
+            if (grossWeight <= tareWeight) {
+                showAlert('Berat kotor harus lebih besar dari berat tarra!', 'warning');
+                document.getElementById('grossWeight').classList.add('is-invalid');
+                return;
+            }
+
+            if (pricePerKg <= 0) {
+                document.getElementById('pricePerKg').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('pricePerKg').classList.remove('is-invalid');
+            }
+
+            if (!isValid) {
+                showAlert('Silakan isi semua field yang diperlukan!', 'warning');
+                return;
+            }
+
+            // Show loading
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Menyimpan...
+            `;
+            submitBtn.disabled = true;
+
+            // Simulate save (demo)
+            setTimeout(function() {
+                const netWeight = grossWeight - tareWeight;
+                const total = netWeight * pricePerKg;
+
+                const transaction = {
+                    code: document.getElementById('transactionCodeDisplay').textContent,
+                    farmerId: farmerId,
+                    productId: productId,
+                    transactionDate: transactionDate,
+                    grossWeight: grossWeight,
+                    tareWeight: tareWeight,
+                    netWeight: netWeight,
+                    pricePerKg: pricePerKg,
+                    totalAmount: total,
+                    notes: notes || '-',
+                    status: 'completed',
+                    createdAt: new Date().toISOString()
+                };
+
+                console.log('Transaksi disimpan:', transaction);
+
+                // Show success
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Transaksi berhasil disimpan!',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                // Redirect after delay
+                setTimeout(function() {
+                    window.location.href = 'transactions.html';
+                }, 2000);
+
+            }, 1500);
+        }
+
+        // ============================================
+        // 10. FORMAT CURRENCY
+        // ============================================
+        function formatCurrency(amount) {
+            if (amount === undefined || amount === null || isNaN(amount) || amount === 0) {
+                return 'Rp 0';
+            }
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(amount));
+        }
+
+        // ============================================
+        // 11. SHOW ALERT
+        // ============================================
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            container.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        if (alert.parentNode) alert.remove();
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // ============================================
+        // 12. SIDEBAR TOGGLE
+        // ============================================
+        function initSidebar() {
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (!toggleBtn || !sidebar) return;
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('active');
+                if (overlay) {
+                    overlay.classList.toggle('active');
+                }
+            });
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // 13. DARK MODE
+        // ============================================
+        function initDarkMode() {
+            const toggleBtn = document.getElementById('darkModeToggle');
+            if (!toggleBtn) return;
+
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                toggleBtn.innerHTML = '<i class="bi bi-sun fs-5"></i>';
+            }
+
+            toggleBtn.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDark);
+                this.innerHTML = isDark ? '<i class="bi bi-sun fs-5"></i>' : '<i class="bi bi-moon fs-5"></i>';
+            });
+        }
+
+        // ============================================
+        // 14. LOGOUT
+        // ============================================
+        function initLogout() {
+            const logoutBtns = [
+                document.getElementById('logoutBtn'),
+                document.getElementById('logoutDropdown')
+            ];
+
+            logoutBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Konfirmasi Logout',
+                            text: 'Apakah Anda yakin ingin logout?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Ya, Logout!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('session');
+                                sessionStorage.removeItem('user');
+                                sessionStorage.removeItem('session');
+                                window.location.href = 'login.html';
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // 15. LOG
+        // ============================================
+        console.log('%c✅ Halaman Transaksi Baru berhasil dimuat!', 'color: #6f42c1; font-size: 16px; font-weight: bold;');
+        console.log('%c📝 Siap menambahkan transaksi baru', 'color: #20c997;');
+    </script>
+
 </body>
 </html>

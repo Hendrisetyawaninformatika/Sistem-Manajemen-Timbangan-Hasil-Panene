@@ -6,7 +6,7 @@
  */
 
 // ============================================
-// Loading Screen
+// Loading Screen - HIDE AFTER PAGE LOAD
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     // Hide loading screen after page loads
@@ -14,8 +14,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen) {
             loadingScreen.classList.add('hidden');
+            // Force display none after transition
+            setTimeout(function() {
+                loadingScreen.style.display = 'none';
+            }, 600);
         }
-    }, 800);
+    }, 1000);
+
+    // Initialize AOS if available
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+    }
 
     // Initialize dark mode
     initDarkMode();
@@ -31,7 +44,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Auto-hide alerts
     autoHideAlerts();
+
+    // Set current date in welcome banner
+    setCurrentDate();
+
+    // Get current user
+    updateUserInfo();
 });
+
+// ============================================
+// Set Current Date
+// ============================================
+function setCurrentDate() {
+    const dateElement = document.getElementById('currentDate');
+    if (dateElement) {
+        const now = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        dateElement.textContent = now.toLocaleDateString('id-ID', options);
+    }
+}
+
+// ============================================
+// Update User Info
+// ============================================
+function updateUserInfo() {
+    const user = getCurrentUser();
+    if (user) {
+        const nameElements = document.querySelectorAll('#userNameDisplay, #welcomeName');
+        nameElements.forEach(el => {
+            if (el) el.textContent = user.name || 'Admin';
+        });
+        
+        const initialElements = document.querySelectorAll('#userInitial');
+        initialElements.forEach(el => {
+            if (el) el.textContent = (user.name || 'A').charAt(0).toUpperCase();
+        });
+    }
+}
 
 // ============================================
 // Dark Mode Toggle
@@ -52,6 +101,25 @@ function initDarkMode() {
         const isDark = document.body.classList.contains('dark-mode');
         localStorage.setItem('darkMode', isDark);
         this.innerHTML = isDark ? '<i class="bi bi-sun fs-5"></i>' : '<i class="bi bi-moon fs-5"></i>';
+        
+        // Re-render charts if they exist
+        if (window.revenueChart) {
+            window.revenueChart.destroy();
+            window.revenueChart = null;
+        }
+        if (window.distributionChart) {
+            window.distributionChart.destroy();
+            window.distributionChart = null;
+        }
+        if (window.reportChart) {
+            window.reportChart.destroy();
+            window.reportChart = null;
+        }
+        
+        // Reload dashboard data if on dashboard page
+        if (document.getElementById('revenueChart')) {
+            loadDashboardData();
+        }
     });
 }
 
@@ -114,28 +182,56 @@ function initLogout() {
         if (btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                Swal.fire({
-                    title: 'Konfirmasi Logout',
-                    text: 'Apakah Anda yakin ingin logout?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Logout!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Clear session
-                        localStorage.removeItem('user');
-                        localStorage.removeItem('session');
-                        // Redirect to login
-                        window.location.href = 'login.html';
-                    }
-                });
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Konfirmasi Logout',
+                        text: 'Apakah Anda yakin ingin logout?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Ya, Logout!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            logout();
+                        }
+                    });
+                } else {
+                    logout();
+                }
             });
         }
     });
 }
+
+// ============================================
+// Logout Function
+// ============================================
+function logout() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('session');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('session');
+    window.location.href = 'login.html';
+}
+window.logout = logout;
+
+// ============================================
+// Get Current User
+// ============================================
+function getCurrentUser() {
+    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (userData) {
+        try {
+            return JSON.parse(userData);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+}
+window.getCurrentUser = getCurrentUser;
 
 // ============================================
 // Counter Animation
@@ -145,10 +241,13 @@ function animateCounters() {
     
     counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-count'));
+        if (isNaN(target)) return;
+        
         const duration = 2000;
         const steps = 60;
         const increment = target / steps;
         let current = 0;
+        let animationId = null;
         
         const updateCounter = () => {
             current += increment;
@@ -157,7 +256,7 @@ function animateCounters() {
                 return;
             }
             counter.textContent = Math.floor(current);
-            requestAnimationFrame(updateCounter);
+            animationId = requestAnimationFrame(updateCounter);
         };
         
         // Start animation when element is in view
@@ -168,7 +267,7 @@ function animateCounters() {
                     observer.unobserve(entry.target);
                 }
             });
-        });
+        }, { threshold: 0.5 });
         
         observer.observe(counter);
     });
@@ -184,7 +283,9 @@ function autoHideAlerts() {
             alert.style.transition = 'opacity 0.5s ease';
             alert.style.opacity = '0';
             setTimeout(() => {
-                alert.remove();
+                if (alert.parentNode) {
+                    alert.remove();
+                }
             }, 500);
         }, 5000);
     });
@@ -200,6 +301,7 @@ function showAlert(message, type = 'success', containerId = 'alertContainer') {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.role = 'alert';
+    alertDiv.style.animation = 'slideDown 0.4s ease';
     
     const iconMap = {
         success: 'bi-check-circle-fill',
@@ -255,29 +357,63 @@ function validateForm(formId) {
 window.validateForm = validateForm;
 
 // ============================================
-// Export Functions
+// Refresh Table Function
 // ============================================
-function exportTableToExcel(tableId, filename = 'export') {
-    const table = document.getElementById(tableId);
-    if (!table) return;
-    
-    const wb = XLSX.utils.table_to_book(table, { sheet: 'Data' });
-    XLSX.writeFile(wb, `${filename}.xlsx`);
+function refreshTable() {
+    const currentPage = window.location.pathname;
+    if (currentPage.includes('farmers.html')) {
+        loadFarmers();
+    } else if (currentPage.includes('products.html')) {
+        loadProducts();
+    } else if (currentPage.includes('transactions.html')) {
+        loadTransactions();
+    }
+    showAlert('Data berhasil diperbarui', 'success');
 }
-window.exportTableToExcel = exportTableToExcel;
+window.refreshTable = refreshTable;
 
-function exportTableToPDF(tableId, filename = 'export') {
-    const element = document.getElementById(tableId);
-    if (!element) return;
-    
-    const opt = {
-        margin: 10,
-        filename: `${filename}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-    };
-    
-    html2pdf().set(opt).from(element).save();
+// ============================================
+// Export Functions (placeholder)
+// ============================================
+function exportFarmersExcel() {
+    showAlert('Fitur export Excel sedang dalam pengembangan', 'info');
 }
-window.exportTableToPDF = exportTableToPDF;
+window.exportFarmersExcel = exportFarmersExcel;
+
+function exportFarmersPDF() {
+    showAlert('Fitur export PDF sedang dalam pengembangan', 'info');
+}
+window.exportFarmersPDF = exportFarmersPDF;
+
+function exportProductsExcel() {
+    showAlert('Fitur export Excel sedang dalam pengembangan', 'info');
+}
+window.exportProductsExcel = exportProductsExcel;
+
+function exportProductsPDF() {
+    showAlert('Fitur export PDF sedang dalam pengembangan', 'info');
+}
+window.exportProductsPDF = exportProductsPDF;
+
+function exportTransactionsExcel() {
+    showAlert('Fitur export Excel sedang dalam pengembangan', 'info');
+}
+window.exportTransactionsExcel = exportTransactionsExcel;
+
+function exportTransactionsPDF() {
+    showAlert('Fitur export PDF sedang dalam pengembangan', 'info');
+}
+window.exportTransactionsPDF = exportTransactionsPDF;
+
+// ============================================
+// Initialize AOS
+// ============================================
+if (typeof AOS !== 'undefined') {
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50
+    });
+}
+
+console.log('✅ Sistem Manajemen Timbangan Hasil Panen loaded successfully');

@@ -1,14 +1,21 @@
+// ============================================
 // Supabase Configuration
+// ============================================
+
+// GANTI DENGAN KONFIGURASI SUPABASE ANDA
 const SUPABASE_URL = 'https://your-project.supabase.co';
 const SUPABASE_KEY = 'your-supabase-anon-key';
 
 // Initialize Supabase client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Export for use in other files
+// Make supabase available globally
 window.supabase = supabaseClient;
 
-// Helper functions
+// ============================================
+// Database Helper Functions
+// ============================================
+
 const db = {
     // Users
     users: {
@@ -328,6 +335,10 @@ const db = {
 // Make db available globally
 window.db = db;
 
+// ============================================
+// Helper Functions
+// ============================================
+
 // Generate UUID
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -339,12 +350,14 @@ window.generateUUID = generateUUID;
 
 // Format currency
 function formatCurrency(amount) {
+    if (amount === undefined || amount === null) return 'Rp 0';
     return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
 }
 window.formatCurrency = formatCurrency;
 
 // Format date
 function formatDate(dateString) {
+    if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString('id-ID', {
         day: '2-digit',
@@ -356,6 +369,7 @@ window.formatDate = formatDate;
 
 // Format datetime
 function formatDateTime(dateString) {
+    if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString('id-ID', {
         day: '2-digit',

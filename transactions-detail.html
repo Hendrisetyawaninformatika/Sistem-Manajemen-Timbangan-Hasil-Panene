@@ -1,15 +1,261 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Config -->
+<script src="js/firebase-config.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Transaksi - Sistem Manajemen Timbangan Hasil Panen</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
     <style>
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* ============================================
+           LOADING SCREEN
+           ============================================ */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-container {
+            text-align: center;
+            color: white;
+        }
+
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            animation: bounceIcon 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .loader-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .loader-subtext {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px auto 0;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            width: 0%;
+            animation: progressBar 2s ease-in-out infinite;
+        }
+
+        @keyframes progressBar {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* ============================================
+           SIDEBAR
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1a3e 100%);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .sidebar-header i {
+            font-size: 1.6rem;
+            color: #4fc3f7;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.65);
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-left-color: #6f42c1;
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #6f42c1;
+        }
+
+        .sidebar-menu a i {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-menu hr {
+            border-color: rgba(255, 255, 255, 0.08);
+            margin: 16px 20px;
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ============================================
+           TOP NAVBAR
+           ============================================ */
+        .top-navbar {
+            background: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .top-navbar .btn-link {
+            color: #212529;
+            padding: 0;
+        }
+
+        .top-navbar .btn-link:hover {
+            color: #6f42c1;
+        }
+
+        /* ============================================
+           DETAIL CARD
+           ============================================ */
         .detail-card {
             border-radius: 20px;
             overflow: hidden;
@@ -24,10 +270,10 @@
 
         .detail-card .card-header .header-icon {
             font-size: 2rem;
-            animation: float-icon 3s ease-in-out infinite;
+            animation: floatIcon 3s ease-in-out infinite;
         }
 
-        @keyframes float-icon {
+        @keyframes floatIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
@@ -36,6 +282,9 @@
             padding: 30px;
         }
 
+        /* ============================================
+           DETAIL ITEMS
+           ============================================ */
         .detail-item {
             display: flex;
             justify-content: space-between;
@@ -67,6 +316,9 @@
             font-size: 1.2rem;
         }
 
+        /* ============================================
+           STATUS BADGE
+           ============================================ */
         .status-badge-lg {
             padding: 8px 20px;
             border-radius: 50px;
@@ -79,16 +331,14 @@
             color: #20c997;
         }
 
-        .action-buttons .btn {
-            border-radius: 12px;
-            padding: 10px 24px;
-            transition: all 0.3s ease;
+        .status-badge-lg.pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
         }
 
-        .action-buttons .btn:hover {
-            transform: translateY(-2px);
-        }
-
+        /* ============================================
+           RECEIPT PREVIEW
+           ============================================ */
         .print-receipt {
             background: white;
             padding: 30px;
@@ -121,6 +371,85 @@
             font-size: 1.1rem;
         }
 
+        /* ============================================
+           AVATAR
+           ============================================ */
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* ============================================
+           WHATSAPP FLOAT
+           ============================================ */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: pulseWA 2s ease-in-out infinite;
+            text-decoration: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(-5deg);
+            color: white;
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
+        }
+
+        @keyframes pulseWA {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6); }
+        }
+
+        /* ============================================
+           DARK MODE
+           ============================================ */
+        body.dark-mode {
+            background-color: #0a0e1a;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .top-navbar {
+            background: #141824;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .top-navbar .btn-link {
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .card {
+            background: #141824;
+            border-color: #2a2f45 !important;
+        }
+
+        body.dark-mode .card-header {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: #2a2f45;
+        }
+
+        body.dark-mode .text-muted {
+            color: #8a8f9e !important;
+        }
+
         body.dark-mode .detail-item {
             border-color: #2a2f45;
         }
@@ -146,6 +475,78 @@
             border-color: #2a2f45;
         }
 
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .detail-card .card-body {
+                padding: 20px;
+            }
+            
+            .whatsapp-float {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+                bottom: 16px;
+                right: 16px;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* ============================================
+           SIDEBAR OVERLAY
+           ============================================ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ============================================
+           PRINT STYLES
+           ============================================ */
         @media print {
             .sidebar, .top-navbar, .whatsapp-float, .action-buttons, .no-print {
                 display: none !important;
@@ -162,25 +563,41 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
+
+    <!-- ============================================
+    LOADING SCREEN
+    ============================================ -->
+    <div id="loadingScreen">
         <div class="loader-container">
+            <i class="bi bi-receipt loader-icon"></i>
             <div class="loader"></div>
-            <div class="loader-text mt-3">Memuat Detail...</div>
+            <div class="loader-text">Memuat Detail...</div>
+            <div class="loader-subtext">Sistem Manajemen Timbangan Hasil Panen</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Sidebar Overlay -->
+    <!-- ============================================
+    SIDEBAR OVERLAY (Mobile)
+    ============================================ -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- Sidebar -->
+    <!-- ============================================
+    SIDEBAR
+    ============================================ -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5 class="fw-bold">
+            <h5>
                 <i class="bi bi-scale"></i> Timbangan Panen
             </h5>
         </div>
@@ -225,8 +642,11 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
     <div class="main-content">
+
         <!-- Top Navbar -->
         <nav class="top-navbar no-print">
             <div class="container-fluid">
@@ -262,15 +682,16 @@
             </div>
         </nav>
 
-        <!-- Page Content -->
+        <!-- Content -->
         <div class="container-fluid mt-4">
             <div class="row">
                 <div class="col-lg-8">
+
                     <!-- Alert Container -->
                     <div id="alertContainer" class="mb-3"></div>
 
                     <!-- Detail Card -->
-                    <div class="card border-0 shadow-sm detail-card" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm detail-card">
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="header-icon">
@@ -286,7 +707,7 @@
                             <!-- Transaction Code -->
                             <div class="text-center mb-4">
                                 <span class="badge bg-primary bg-opacity-10 text-primary px-4 py-2 fs-6">
-                                    <i class="bi bi-tag"></i> Kode: <strong id="detail_code">-</strong>
+                                    <i class="bi bi-tag"></i> Kode: <strong id="detailCode">TRX20240101ABCD</strong>
                                 </span>
                             </div>
 
@@ -295,37 +716,37 @@
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <span class="label">Petani</span>
-                                        <span class="value" id="detail_farmer">-</span>
+                                        <span class="value" id="detailFarmer">Budi Pranoto</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">NIK</span>
-                                        <span class="value" id="detail_farmer_nik">-</span>
+                                        <span class="value" id="detailNik">1234567890123456</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Telepon</span>
-                                        <span class="value" id="detail_farmer_phone">-</span>
+                                        <span class="value" id="detailPhone">081234567890</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Produk</span>
-                                        <span class="value" id="detail_product">-</span>
+                                        <span class="value" id="detailProduct">Padi</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <span class="label">Berat Kotor</span>
-                                        <span class="value" id="detail_gross_weight">-</span>
+                                        <span class="value" id="detailGrossWeight">50.00 kg</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Berat Tarra</span>
-                                        <span class="value" id="detail_tare_weight">-</span>
+                                        <span class="value" id="detailTareWeight">2.00 kg</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Berat Bersih</span>
-                                        <span class="value highlight" id="detail_net_weight">-</span>
+                                        <span class="value highlight" id="detailNetWeight">48.00 kg</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Harga per kg</span>
-                                        <span class="value" id="detail_price_per_kg">-</span>
+                                        <span class="value" id="detailPrice">Rp 12.000</span>
                                     </div>
                                 </div>
                             </div>
@@ -333,7 +754,7 @@
                             <!-- Total -->
                             <div class="detail-item mt-3 pt-3 border-top border-2">
                                 <span class="label fw-bold fs-5">Total Pembayaran</span>
-                                <span class="value success fs-3" id="detail_total_amount">-</span>
+                                <span class="value success fs-3" id="detailTotal">Rp 576.000</span>
                             </div>
 
                             <!-- Additional Info -->
@@ -341,14 +762,14 @@
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <span class="label">Tanggal Transaksi</span>
-                                        <span class="value" id="detail_date">-</span>
+                                        <span class="value" id="detailDate">01 Januari 2024</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <span class="label">Status</span>
                                         <span class="value">
-                                            <span class="status-badge-lg completed" id="detail_status">
+                                            <span class="status-badge-lg completed" id="detailStatus">
                                                 <i class="bi bi-check-circle"></i> Selesai
                                             </span>
                                         </span>
@@ -358,17 +779,17 @@
 
                             <div class="detail-item">
                                 <span class="label">Catatan</span>
-                                <span class="value" id="detail_notes">-</span>
+                                <span class="value" id="detailNotes">-</span>
                             </div>
 
                             <div class="detail-item">
                                 <span class="label">Dibuat Oleh</span>
-                                <span class="value" id="detail_created_by">-</span>
+                                <span class="value" id="detailCreatedBy">Admin</span>
                             </div>
 
                             <div class="detail-item">
                                 <span class="label">Dibuat Pada</span>
-                                <span class="value" id="detail_created_at">-</span>
+                                <span class="value" id="detailCreatedAt">01 Januari 2024 10:30</span>
                             </div>
 
                             <!-- Action Buttons -->
@@ -388,8 +809,8 @@
                 </div>
 
                 <!-- Receipt Preview -->
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card border-0 shadow-sm no-print">
+                <div class="col-lg-4 no-print">
+                    <div class="card border-0 shadow-sm">
                         <div class="card-header bg-transparent">
                             <h6 class="fw-bold mb-0"><i class="bi bi-receipt"></i> Preview Nota</h6>
                         </div>
@@ -401,27 +822,27 @@
                                 </div>
                                 <div class="receipt-row">
                                     <span>Kode</span>
-                                    <span id="receipt_code">-</span>
+                                    <span id="receiptCode">TRX20240101ABCD</span>
                                 </div>
                                 <div class="receipt-row">
                                     <span>Petani</span>
-                                    <span id="receipt_farmer">-</span>
+                                    <span id="receiptFarmer">Budi Pranoto</span>
                                 </div>
                                 <div class="receipt-row">
                                     <span>Produk</span>
-                                    <span id="receipt_product">-</span>
+                                    <span id="receiptProduct">Padi</span>
                                 </div>
                                 <div class="receipt-row">
                                     <span>Berat Bersih</span>
-                                    <span id="receipt_net_weight">-</span>
+                                    <span id="receiptNetWeight">48.00 kg</span>
                                 </div>
                                 <div class="receipt-row">
                                     <span>Harga/kg</span>
-                                    <span id="receipt_price">-</span>
+                                    <span id="receiptPrice">Rp 12.000</span>
                                 </div>
                                 <div class="receipt-total">
                                     <span>Total</span>
-                                    <span id="receipt_total">-</span>
+                                    <span id="receiptTotal">Rp 576.000</span>
                                 </div>
                                 <div class="text-center mt-3">
                                     <small class="text-muted">Terima kasih atas kepercayaan Anda</small>
@@ -434,7 +855,9 @@
         </div>
     </div>
 
-    <!-- WhatsApp Floating Button -->
+    <!-- ============================================
+    WHATSAPP FLOATING BUTTON
+    ============================================ -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
        class="whatsapp-float" 
        target="_blank"
@@ -442,14 +865,347 @@
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- Scripts -->
+    <!-- ============================================
+    SCRIPTS
+    ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/transactions.js"></script>
+
+    <script>
+        // ============================================
+        // 1. HIDE LOADING SCREEN - MULTI FALLBACK
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            hideLoading();
+            initPage();
+        });
+
+        setTimeout(hideLoading, 1500);
+        setTimeout(hideLoading, 3000);
+        setTimeout(hideLoading, 5000);
+
+        function hideLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                loadingScreen.classList.add('hidden');
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 800);
+            }
+        }
+
+        // ============================================
+        // 2. PAGE INITIALIZATION
+        // ============================================
+        function initPage() {
+            // Check if user is logged in
+            const user = getUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update user info
+            updateUserInfo(user);
+
+            // Get transaction ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const transactionId = urlParams.get('id');
+
+            if (!transactionId) {
+                showAlert('ID transaksi tidak ditemukan!', 'danger');
+                setTimeout(function() {
+                    window.location.href = 'transactions.html';
+                }, 2000);
+                return;
+            }
+
+            // Load transaction data
+            loadTransactionData(transactionId);
+
+            // Init sidebar
+            initSidebar();
+
+            // Init dark mode
+            initDarkMode();
+
+            // Init logout
+            initLogout();
+
+            // Init WhatsApp
+            initWhatsApp();
+        }
+
+        // ============================================
+        // 3. GET USER
+        // ============================================
+        function getUser() {
+            try {
+                const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+                if (userData) {
+                    return JSON.parse(userData);
+                }
+            } catch (e) {
+                console.error('Error getting user:', e);
+            }
+            return null;
+        }
+
+        // ============================================
+        // 4. UPDATE USER INFO
+        // ============================================
+        function updateUserInfo(user) {
+            const name = user?.name || 'Admin';
+            document.getElementById('userNameDisplay').textContent = name;
+            document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+        }
+
+        // ============================================
+        // 5. LOAD TRANSACTION DATA (DEMO)
+        // ============================================
+        function loadTransactionData(id) {
+            // Demo transaction data - in real app, fetch from database
+            const transaction = {
+                id: id,
+                code: 'TRX20240101ABCD',
+                farmer: 'Budi Pranoto',
+                nik: '1234567890123456',
+                phone: '081234567890',
+                product: 'Padi',
+                grossWeight: 50,
+                tareWeight: 2,
+                netWeight: 48,
+                pricePerKg: 12000,
+                totalAmount: 576000,
+                date: '2024-01-01',
+                status: 'completed',
+                notes: 'Transaksi penimbangan padi petani Budi Pranoto',
+                createdBy: 'Admin',
+                createdAt: '2024-01-01T10:30:00'
+            };
+
+            // Populate detail
+            document.getElementById('detailCode').textContent = transaction.code;
+            document.getElementById('detailFarmer').textContent = transaction.farmer;
+            document.getElementById('detailNik').textContent = transaction.nik;
+            document.getElementById('detailPhone').textContent = transaction.phone;
+            document.getElementById('detailProduct').textContent = transaction.product;
+            document.getElementById('detailGrossWeight').textContent = transaction.grossWeight + ' kg';
+            document.getElementById('detailTareWeight').textContent = transaction.tareWeight + ' kg';
+            document.getElementById('detailNetWeight').textContent = transaction.netWeight + ' kg';
+            document.getElementById('detailPrice').textContent = formatCurrency(transaction.pricePerKg);
+            document.getElementById('detailTotal').textContent = formatCurrency(transaction.totalAmount);
+            document.getElementById('detailDate').textContent = formatDate(transaction.date);
+            document.getElementById('detailNotes').textContent = transaction.notes || '-';
+            document.getElementById('detailCreatedBy').textContent = transaction.createdBy;
+            document.getElementById('detailCreatedAt').textContent = formatDateTime(transaction.createdAt);
+
+            // Populate receipt
+            document.getElementById('receiptCode').textContent = transaction.code;
+            document.getElementById('receiptFarmer').textContent = transaction.farmer;
+            document.getElementById('receiptProduct').textContent = transaction.product;
+            document.getElementById('receiptNetWeight').textContent = transaction.netWeight + ' kg';
+            document.getElementById('receiptPrice').textContent = formatCurrency(transaction.pricePerKg);
+            document.getElementById('receiptTotal').textContent = formatCurrency(transaction.totalAmount);
+        }
+
+        // ============================================
+        // 6. INIT WHATSAPP
+        // ============================================
+        function initWhatsApp() {
+            const waBtn = document.getElementById('whatsappBtn');
+            if (waBtn) {
+                const message = `*Sistem Manajemen Timbangan Hasil Panen*
+                
+*Nota Transaksi*
+Kode: ${document.getElementById('detailCode').textContent}
+Petani: ${document.getElementById('detailFarmer').textContent}
+Produk: ${document.getElementById('detailProduct').textContent}
+Berat Bersih: ${document.getElementById('detailNetWeight').textContent}
+Total: ${document.getElementById('detailTotal').textContent}
+Tanggal: ${document.getElementById('detailDate').textContent}
+
+Terima kasih telah menggunakan layanan kami.`;
+                
+                waBtn.href = `https://wa.me/6281248141031?text=${encodeURIComponent(message)}`;
+            }
+        }
+
+        // ============================================
+        // 7. FORMAT HELPERS
+        // ============================================
+        function formatCurrency(amount) {
+            if (amount === undefined || amount === null || isNaN(amount) || amount === 0) {
+                return 'Rp 0';
+            }
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(amount));
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return '-';
+                return date.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return '-';
+                return date.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        // ============================================
+        // 8. SHOW ALERT
+        // ============================================
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            container.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        if (alert.parentNode) alert.remove();
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // ============================================
+        // 9. SIDEBAR TOGGLE
+        // ============================================
+        function initSidebar() {
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (!toggleBtn || !sidebar) return;
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('active');
+                if (overlay) {
+                    overlay.classList.toggle('active');
+                }
+            });
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // 10. DARK MODE
+        // ============================================
+        function initDarkMode() {
+            const toggleBtn = document.getElementById('darkModeToggle');
+            if (!toggleBtn) return;
+
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                toggleBtn.innerHTML = '<i class="bi bi-sun fs-5"></i>';
+            }
+
+            toggleBtn.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDark);
+                this.innerHTML = isDark ? '<i class="bi bi-sun fs-5"></i>' : '<i class="bi bi-moon fs-5"></i>';
+            });
+        }
+
+        // ============================================
+        // 11. LOGOUT
+        // ============================================
+        function initLogout() {
+            const logoutBtns = [
+                document.getElementById('logoutBtn'),
+                document.getElementById('logoutDropdown')
+            ];
+
+            logoutBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Konfirmasi Logout',
+                            text: 'Apakah Anda yakin ingin logout?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Ya, Logout!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('session');
+                                sessionStorage.removeItem('user');
+                                sessionStorage.removeItem('session');
+                                window.location.href = 'login.html';
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // 12. LOG
+        // ============================================
+        console.log('%c✅ Halaman Detail Transaksi berhasil dimuat!', 'color: #6f42c1; font-size: 16px; font-weight: bold;');
+        console.log('%c📄 Detail transaksi siap ditampilkan', 'color: #20c997;');
+    </script>
+
 </body>
 </html>

@@ -4,13 +4,249 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Petani - Sistem Manajemen Timbangan Hasil Panen</title>
+    
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
     <style>
-        /* Same styles as farmers-create.html */
+        /* Same styles as farmers-create.html with different header color */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* ============================================
+           LOADING SCREEN
+           ============================================ */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #20c997, #198754);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-container {
+            text-align: center;
+            color: white;
+        }
+
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            animation: bounceIcon 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .loader-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .loader-subtext {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px auto 0;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            width: 0%;
+            animation: progressBar 2s ease-in-out infinite;
+        }
+
+        @keyframes progressBar {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* ============================================
+           SIDEBAR
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1a3e 100%);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .sidebar-header i {
+            font-size: 1.6rem;
+            color: #4fc3f7;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.65);
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-left-color: #20c997;
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #20c997;
+        }
+
+        .sidebar-menu a i {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-menu hr {
+            border-color: rgba(255, 255, 255, 0.08);
+            margin: 16px 20px;
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ============================================
+           TOP NAVBAR
+           ============================================ */
+        .top-navbar {
+            background: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .top-navbar .btn-link {
+            color: #212529;
+            padding: 0;
+        }
+
+        .top-navbar .btn-link:hover {
+            color: #20c997;
+        }
+
+        /* ============================================
+           FORM CARD
+           ============================================ */
         .form-card {
             border-radius: 20px;
             overflow: hidden;
@@ -25,10 +261,10 @@
 
         .form-card .card-header .header-icon {
             font-size: 2rem;
-            animation: float-icon 3s ease-in-out infinite;
+            animation: floatIcon 3s ease-in-out infinite;
         }
 
-        @keyframes float-icon {
+        @keyframes floatIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
@@ -37,6 +273,9 @@
             padding: 30px;
         }
 
+        /* ============================================
+           FORM ELEMENTS
+           ============================================ */
         .form-control, .form-select {
             border-radius: 12px;
             padding: 10px 16px;
@@ -51,6 +290,10 @@
 
         .form-control.is-invalid, .form-select.is-invalid {
             border-color: #dc3545;
+        }
+
+        .form-control.is-invalid:focus, .form-select.is-invalid:focus {
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
         }
 
         .form-label {
@@ -87,6 +330,9 @@
             margin-right: 8px;
         }
 
+        /* ============================================
+           BUTTONS
+           ============================================ */
         .btn-submit {
             border-radius: 12px;
             padding: 12px 40px;
@@ -109,11 +355,14 @@
         }
 
         .btn-cancel {
-            border-radius: 12px;
+            borderRadius: 12px;
             padding: 12px 40px;
             font-weight: 600;
         }
 
+        /* ============================================
+           AVATAR PREVIEW
+           ============================================ */
         .avatar-preview {
             width: 80px;
             height: 80px;
@@ -132,6 +381,85 @@
         .avatar-preview.has-name {
             background: #20c997;
             color: white;
+        }
+
+        /* ============================================
+           AVATAR
+           ============================================ */
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* ============================================
+           WHATSAPP FLOAT
+           ============================================ */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: pulseWA 2s ease-in-out infinite;
+            text-decoration: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1) rotate(-5deg);
+            color: white;
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
+        }
+
+        @keyframes pulseWA {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6); }
+        }
+
+        /* ============================================
+           DARK MODE
+           ============================================ */
+        body.dark-mode {
+            background-color: #0a0e1a;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .top-navbar {
+            background: #141824;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .top-navbar .btn-link {
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .card {
+            background: #141824;
+            border-color: #2a2f45 !important;
+        }
+
+        body.dark-mode .card-header {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: #2a2f45;
+        }
+
+        body.dark-mode .text-muted {
+            color: #8a8f9e !important;
         }
 
         body.dark-mode .form-control,
@@ -172,37 +500,112 @@
             color: white;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s ease-in-out infinite;
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @media (max-width: 576px) {
+            .form-card .card-body {
+                padding: 20px;
+            }
+            
+            .whatsapp-float {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+                bottom: 16px;
+                right: 16px;
+            }
+            
+            .btn-submit, .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* ============================================
+           SIDEBAR OVERLAY
+           ============================================ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
     </style>
 </head>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Config -->
+<script src="js/firebase-config.js"></script>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
+
+    <!-- ============================================
+    LOADING SCREEN
+    ============================================ -->
+    <div id="loadingScreen">
         <div class="loader-container">
+            <i class="bi bi-pencil-square loader-icon"></i>
             <div class="loader"></div>
-            <div class="loader-text mt-3">Memuat Data...</div>
+            <div class="loader-text">Memuat Data...</div>
+            <div class="loader-subtext">Sistem Manajemen Timbangan Hasil Panen</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Sidebar Overlay -->
+    <!-- ============================================
+    SIDEBAR OVERLAY (Mobile)
+    ============================================ -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- Sidebar -->
+    <!-- ============================================
+    SIDEBAR
+    ============================================ -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5 class="fw-bold">
+            <h5>
                 <i class="bi bi-scale"></i> Timbangan Panen
             </h5>
         </div>
@@ -247,8 +650,11 @@
         </ul>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
     <div class="main-content">
+
         <!-- Top Navbar -->
         <nav class="top-navbar">
             <div class="container-fluid">
@@ -284,15 +690,16 @@
             </div>
         </nav>
 
-        <!-- Page Content -->
+        <!-- Content -->
         <div class="container-fluid mt-4">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
+
                     <!-- Alert Container -->
                     <div id="alertContainer" class="mb-3"></div>
 
                     <!-- Form Card -->
-                    <div class="card border-0 shadow-sm form-card" data-aos="fade-up">
+                    <div class="card border-0 shadow-sm form-card">
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="header-icon">
@@ -375,8 +782,8 @@
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" 
                                                type="checkbox" 
-                                               id="is_active">
-                                        <label class="form-check-label" for="is_active">
+                                               id="isActive">
+                                        <label class="form-check-label" for="isActive">
                                             <span id="statusLabel">Aktif</span>
                                         </label>
                                     </div>
@@ -388,7 +795,7 @@
                                     <a href="farmers.html" class="btn btn-outline-secondary btn-cancel">
                                         <i class="bi bi-arrow-left"></i> Kembali
                                     </a>
-                                    <button type="submit" class="btn btn-success btn-submit">
+                                    <button type="submit" class="btn btn-success btn-submit" id="submitBtn">
                                         <i class="bi bi-save"></i> Perbarui
                                     </button>
                                 </div>
@@ -400,7 +807,9 @@
         </div>
     </div>
 
-    <!-- WhatsApp Floating Button -->
+    <!-- ============================================
+    WHATSAPP FLOATING BUTTON
+    ============================================ -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
        class="whatsapp-float" 
        target="_blank"
@@ -408,14 +817,399 @@
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- Scripts -->
+    <!-- ============================================
+    SCRIPTS
+    ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/farmers.js"></script>
+
+    <script>
+        // ============================================
+        // 1. HIDE LOADING SCREEN - MULTI FALLBACK
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            hideLoading();
+            initPage();
+        });
+
+        setTimeout(hideLoading, 1500);
+        setTimeout(hideLoading, 3000);
+        setTimeout(hideLoading, 5000);
+
+        function hideLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                loadingScreen.classList.add('hidden');
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 800);
+            }
+        }
+
+        // ============================================
+        // 2. PAGE INITIALIZATION
+        // ============================================
+        let farmerId = null;
+        let farmerData = null;
+
+        function initPage() {
+            // Check if user is logged in
+            const user = getUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update user info
+            updateUserInfo(user);
+
+            // Get farmer ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            farmerId = urlParams.get('id');
+
+            if (!farmerId) {
+                showAlert('ID petani tidak ditemukan!', 'danger');
+                setTimeout(function() {
+                    window.location.href = 'farmers.html';
+                }, 2000);
+                return;
+            }
+
+            // Load farmer data
+            loadFarmerData(farmerId);
+
+            // Init sidebar
+            initSidebar();
+
+            // Init dark mode
+            initDarkMode();
+
+            // Init logout
+            initLogout();
+
+            // Init form
+            initForm();
+
+            // Init avatar preview
+            initAvatarPreview();
+        }
+
+        // ============================================
+        // 3. GET USER
+        // ============================================
+        function getUser() {
+            try {
+                const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+                if (userData) {
+                    return JSON.parse(userData);
+                }
+            } catch (e) {
+                console.error('Error getting user:', e);
+            }
+            return null;
+        }
+
+        // ============================================
+        // 4. UPDATE USER INFO
+        // ============================================
+        function updateUserInfo(user) {
+            const name = user?.name || 'Admin';
+            document.getElementById('userNameDisplay').textContent = name;
+            document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+        }
+
+        // ============================================
+        // 5. LOAD FARMER DATA (DEMO)
+        // ============================================
+        function loadFarmerData(id) {
+            // Demo data - in real app, fetch from database
+            const farmersData = [
+                { id: '1', name: 'Budi Pranoto', nik: '1234567890123456', phone: '081234567890', address: 'Jl. Pertanian No. 1, Jakarta', isActive: true },
+                { id: '2', name: 'Siti Rahayu', nik: '2345678901234567', phone: '081234567891', address: 'Jl. Sawah Indah No. 2, Bandung', isActive: true },
+                { id: '3', name: 'Ahmad Hidayat', nik: '3456789012345678', phone: '081234567892', address: 'Jl. Kebun Raya No. 3, Surabaya', isActive: true },
+                { id: '4', name: 'Dewi Sartika', nik: '4567890123456789', phone: '081234567893', address: 'Jl. Cabe Rawit No. 4, Medan', isActive: false },
+                { id: '5', name: 'Eko Prasetyo', nik: '5678901234567890', phone: '081234567894', address: 'Jl. Padi Harum No. 5, Semarang', isActive: true }
+            ];
+
+            farmerData = farmersData.find(f => f.id === id);
+
+            if (!farmerData) {
+                showAlert('Data petani tidak ditemukan!', 'danger');
+                setTimeout(function() {
+                    window.location.href = 'farmers.html';
+                }, 2000);
+                return;
+            }
+
+            // Fill form with data
+            document.getElementById('name').value = farmerData.name || '';
+            document.getElementById('nik').value = farmerData.nik || '';
+            document.getElementById('phone').value = farmerData.phone || '';
+            document.getElementById('address').value = farmerData.address || '';
+            document.getElementById('isActive').checked = farmerData.isActive || false;
+
+            // Update status label
+            document.getElementById('statusLabel').textContent = farmerData.isActive ? 'Aktif' : 'Nonaktif';
+
+            // Update avatar
+            updateAvatar(farmerData.name);
+        }
+
+        // ============================================
+        // 6. INIT FORM
+        // ============================================
+        function initForm() {
+            const form = document.getElementById('farmerForm');
+            
+            // Status toggle
+            document.getElementById('isActive').addEventListener('change', function() {
+                document.getElementById('statusLabel').textContent = this.checked ? 'Aktif' : 'Nonaktif';
+            });
+
+            // Form submit
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateFarmer();
+            });
+        }
+
+        // ============================================
+        // 7. AVATAR PREVIEW
+        // ============================================
+        function initAvatarPreview() {
+            const nameInput = document.getElementById('name');
+            const avatar = document.getElementById('avatarPreview');
+
+            nameInput.addEventListener('input', function() {
+                updateAvatar(this.value.trim());
+            });
+        }
+
+        function updateAvatar(name) {
+            const avatar = document.getElementById('avatarPreview');
+            if (name) {
+                avatar.innerHTML = name.charAt(0).toUpperCase();
+                avatar.classList.add('has-name');
+            } else {
+                avatar.innerHTML = '<i class="bi bi-person"></i>';
+                avatar.classList.remove('has-name');
+            }
+        }
+
+        // ============================================
+        // 8. UPDATE FARMER
+        // ============================================
+        function updateFarmer() {
+            const name = document.getElementById('name').value.trim();
+            const nik = document.getElementById('nik').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const isActive = document.getElementById('isActive').checked;
+
+            // Validate
+            if (!name) {
+                document.getElementById('name').classList.add('is-invalid');
+                showAlert('Nama lengkap wajib diisi!', 'warning');
+                return;
+            } else {
+                document.getElementById('name').classList.remove('is-invalid');
+            }
+
+            // Validate NIK (if filled)
+            if (nik && (nik.length < 16 || nik.length > 16)) {
+                showAlert('NIK harus 16 digit!', 'warning');
+                document.getElementById('nik').classList.add('is-invalid');
+                return;
+            } else {
+                document.getElementById('nik').classList.remove('is-invalid');
+            }
+
+            // Validate phone (if filled)
+            if (phone && phone.length < 10) {
+                showAlert('Nomor telepon minimal 10 digit!', 'warning');
+                document.getElementById('phone').classList.add('is-invalid');
+                return;
+            } else {
+                document.getElementById('phone').classList.remove('is-invalid');
+            }
+
+            // Show loading
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Menyimpan...
+            `;
+            submitBtn.disabled = true;
+
+            // Simulate update (demo)
+            setTimeout(function() {
+                const updatedFarmer = {
+                    id: farmerId,
+                    name: name,
+                    nik: nik || '-',
+                    phone: phone || '-',
+                    address: address || '-',
+                    isActive: isActive,
+                    updatedAt: new Date().toISOString()
+                };
+
+                console.log('Data petani diperbarui:', updatedFarmer);
+
+                // Show success
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: 'Data petani berhasil diperbarui!',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                // Redirect after delay
+                setTimeout(function() {
+                    window.location.href = 'farmers.html';
+                }, 2000);
+
+            }, 1500);
+        }
+
+        // ============================================
+        // 9. SHOW ALERT
+        // ============================================
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            container.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        if (alert.parentNode) alert.remove();
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // ============================================
+        // 10. SIDEBAR TOGGLE
+        // ============================================
+        function initSidebar() {
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (!toggleBtn || !sidebar) return;
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('active');
+                if (overlay) {
+                    overlay.classList.toggle('active');
+                }
+            });
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // 11. DARK MODE
+        // ============================================
+        function initDarkMode() {
+            const toggleBtn = document.getElementById('darkModeToggle');
+            if (!toggleBtn) return;
+
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                toggleBtn.innerHTML = '<i class="bi bi-sun fs-5"></i>';
+            }
+
+            toggleBtn.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDark);
+                this.innerHTML = isDark ? '<i class="bi bi-sun fs-5"></i>' : '<i class="bi bi-moon fs-5"></i>';
+            });
+        }
+
+        // ============================================
+        // 12. LOGOUT
+        // ============================================
+        function initLogout() {
+            const logoutBtns = [
+                document.getElementById('logoutBtn'),
+                document.getElementById('logoutDropdown')
+            ];
+
+            logoutBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Konfirmasi Logout',
+                            text: 'Apakah Anda yakin ingin logout?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Ya, Logout!',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('session');
+                                sessionStorage.removeItem('user');
+                                sessionStorage.removeItem('session');
+                                window.location.href = 'login.html';
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // 13. LOG
+        // ============================================
+        console.log('%c✅ Halaman Edit Petani berhasil dimuat!', 'color: #20c997; font-size: 16px; font-weight: bold;');
+        console.log(`%c👨‍🌾 Mengedit data petani ID: ${farmerId}`, 'color: #20c997;');
+    </script>
+
 </body>
 </html>
