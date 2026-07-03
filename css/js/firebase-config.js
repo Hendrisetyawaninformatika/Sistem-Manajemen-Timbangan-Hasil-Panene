@@ -4,12 +4,14 @@
 // ============================================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAbCdEfGhIjKlMnOpQrStUvWxYz12345",  // GANTI DENGAN API KEY ANDA
-    authDomain: "sistem-timbangan-panen.firebaseapp.com", // GANTI
-    projectId: "sistem-timbangan-panen",                   // GANTI
-    storageBucket: "sistem-timbangan-panen.appspot.com",   // GANTI
-    messagingSenderId: "123456789012",                     // GANTI
-    appId: "1:123456789012:web:abcdef1234567890"           // GANTI
+  apiKey: "AIzaSyDi_zEip2snQx_TlCN--tcgm5WZLXgZq4Q",
+  authDomain: "manajement-petani.firebaseapp.com",
+  databaseURL: "https://manajement-petani-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "manajement-petani",
+  storageBucket: "manajement-petani.firebasestorage.app",
+  messagingSenderId: "795537405486",
+  appId: "1:795537405486:web:7819bc9ac5da03d352d1bf",
+  measurementId: "G-QCW5W6FVCP"
 };
 
 // Initialize Firebase

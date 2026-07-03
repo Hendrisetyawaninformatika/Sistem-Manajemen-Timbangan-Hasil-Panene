@@ -1209,7 +1209,120 @@
                 }
             });
         }
+   // ============================================
+// LOAD FARMERS FROM LOCALSTORAGE
+// ============================================
+function loadFarmers() {
+    // Ambil data dari localStorage
+    let farmers = JSON.parse(localStorage.getItem('farmers') || '[]');
+    
+    console.log('📦 Data petani dari localStorage:', farmers);
+    
+    const tbody = document.getElementById('farmersTableBody');
+    if (!tbody) return;
 
+    if (farmers.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    Belum ada data petani
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    let html = '';
+    farmers.forEach((farmer, index) => {
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-primary bg-opacity-10 text-primary me-2" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;">
+                            ${farmer.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div class="fw-semibold">${farmer.name}</div>
+                            <small class="text-muted">${farmer.nik || '-'}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>${farmer.nik || '-'}</td>
+                <td>${farmer.phone || '-'}</td>
+                <td>${farmer.address || '-'}</td>
+                <td>
+                    <span class="badge ${farmer.isActive ? 'bg-success' : 'bg-secondary'}">
+                        ${farmer.isActive ? 'Aktif' : 'Nonaktif'}
+                    </span>
+                </td>
+                <td>${formatDate(farmer.createdAt)}</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="farmers-edit.html?id=${farmer.id}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button onclick="deleteFarmer('${farmer.id}')" class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// ============================================
+// DELETE FARMER FROM LOCALSTORAGE
+// ============================================
+function deleteFarmer(id) {
+    Swal.fire({
+        title: 'Konfirmasi Hapus',
+        text: 'Apakah Anda yakin ingin menghapus data petani ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let farmers = JSON.parse(localStorage.getItem('farmers') || '[]');
+            farmers = farmers.filter(f => f.id !== id);
+            localStorage.setItem('farmers', JSON.stringify(farmers));
+            
+            loadFarmers(); // Refresh tabel
+            
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Data petani berhasil dihapus.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    });
+}
+
+// ============================================
+// FORMAT DATE
+// ============================================
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    } catch (e) {
+        return '-';
+    }
+}
         // ============================================
         // 16. LOG
         // ============================================

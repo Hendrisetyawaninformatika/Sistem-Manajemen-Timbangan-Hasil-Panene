@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<!-- Firebase Config -->
-<script src="js/firebase-config.js"></script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Transaksi Baru - Sistem Manajemen Timbangan Hasil Panen</title>
     
     <!-- Bootstrap 5 -->
@@ -20,596 +13,294 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- AOS Animation -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     
     <style>
-        /* ============================================
-           RESET & BASE
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --primary-bg: #e8f5e9;
+            --primary-gradient: linear-gradient(135deg, #2e7d32, #43a047);
+            --white: #ffffff;
+            --gray-50: #f8faf8;
+            --gray-100: #f0f5f0;
+            --gray-200: #e8ece8;
+            --gray-300: #d5ddd5;
+            --gray-400: #a8b8a8;
+            --gray-500: #7a8a7a;
+            --gray-600: #5a6a5a;
+            --gray-700: #3a4a3a;
+            --gray-800: #2a3a2a;
+            --gray-900: #1a2a1a;
+            --shadow-sm: 0 2px 12px rgba(46, 125, 50, 0.08);
+            --shadow-md: 0 8px 32px rgba(46, 125, 50, 0.12);
+            --shadow-lg: 0 16px 48px rgba(46, 125, 50, 0.16);
+            --radius: 20px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f0f2f5;
+            background: var(--gray-50);
             overflow-x: hidden;
-            transition: background 0.3s ease;
         }
 
-        /* ============================================
-           LOADING SCREEN
-           ============================================ */
+        /* Loading Screen */
         #loadingScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #6f42c1, #5a32a3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--primary-gradient);
+            display: flex; justify-content: center; align-items: center;
             z-index: 99999;
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
-
-        #loadingScreen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .loader-container {
-            text-align: center;
-            color: white;
-        }
-
+        #loadingScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loader-container { text-align: center; color: white; }
         .loader {
-            width: 70px;
-            height: 70px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
+            width: 70px; height: 70px;
+            border: 5px solid rgba(255,255,255,0.2);
             border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 0 auto;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loader-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-            animation: bounceIcon 1.5s ease-in-out infinite;
-        }
-
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-icon { font-size: 3rem; display: block; animation: bounceIcon 1.5s ease-in-out infinite; }
         @keyframes bounceIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-15px); }
         }
-
-        .loader-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-top: 1rem;
-        }
-
-        .loader-subtext {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-top: 0.3rem;
-        }
-
+        .loader-text { font-size: 1.2rem; font-weight: 600; margin-top: 1rem; }
+        .loader-subtext { font-size: 0.9rem; opacity: 0.7; margin-top: 0.3rem; }
         .loader-progress {
-            width: 200px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.2);
+            width: 200px; height: 3px;
+            background: rgba(255,255,255,0.2);
             border-radius: 10px;
             margin: 20px auto 0;
             overflow: hidden;
         }
-
         .loader-progress-bar {
-            height: 100%;
-            background: white;
+            height: 100%; background: white;
             border-radius: 10px;
             width: 0%;
             animation: progressBar 2s ease-in-out infinite;
         }
-
         @keyframes progressBar {
             0% { width: 0%; }
             50% { width: 70%; }
             100% { width: 100%; }
         }
 
-        /* ============================================
-           SIDEBAR
-           ============================================ */
+        /* Sidebar */
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 260px;
-            background: linear-gradient(180deg, #0a0e27 0%, #1a1a3e 100%);
+            position: fixed; top: 0; left: 0;
+            height: 100vh; width: 260px;
+            background: linear-gradient(180deg, #1a3a1a 0%, #2e7d32 100%);
             color: white;
             transition: all 0.3s ease;
             z-index: 1000;
             overflow-y: auto;
             overflow-x: hidden;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
         }
-
-        .sidebar::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         .sidebar-header {
             padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; gap: 12px;
         }
-
-        .sidebar-header h5 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 1.1rem;
-            white-space: nowrap;
-        }
-
-        .sidebar-header i {
-            font-size: 1.6rem;
-            color: #4fc3f7;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 4px;
-        }
-
+        .sidebar-header h5 { margin: 0; font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+        .sidebar-header i { font-size: 1.6rem; color: #a5d6a7; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 16px 0; }
+        .sidebar-menu li { margin-bottom: 4px; }
         .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            display: flex; align-items: center; gap: 14px;
             padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.65);
+            color: rgba(255,255,255,0.7);
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
             font-size: 0.95rem;
             text-decoration: none;
         }
+        .sidebar-menu a:hover { color: white; border-left-color: #81c784; background: rgba(255,255,255,0.05); }
+        .sidebar-menu a.active { color: white; border-left-color: #81c784; background: rgba(255,255,255,0.08); }
+        .sidebar-menu a i { font-size: 1.3rem; width: 24px; text-align: center; }
+        .sidebar-menu hr { border-color: rgba(255,255,255,0.08); margin: 16px 20px; }
 
-        .sidebar-menu a:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-            border-left-color: #6f42c1;
-        }
+        /* Main Content */
+        .main-content { margin-left: 260px; min-height: 100vh; transition: margin-left 0.3s ease; }
 
-        .sidebar-menu a.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: #6f42c1;
-        }
-
-        .sidebar-menu a i {
-            font-size: 1.3rem;
-            width: 24px;
-            text-align: center;
-        }
-
-        .sidebar-menu hr {
-            border-color: rgba(255, 255, 255, 0.08);
-            margin: 16px 20px;
-        }
-
-        /* ============================================
-           MAIN CONTENT
-           ============================================ */
-        .main-content {
-            margin-left: 260px;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* ============================================
-           TOP NAVBAR
-           ============================================ */
+        /* Top Navbar */
         .top-navbar {
-            background: white;
+            background: var(--white);
             padding: 12px 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            position: sticky;
-            top: 0;
-            z-index: 999;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            position: sticky; top: 0; z-index: 999;
+            border-bottom: 2px solid var(--primary-bg);
         }
-
-        .top-navbar .btn-link {
-            color: #212529;
-            padding: 0;
-        }
-
-        .top-navbar .btn-link:hover {
-            color: #6f42c1;
-        }
-
-        /* ============================================
-           FORM CARD
-           ============================================ */
-        .form-card {
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .form-card .card-header {
-            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+        .top-navbar .btn-link { color: var(--gray-700); padding: 0; transition: var(--transition); }
+        .top-navbar .btn-link:hover { color: var(--primary); transform: scale(1.1); }
+        .avatar-sm {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.8rem;
+            background: var(--primary-gradient);
             color: white;
-            border: none;
-            padding: 20px 24px;
+            transition: var(--transition);
         }
+        .avatar-sm:hover { transform: scale(1.1); }
 
+        /* Form Card */
+        .form-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+        .form-card .card-header {
+            background: var(--primary-gradient);
+            color: white; border: none; padding: 20px 24px;
+        }
         .form-card .card-header .header-icon {
             font-size: 2rem;
             animation: floatIcon 3s ease-in-out infinite;
         }
-
         @keyframes floatIcon {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
+        .form-card .card-body { padding: 30px; }
 
-        .form-card .card-body {
-            padding: 30px;
-        }
-
-        /* ============================================
-           FORM ELEMENTS
-           ============================================ */
+        /* Form Elements */
         .form-control, .form-select {
-            border-radius: 12px;
-            padding: 10px 16px;
+            border-radius: 12px; padding: 10px 16px;
             border: 2px solid #e9ecef;
             transition: all 0.3s ease;
         }
-
         .form-control:focus, .form-select:focus {
-            border-color: #6f42c1;
-            box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
         }
-
-        .form-control.is-invalid, .form-select.is-invalid {
-            border-color: #dc3545;
-        }
-
-        .form-control.is-invalid:focus, .form-select.is-invalid:focus {
-            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
-        }
-
-        .form-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #495057;
-        }
-
-        .form-hint {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 4px;
-        }
-
+        .form-control.is-invalid, .form-select.is-invalid { border-color: #dc3545; }
+        .form-label { font-weight: 600; font-size: 0.9rem; color: var(--gray-700); }
+        .form-hint { font-size: 0.8rem; color: var(--gray-500); margin-top: 4px; }
         .form-section {
-            border-bottom: 1px solid #e9ecef;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 20px; margin-bottom: 20px;
         }
-
-        .form-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
+        .form-section:last-child { border-bottom: none; margin-bottom: 0; }
         .form-section-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #6f42c1;
-            margin-bottom: 16px;
+            font-size: 0.9rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 16px;
         }
+        .form-section-title i { margin-right: 8px; }
 
-        .form-section-title i {
-            margin-right: 8px;
-        }
-
-        /* ============================================
-           BUTTONS
-           ============================================ */
-        .btn-submit {
-            border-radius: 12px;
-            padding: 12px 40px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3);
-        }
-
-        .btn-submit:disabled {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-cancel {
-            border-radius: 12px;
-            padding: 12px 40px;
-            font-weight: 600;
-        }
-
-        /* ============================================
-           CALCULATION DISPLAY
-           ============================================ */
+        /* Calculation Display */
         .calculation-display {
-            background: #f8f9fa;
+            background: var(--gray-50);
             border-radius: 16px;
             padding: 20px;
             margin-top: 16px;
         }
-
         .calculation-display .calc-item {
-            display: flex;
-            justify-content: space-between;
+            display: flex; justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--gray-200);
         }
+        .calculation-display .calc-item:last-child { border-bottom: none; }
+        .calculation-display .calc-label { color: var(--gray-500); }
+        .calculation-display .calc-value { font-weight: 700; font-size: 1.1rem; }
+        .calculation-display .calc-value.total { color: var(--primary); font-size: 1.3rem; }
 
-        .calculation-display .calc-item:last-child {
-            border-bottom: none;
-        }
-
-        .calculation-display .calc-label {
-            color: #6c757d;
-        }
-
-        .calculation-display .calc-value {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .calculation-display .calc-value.total {
-            color: #6f42c1;
-            font-size: 1.3rem;
-        }
-
-        /* ============================================
-           TRANSACTION CODE
-           ============================================ */
         .transaction-code-display {
             font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #6f42c1;
-            background: rgba(111, 66, 193, 0.1);
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-bg);
             padding: 8px 16px;
             border-radius: 10px;
             display: inline-block;
         }
 
-        body.dark-mode .transaction-code-display {
-            background: rgba(111, 66, 193, 0.2);
-        }
-
-        /* ============================================
-           AVATAR
-           ============================================ */
-        .avatar-sm {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        /* ============================================
-           WHATSAPP FLOAT
-           ============================================ */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 56px;
-            height: 56px;
-            background: #25d366;
+        /* Buttons */
+        .btn-submit {
+            border-radius: 12px; padding: 12px 40px;
+            font-weight: 600;
+            background: var(--primary);
+            border-color: var(--primary);
             color: white;
+            transition: var(--transition);
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46,125,50,0.3);
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: white;
+        }
+        .btn-submit:disabled { transform: none; box-shadow: none; opacity: 0.7; }
+        .btn-cancel {
+            border-radius: 12px; padding: 12px 40px;
+            font-weight: 600; transition: var(--transition);
+        }
+        .btn-cancel:hover { transform: translateY(-2px); }
+
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 56px; height: 56px;
+            background: #25d366; color: white;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.8rem;
-            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            box-shadow: 0 4px 20px rgba(37,211,102,0.4);
             z-index: 999;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             animation: pulseWA 2s ease-in-out infinite;
             text-decoration: none;
         }
-
-        .whatsapp-float:hover {
-            transform: scale(1.1) rotate(-5deg);
-            color: white;
-            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.5);
-        }
-
+        .whatsapp-float:hover { transform: scale(1.1) rotate(-5deg); color: white; box-shadow: 0 6px 30px rgba(37,211,102,0.5); }
         @keyframes pulseWA {
-            0%, 100% { box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); }
-            50% { box-shadow: 0 4px 40px rgba(37, 211, 102, 0.6); }
+            0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.4); }
+            50% { box-shadow: 0 4px 40px rgba(37,211,102,0.6); }
         }
 
-        /* ============================================
-           DARK MODE
-           ============================================ */
+        /* Dark Mode */
         body.dark-mode {
-            background-color: #0a0e1a;
-            color: #e4e6eb;
+            background-color: #0d1a0d; color: #e8f5e9;
         }
-
         body.dark-mode .top-navbar {
-            background: #141824;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            background: #1a2a1a; border-bottom-color: #2a3a2a;
         }
-
-        body.dark-mode .top-navbar .btn-link {
-            color: #e4e6eb;
+        body.dark-mode .top-navbar .btn-link { color: #a5d6a7; }
+        body.dark-mode .card { background: #1a2a1a; border-color: #2a3a2a !important; }
+        body.dark-mode .card-header { background: rgba(255,255,255,0.03); border-color: #2a3a2a; }
+        body.dark-mode .text-muted { color: #8aaa8a !important; }
+        body.dark-mode .form-control, body.dark-mode .form-select {
+            background: #1a2a1a; border-color: #2a3a2a; color: #e8f5e9;
         }
-
-        body.dark-mode .card {
-            background: #141824;
-            border-color: #2a2f45 !important;
+        body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
+            border-color: var(--primary);
         }
-
-        body.dark-mode .card-header {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: #2a2f45;
+        body.dark-mode .form-label { color: #a5d6a7; }
+        body.dark-mode .form-hint { color: #6a8a6a; }
+        body.dark-mode .form-section { border-color: #2a3a2a; }
+        body.dark-mode .form-card .card-body { background: #1a2a1a; }
+        body.dark-mode .calculation-display { background: #1a2a1a; }
+        body.dark-mode .calculation-display .calc-item { border-color: #2a3a2a; }
+        body.dark-mode .calculation-display .calc-label { color: #6a8a6a; }
+        body.dark-mode .form-card .card-header {
+            background: linear-gradient(135deg, #0a1a0a, #1a3a1a);
         }
-
-        body.dark-mode .text-muted {
-            color: #8a8f9e !important;
+        body.dark-mode .transaction-code-display {
+            background: rgba(46,125,50,0.2);
         }
-
-        body.dark-mode .form-control,
-        body.dark-mode .form-select {
-            background: #1a1f33;
-            border-color: #2a2f45;
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .form-control:focus,
-        body.dark-mode .form-select:focus {
-            border-color: #6f42c1;
-        }
-
-        body.dark-mode .form-label {
-            color: #e4e6eb;
-        }
-
-        body.dark-mode .form-hint {
-            color: #8a8f9e;
-        }
-
-        body.dark-mode .form-section {
-            border-color: #2a2f45;
-        }
-
-        body.dark-mode .form-card .card-body {
-            background: #141824;
-        }
-
-        body.dark-mode .calculation-display {
-            background: #1a1f33;
-        }
-
-        body.dark-mode .calculation-display .calc-item {
-            border-color: #2a2f45;
-        }
-
-        body.dark-mode .calculation-display .calc-label {
-            color: #8a8f9e;
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-            }
-            
-            .sidebar-overlay.active {
-                display: block;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .form-card .card-body {
-                padding: 20px;
-            }
-            
-            .whatsapp-float {
-                width: 48px;
-                height: 48px;
-                font-size: 1.5rem;
-                bottom: 16px;
-                right: 16px;
-            }
-            
-            .btn-submit, .btn-cancel {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* ============================================
-           SIDEBAR OVERLAY
-           ============================================ */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        /* ============================================
-           WEIGHT INPUT GROUP
-           ============================================ */
         .weight-input-group .input-group-text {
             border-radius: 12px 0 0 12px;
             font-weight: 600;
@@ -617,23 +308,53 @@
             border: 2px solid #e9ecef;
             border-right: none;
         }
-
         .weight-input-group .form-control {
             border-radius: 0 12px 12px 0;
         }
-
         body.dark-mode .weight-input-group .input-group-text {
-            background: #1a1f33;
-            border-color: #2a2f45;
-            color: #e4e6eb;
+            background: #1a2a1a;
+            border-color: #2a3a2a;
+            color: #e8f5e9;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .sidebar-overlay {
+                display: none;
+                position: fixed; top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .sidebar-overlay.active { display: block; }
+        }
+        @media (max-width: 576px) {
+            .form-card .card-body { padding: 20px; }
+            .whatsapp-float { width: 48px; height: 48px; font-size: 1.5rem; bottom: 16px; right: 16px; }
+            .btn-submit, .btn-cancel { width: 100%; }
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .sidebar-overlay.active { display: block; }
+        #alertContainer { min-height: 50px; }
+        .alert { border-radius: 12px; padding: 12px 16px; font-size: 0.9rem; animation: slideDown 0.4s ease; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================
-    LOADING SCREEN
-    ============================================ -->
+    <!-- Loading Screen -->
     <div id="loadingScreen">
         <div class="loader-container">
             <i class="bi bi-plus-circle loader-icon"></i>
@@ -646,64 +367,25 @@
         </div>
     </div>
 
-    <!-- ============================================
-    SIDEBAR OVERLAY (Mobile)
-    ============================================ -->
+    <!-- Sidebar Overlay -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- ============================================
-    SIDEBAR
-    ============================================ -->
+    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5>
-                <i class="bi bi-scale"></i> Timbangan Panen
-            </h5>
+            <h5><i class="bi bi-tree"></i> Timbangan Panen</h5>
         </div>
         <ul class="sidebar-menu">
-            <li>
-                <a href="dashboard.html">
-                    <i class="bi bi-grid"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="farmers.html">
-                    <i class="bi bi-people"></i>
-                    <span>Data Petani</span>
-                </a>
-            </li>
-            <li>
-                <a href="products.html">
-                    <i class="bi bi-box-seam"></i>
-                    <span>Jenis Hasil Panen</span>
-                </a>
-            </li>
-            <li>
-                <a href="transactions.html" class="active">
-                    <i class="bi bi-cash-stack"></i>
-                    <span>Transaksi</span>
-                </a>
-            </li>
-            <li>
-                <a href="reports.html">
-                    <i class="bi bi-file-text"></i>
-                    <span>Laporan</span>
-                </a>
-            </li>
-            <li class="mt-4">
-                <hr>
-                <a href="#" id="logoutBtn">
-                    <i class="bi bi-box-arrow-right text-danger"></i>
-                    <span class="text-danger">Logout</span>
-                </a>
-            </li>
+            <li><a href="dashboard.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></li>
+            <li><a href="farmers.html"><i class="bi bi-people-fill"></i> Data Petani</a></li>
+            <li><a href="products.html"><i class="bi bi-box-seam-fill"></i> Jenis Hasil Panen</a></li>
+            <li><a href="transactions.html" class="active"><i class="bi bi-cash-stack"></i> Transaksi</a></li>
+            <li><a href="reports.html"><i class="bi bi-file-text-fill"></i> Laporan</a></li>
+            <li class="mt-4"><hr><a href="#" id="logoutBtn"><i class="bi bi-box-arrow-right text-danger"></i> <span class="text-danger">Logout</span></a></li>
         </ul>
     </nav>
 
-    <!-- ============================================
-    MAIN CONTENT
-    ============================================ -->
+    <!-- Main Content -->
     <div class="main-content">
 
         <!-- Top Navbar -->
@@ -711,23 +393,17 @@
             <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-link" id="toggleSidebar">
-                            <i class="bi bi-list fs-4"></i>
-                        </button>
-                        <div class="d-none d-md-block">
-                            <span class="text-muted">Transaksi Baru</span>
-                        </div>
+                        <button class="btn btn-link" id="toggleSidebar"><i class="bi bi-list fs-4"></i></button>
+                        <span class="fw-semibold d-none d-md-block" style="color: var(--gray-700);">
+                            <i class="bi bi-tree-fill text-success me-1"></i> Transaksi Baru
+                        </span>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <button class="btn btn-link" id="darkModeToggle">
-                            <i class="bi bi-moon fs-5"></i>
-                        </button>
+                        <button class="btn btn-link" id="darkModeToggle"><i class="bi bi-moon fs-5"></i></button>
                         <div class="dropdown">
                             <button class="btn btn-link dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                                <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
-                                    <span id="userInitial">A</span>
-                                </div>
-                                <span id="userNameDisplay" class="d-none d-md-inline">Admin</span>
+                                <div class="avatar-sm"><span id="userInitial">A</span></div>
+                                <span id="userNameDisplay" class="d-none d-md-inline fw-semibold" style="color: var(--gray-700);">Admin</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profil</a></li>
@@ -750,12 +426,10 @@
                     <div id="alertContainer" class="mb-3"></div>
 
                     <!-- Form Card -->
-                    <div class="card border-0 shadow-sm form-card">
+                    <div class="card form-card" data-aos="fade-right">
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
-                                <div class="header-icon">
-                                    <i class="bi bi-plus-circle"></i>
-                                </div>
+                                <div class="header-icon"><i class="bi bi-plus-circle"></i></div>
                                 <div>
                                     <h5 class="fw-bold mb-0">Transaksi Baru</h5>
                                     <p class="mb-0 opacity-75 small">Isikan data transaksi penimbangan</p>
@@ -771,7 +445,7 @@
                                     </div>
                                     <div class="text-center">
                                         <div class="transaction-code-display" id="transactionCodeDisplay">
-                                            TRX20240101XXXXXX
+                                            TRX20260704XXXXXX
                                         </div>
                                         <p class="text-muted small mt-2">Kode transaksi akan dibuat otomatis</p>
                                     </div>
@@ -792,6 +466,11 @@
                                                 <option value="3">Ahmad Hidayat</option>
                                                 <option value="4">Dewi Sartika</option>
                                                 <option value="5">Eko Prasetyo</option>
+                                                <option value="6">Ratna Dewi</option>
+                                                <option value="7">Bambang Susanto</option>
+                                                <option value="8">Lina Marlina</option>
+                                                <option value="9">Rudi Hartono</option>
+                                                <option value="10">Maya Sari</option>
                                             </select>
                                             <div class="invalid-feedback">Silakan pilih petani</div>
                                         </div>
@@ -804,6 +483,11 @@
                                                 <option value="3" data-price="10000">Kedelai</option>
                                                 <option value="4" data-price="25000">Cabai Merah</option>
                                                 <option value="5" data-price="30000">Bawang Merah</option>
+                                                <option value="6" data-price="35000">Bawang Putih</option>
+                                                <option value="7" data-price="15000">Tomat</option>
+                                                <option value="8" data-price="18000">Kentang</option>
+                                                <option value="9" data-price="22000">Mangga</option>
+                                                <option value="10" data-price="14000">Pisang</option>
                                             </select>
                                             <div class="invalid-feedback">Silakan pilih produk</div>
                                         </div>
@@ -897,7 +581,7 @@
                                     <a href="transactions.html" class="btn btn-outline-secondary btn-cancel">
                                         <i class="bi bi-arrow-left"></i> Kembali
                                     </a>
-                                    <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
+                                    <button type="submit" class="btn btn-submit" id="submitBtn">
                                         <i class="bi bi-save"></i> Simpan Transaksi
                                     </button>
                                 </div>
@@ -907,7 +591,7 @@
                 </div>
 
                 <!-- Sidebar - Perhitungan -->
-                <div class="col-lg-4">
+                <div class="col-lg-4" data-aos="fade-left">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-transparent">
                             <h6 class="fw-bold mb-0"><i class="bi bi-calculator"></i> Ringkasan Perhitungan</h6>
@@ -959,100 +643,64 @@
         </div>
     </div>
 
-    <!-- ============================================
-    WHATSAPP FLOATING BUTTON
-    ============================================ -->
+    <!-- WhatsApp Float -->
     <a href="https://wa.me/6281248141031?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20Sistem%20Manajemen%20Timbangan%20Hasil%20Panen." 
-       class="whatsapp-float" 
-       target="_blank"
-       title="Hubungi Admin via WhatsApp">
+       class="whatsapp-float" target="_blank">
         <i class="bi bi-whatsapp"></i>
     </a>
 
-    <!-- ============================================
-    SCRIPTS
-    ============================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 
     <script>
         // ============================================
-        // 1. HIDE LOADING SCREEN - MULTI FALLBACK
+        // 1. HIDE LOADING SCREEN
         // ============================================
-        
         document.addEventListener('DOMContentLoaded', function() {
             hideLoading();
             initPage();
         });
-
         setTimeout(hideLoading, 1500);
         setTimeout(hideLoading, 3000);
-        setTimeout(hideLoading, 5000);
 
         function hideLoading() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
                 loadingScreen.classList.add('hidden');
-                setTimeout(function() {
-                    loadingScreen.style.display = 'none';
-                }, 800);
+                setTimeout(function() { loadingScreen.style.display = 'none'; }, 800);
             }
         }
 
         // ============================================
-        // 2. PAGE INITIALIZATION
+        // 2. INIT AOS
+        // ============================================
+        AOS.init({ duration: 600, once: true, offset: 30 });
+
+        // ============================================
+        // 3. PAGE INITIALIZATION
         // ============================================
         function initPage() {
-            // Check if user is logged in
             const user = getUser();
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Update user info
+            if (!user) { window.location.href = 'login.html'; return; }
             updateUserInfo(user);
-
-            // Generate transaction code
             generateTransactionCode();
-
-            // Set default date
             setDefaultDate();
-
-            // Init sidebar
             initSidebar();
-
-            // Init dark mode
             initDarkMode();
-
-            // Init logout
             initLogout();
-
-            // Init form
             initForm();
-
-            // Init calculations
             initCalculations();
         }
 
-        // ============================================
-        // 3. GET USER
-        // ============================================
         function getUser() {
             try {
                 const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
-                if (userData) {
-                    return JSON.parse(userData);
-                }
-            } catch (e) {
-                console.error('Error getting user:', e);
-            }
+                if (userData) return JSON.parse(userData);
+            } catch (e) { console.error('Error getting user:', e); }
             return null;
         }
 
-        // ============================================
-        // 4. UPDATE USER INFO
-        // ============================================
         function updateUserInfo(user) {
             const name = user?.name || 'Admin';
             document.getElementById('userNameDisplay').textContent = name;
@@ -1060,7 +708,7 @@
         }
 
         // ============================================
-        // 5. GENERATE TRANSACTION CODE
+        // 4. GENERATE TRANSACTION CODE
         // ============================================
         function generateTransactionCode() {
             const prefix = 'TRX';
@@ -1074,7 +722,7 @@
         }
 
         // ============================================
-        // 6. SET DEFAULT DATE
+        // 5. SET DEFAULT DATE
         // ============================================
         function setDefaultDate() {
             const today = new Date().toISOString().split('T')[0];
@@ -1082,11 +730,9 @@
         }
 
         // ============================================
-        // 7. INIT FORM
+        // 6. INIT FORM
         // ============================================
         function initForm() {
-            const form = document.getElementById('transactionForm');
-
             // Product change - auto fill price
             document.getElementById('productId').addEventListener('change', function() {
                 const selected = this.options[this.selectedIndex];
@@ -1097,23 +743,19 @@
                 }
             });
 
-            form.addEventListener('submit', function(e) {
+            document.getElementById('transactionForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 saveTransaction();
             });
         }
 
         // ============================================
-        // 8. CALCULATIONS
+        // 7. CALCULATIONS
         // ============================================
         function initCalculations() {
-            const grossWeight = document.getElementById('grossWeight');
-            const tareWeight = document.getElementById('tareWeight');
-            const pricePerKg = document.getElementById('pricePerKg');
-
-            grossWeight.addEventListener('input', calculateTotal);
-            tareWeight.addEventListener('input', calculateTotal);
-            pricePerKg.addEventListener('input', calculateTotal);
+            document.getElementById('grossWeight').addEventListener('input', calculateTotal);
+            document.getElementById('tareWeight').addEventListener('input', calculateTotal);
+            document.getElementById('pricePerKg').addEventListener('input', calculateTotal);
         }
 
         function calculateTotal() {
@@ -1132,9 +774,10 @@
         }
 
         // ============================================
-        // 9. SAVE TRANSACTION
+        // 8. SAVE TRANSACTION - FUNGSI UTAMA
         // ============================================
         function saveTransaction() {
+            // Ambil data dari form
             const farmerId = document.getElementById('farmerId').value;
             const productId = document.getElementById('productId').value;
             const transactionDate = document.getElementById('transactionDate').value;
@@ -1143,7 +786,7 @@
             const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
             const notes = document.getElementById('notes').value.trim();
 
-            // Validate
+            // ========== VALIDASI ==========
             let isValid = true;
 
             if (!farmerId) {
@@ -1192,60 +835,71 @@
                 return;
             }
 
-            // Show loading
-            const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = `
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Menyimpan...
-            `;
-            submitBtn.disabled = true;
+            // ========== SIMPAN DATA ==========
+            const netWeight = grossWeight - tareWeight;
+            const total = netWeight * pricePerKg;
 
-            // Simulate save (demo)
-            setTimeout(function() {
-                const netWeight = grossWeight - tareWeight;
-                const total = netWeight * pricePerKg;
+            // Dapatkan nama petani dan produk
+            const farmerSelect = document.getElementById('farmerId');
+            const farmerName = farmerSelect.options[farmerSelect.selectedIndex].text;
+            
+            const productSelect = document.getElementById('productId');
+            const productName = productSelect.options[productSelect.selectedIndex].text;
 
-                const transaction = {
-                    code: document.getElementById('transactionCodeDisplay').textContent,
-                    farmerId: farmerId,
-                    productId: productId,
-                    transactionDate: transactionDate,
-                    grossWeight: grossWeight,
-                    tareWeight: tareWeight,
-                    netWeight: netWeight,
-                    pricePerKg: pricePerKg,
-                    totalAmount: total,
-                    notes: notes || '-',
-                    status: 'completed',
-                    createdAt: new Date().toISOString()
-                };
+            const transaction = {
+                id: 'T' + Date.now(),
+                code: document.getElementById('transactionCodeDisplay').textContent,
+                farmerId: farmerId,
+                farmerName: farmerName,
+                productId: productId,
+                productName: productName,
+                grossWeight: grossWeight,
+                tareWeight: tareWeight,
+                netWeight: netWeight,
+                pricePerKg: pricePerKg,
+                totalAmount: total,
+                date: transactionDate,
+                notes: notes || '-',
+                status: 'Selesai'
+            };
 
-                console.log('Transaksi disimpan:', transaction);
+            try {
+                // Ambil data existing dari localStorage
+                let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                
+                // Tambahkan transaksi baru
+                transactions.push(transaction);
+                
+                // Simpan kembali ke localStorage
+                localStorage.setItem('transactions', JSON.stringify(transactions));
 
-                // Show success
+                console.log('✅ Transaksi berhasil disimpan:', transaction);
+                console.log('📦 Total transaksi di localStorage:', transactions.length);
+
+                // ========== TAMPILKAN NOTIFIKASI ==========
                 Swal.fire({
-                    title: 'Berhasil!',
-                    text: 'Transaksi berhasil disimpan!',
                     icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Transaksi "' + transaction.code + '" berhasil disimpan!',
                     timer: 2000,
-                    showConfirmButton: false
+                    showConfirmButton: false,
+                    background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
+                    color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a'
                 });
 
-                // Reset button
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-
-                // Redirect after delay
+                // Redirect ke halaman transaksi setelah 2 detik
                 setTimeout(function() {
                     window.location.href = 'transactions.html';
                 }, 2000);
 
-            }, 1500);
+            } catch (error) {
+                console.error('❌ Gagal menyimpan data:', error);
+                showAlert('Gagal menyimpan data. Silakan coba lagi!', 'danger');
+            }
         }
 
         // ============================================
-        // 10. FORMAT CURRENCY
+        // 9. FORMAT CURRENCY
         // ============================================
         function formatCurrency(amount) {
             if (amount === undefined || amount === null || isNaN(amount) || amount === 0) {
@@ -1255,7 +909,7 @@
         }
 
         // ============================================
-        // 11. SHOW ALERT
+        // 10. SHOW ALERT
         // ============================================
         function showAlert(message, type = 'success') {
             const container = document.getElementById('alertContainer');
@@ -1268,11 +922,18 @@
                 info: 'bi-info-circle-fill'
             };
 
+            const colors = {
+                success: '#d4edda',
+                danger: '#f8d7da',
+                warning: '#fff3cd',
+                info: '#cce5ff'
+            };
+
             container.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <div class="alert alert-${type} alert-dismissible fade show" style="background: ${colors[type]}; border-radius: 12px;">
                     <i class="bi ${icons[type] || 'bi-info-circle-fill'} me-2"></i>
                     ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
 
@@ -1281,61 +942,49 @@
                 if (alert) {
                     alert.style.transition = 'opacity 0.5s ease';
                     alert.style.opacity = '0';
-                    setTimeout(() => {
-                        if (alert.parentNode) alert.remove();
-                    }, 500);
+                    setTimeout(() => { if (alert.parentNode) alert.remove(); }, 500);
                 }
             }, 5000);
         }
 
         // ============================================
-        // 12. SIDEBAR TOGGLE
+        // 11. SIDEBAR TOGGLE
         // ============================================
         function initSidebar() {
             const toggleBtn = document.getElementById('toggleSidebar');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-
             if (!toggleBtn || !sidebar) return;
-
             toggleBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 sidebar.classList.toggle('active');
-                if (overlay) {
-                    overlay.classList.toggle('active');
-                }
+                if (overlay) overlay.classList.toggle('active');
             });
-
             if (overlay) {
                 overlay.addEventListener('click', function() {
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
                 });
             }
-
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
-                    if (overlay) {
-                        overlay.classList.remove('active');
-                    }
+                    if (overlay) overlay.classList.remove('active');
                 }
             });
         }
 
         // ============================================
-        // 13. DARK MODE
+        // 12. DARK MODE
         // ============================================
         function initDarkMode() {
             const toggleBtn = document.getElementById('darkModeToggle');
             if (!toggleBtn) return;
-
             const darkMode = localStorage.getItem('darkMode') === 'true';
             if (darkMode) {
                 document.body.classList.add('dark-mode');
                 toggleBtn.innerHTML = '<i class="bi bi-sun fs-5"></i>';
             }
-
             toggleBtn.addEventListener('click', function() {
                 document.body.classList.toggle('dark-mode');
                 const isDark = document.body.classList.contains('dark-mode');
@@ -1345,14 +994,10 @@
         }
 
         // ============================================
-        // 14. LOGOUT
+        // 13. LOGOUT
         // ============================================
         function initLogout() {
-            const logoutBtns = [
-                document.getElementById('logoutBtn'),
-                document.getElementById('logoutDropdown')
-            ];
-
+            const logoutBtns = [document.getElementById('logoutBtn'), document.getElementById('logoutDropdown')];
             logoutBtns.forEach(btn => {
                 if (btn) {
                     btn.addEventListener('click', function(e) {
@@ -1365,7 +1010,9 @@
                             confirmButtonColor: '#dc3545',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: 'Ya, Logout!',
-                            cancelButtonText: 'Batal'
+                            cancelButtonText: 'Batal',
+                            background: document.body.classList.contains('dark-mode') ? '#1a2a1a' : '#ffffff',
+                            color: document.body.classList.contains('dark-mode') ? '#e8f5e9' : '#1a2a1a'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 localStorage.removeItem('user');
@@ -1381,10 +1028,10 @@
         }
 
         // ============================================
-        // 15. LOG
+        // 14. LOG
         // ============================================
-        console.log('%c✅ Halaman Transaksi Baru berhasil dimuat!', 'color: #6f42c1; font-size: 16px; font-weight: bold;');
-        console.log('%c📝 Siap menambahkan transaksi baru', 'color: #20c997;');
+        console.log('%c🌿 Form Tambah Transaksi', 'color: #2e7d32; font-size: 16px; font-weight: bold;');
+        console.log('%c✅ Siap menambahkan transaksi baru ke LocalStorage', 'color: #4caf50;');
     </script>
 
 </body>
